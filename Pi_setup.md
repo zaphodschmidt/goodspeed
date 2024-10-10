@@ -38,10 +38,12 @@ This will also install Firefox on the Raspberry Pi.
 
 To add the Raspberry Pi to your Tailscale network:
 
-1. Open a terminal and run the following command to install Tailscale:
+1. Open a terminal and run the following commands to install Tailscale:
 
 ```bash
+sudo apt install curl
 curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up
 ```
 
 2. Follow the instructions to log into your Tailscale account and connect the device. You can access your machine list via the Tailscale Admin Console.
