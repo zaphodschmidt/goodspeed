@@ -8,10 +8,9 @@ Raspberry Pi 5 - Ubuntu 24.04 Desktop 64bit
 Raspberry Pi 4 - Ubuntu 22.04 Desktop 64bit
 
 # 3. Update the OS
-\```
+
 sudo apt upgrade
 sudo apt update
-\```
 
 This will download firefox on the Pi
 
