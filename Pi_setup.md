@@ -48,6 +48,14 @@ sudo tailscale up
 
 2. Follow the instructions to log into your Tailscale account and connect the device. You can access your machine list via the Tailscale Admin Console.
 
+3. Then, enter in this command again:
+   
+```bash
+sudo apt install curl
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up
+```
+
 ### 6. Install OpenSSH
 
 To enable remote access to your Raspberry Pi, install the OpenSSH server and client:
@@ -55,6 +63,8 @@ To enable remote access to your Raspberry Pi, install the OpenSSH server and cli
 ```bash
 sudo apt install openssh-server
 sudo apt install openssh-client
+sudo systemctl enable ssh
+sudo systemctl start ssh
 ```
 
 Once installed, your Pi will be ready for SSH connections.
