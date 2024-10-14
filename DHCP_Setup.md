@@ -1,63 +1,125 @@
 # DHCP Server Setup
 
-### 1. Install isc-dhcp-server
-1. Open a terminal and run the following command:
-```bash
-sudo apt install isc-dhcp-server
-```
-### 2. Create Netplan Configuration and Backup
-1. In the terminal, run the following commands:
+### 1. Create Netplan Configuration and Backup
+In the terminal, run the following commands:
 ```bash
 sudo touch /etc/netplan/00-installer-config.yaml
 sudo cp /etc/netplan/00-installer-config.yaml /etc/netplan/00-installer-config.yaml.bak
 ```
+### 2. Find Router's IP
+1. In the terminal, run the command:
+```bash
+arp -a
+```
+2. In the resulting list, find an entry that starts with "_gateway" and has an ip address of the form x.x.x.1:
+```bash
+_gateway (10.110.70.1) at d4:01:c3:54:58:6b [ether] on eth0 
+```
+3. Record the ip address and its subnet. In this case, the ip adress of the router is 10.110.70.1 and the subnet is 10.110.70.x.
 
-* Install Ubuntu on to SD card using Raspberry Pi imager
-    * https://www.raspberrypi.com/software/
-* Disable ivp6
-    * Ubuntu settings -> network -> disable ipv4
-* Enable SSH
-    * sudo apt update 
-    * sudo apt install openssh-server
-    * sudo systemctl enable ssh
-    * sudo systemctl start ssh
-* sudo apt install isc-dhcp-server
-* sudo touch /etc/netplan/00-installer-config.yaml
-*  sudo cp /etc/netplan/00-installer-config.yaml /etc/netplan/00-installer-config.yaml.bak
-*   sudo nano /etc/netplan/00-installer-config.yaml
-    * network:
-    *   version: 2
-    *   renderer: networkd
-    *   ethernets:
-    *     eth0:
-    *       addresses:
-    *         - 10.10.110.1/24
-    *       dhcp4: no
-    *       routes:
-    *         - to: default
-    *           via: 10.0.0.1                                                                                                                                
-    *       nameservers:                                                                                                                                          
-    *         addresses:                                                                                                                                         
-    *           - 8.8.8.8
-    *           - 8.8.4.4
-    *     wlan0:                                                                                                                                                  
-    *       dhcp4: yes  
-*  Sudo netplan try, see if ssh works, Tailscale works, no issues
-* Sudo netplan apply
-* sudo nano /etc/dhcp/dhcpd.conf
-    * subnet 10.10.110.0 netmask 255.255.255.0 { 
-    * interface eth0; 
-    * range 10.10.110.2 
-    * 10.10.110.50; 
-    * option subnet-mask 255.255.255.0; 
-    * option broadcast-address 10.10.110.255; 
-    * }
-* sudo nano /etc/default/isc-dhcp-server
-    * Edit line INTERFACESv4="" to INTERFACESv4="eth0"
-* sudo systemctl restart isc-dhcp-server
-* sudo systemctl enable isc-dhcp-server
-* sudo systemctl status isc-dhcp-server
-* sudo apt install nmap
+### 3. Configure Netplan
+1. In the terminal, run:
+```bash
+sudo nano /etc/netplan/00-installer-config.yaml
+```
+2. Using the nano text editor, paste in the following:
+```yaml
+network:
+  version: 2
+  renderer: NetworkManager
+  ethernets:
+    eth0:
+      dhcp4: false
+      addresses:
+#The following line must use the subnet of the router with the fourth number as 2.
+        - 10.110.70.2/24
+      routes:
+        - to: 0.0.0.0/0
+#The following line must be the IP of the router.
+          via: 10.110.70.1
+      nameservers: 
+         addresses:
+          - 8.8.8.8
+          - 8.8.4.4
+```
+3. Then, edit the lines with comments above them to use the proper subnets.
+4. Save this configuration and exit nano by doing CTRL+X, then pressing the y key, and pressing ENTER.
+### 4. Apply Netplan configurations
+1. Run the following terminal command:
+```bash
+sudo netplan try
+```
+2. If the resulting output looks like this:
+```bash
+Do you want to keep these settings?
+
+
+Press ENTER before the timeout to accept the new configuration
+
+
+Changes will revert in 100 seconds
+```
+Then the configuration is valid and working. Press enter.
+If the output indicates there are errors with the netplan, there is no output at all, or connection to the pi is lost, revisit step 3 and ensure all information is correctly entered with proper indentation.
+### 5. Install and configure isc-dhcp-server
+1. In the terminal, run:
+```bash
+sudo apt install isc-dhcp-server
+```
+2. Once installed, run:
+```bash
+sudo nano /etc/dhcp/dhcpd.conf
+```
+3. Using the nano text editor, add these lines to the bottom of the file, but with the subnet of your router. For this example, the subnet 10.110.70.x was used.
+```conf
+subnet 10.110.70.0 netmask 255.255.255.0 {
+  interface eth0;
+  range 10.110.70.3 10.110.70.50;
+  option routers 10.110.70.1;
+  option subnet-mask 255.255.255.0;
+  option broadcast-address 10.110.70.255; 
+}
+
+host cam_01 {
+  option host-name "cam_01";
+  hardware ethernet f0:00:00:b8:39:35;
+  fixed-address 10.110.70.4;
+}
+```
+4. Save this configuration and exit nano by doing CTRL+X, then pressing the y key, and pressing ENTER.
+
+### 5. Configure default interface 
+1. Run the command:
+```bash
+sudo nano /etc/default/isc-dhcp-server
+```
+2. Using nano, change the line
+```
+INTERFACESv4=""
+```
+to
+```
+INTERFACESv4="eth0"
+```
+### 6. Enable and Start isc-dhcp-server
+Run the following commands in the terminal:
+```
+sudo systemctl enable isc-dhcp-server
+sudo systemctl start isc-dhcp-server
+sudo systemctl status isc-dhcp-server
+```
+
+### 6. Find MAC address of camera
+1. Make sure camera is plugged into the same ethernet switch the camera is plugged into, and ensure there is a green light on the camera's cord indicating it is powered on and transmitting.
+2. Run the following command:
+```
+sudo apt install nmap
+```
+3. Run the following command with the ip of your router:
+```
+sudo nmap -sP 10.110.70.1/24
+```
+4. 
 * sudo nmap -sP 192.168.0.1/24 (address of router)
 * Curl ip of suspected camera
     * keep track of MAC address
