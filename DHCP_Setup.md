@@ -1,16 +1,16 @@
 # DHCP Server Setup
 
-sudo route del default gw 10.0.0.1 wlan0
-sudo ip route del default via 10.10.110.1 dev eth0
-E10ADC3949BA59ABBE56E057F20F883E sudo ip -s -s neigh flush all
-cat /var/lib/dhcp/dhcpd.leases
-ffmpeg -i "rtsp://10.0.0.117:554/h264?username=admin&password=123456" -frames:v 1 /home/goodspeed4/camera_pictures/camera_snapshot_$(date +%Y%m%d%H%M%S).jpg ssh -L 8080:10.10.110.10:80 goodspeed4@100.107.148.66 Camera settings:q change username and password
-Camera->video->set video compression to H264, set framerate to 5fps, set quality to best
-Network->TCP/IP->Mode->Static  _gateway (10.0.0.1) at 3c:b7:4b:83:65:cc [ether] on wlan0
-
-F0:00:00:B8:39:35
- Two terminals
-Outside of range doesn’t matter
+### 1. Install isc-dhcp-server
+1. Open a terminal and run the following command:
+```bash
+sudo apt install isc-dhcp-server
+```
+### 2. Create Netplan Configuration and Backup
+1. In the terminal, run the following commands:
+```bash
+sudo touch /etc/netplan/00-installer-config.yaml
+sudo cp /etc/netplan/00-installer-config.yaml /etc/netplan/00-installer-config.yaml.bak
+```
 
 * Install Ubuntu on to SD card using Raspberry Pi imager
     * https://www.raspberrypi.com/software/
