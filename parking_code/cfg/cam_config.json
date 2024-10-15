@@ -1,0 +1,759 @@
+{
+    "cam1": {
+        "number": 1,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam1.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts1.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam1.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts1.js",
+        "spots": [
+            {
+                "number": 1,
+                "vertices": [
+			 [  1920,  960],
+                         [  1470,  190],
+                         [  1675,  190],
+                         [  1920,  540]
+                            ],
+                "base_nEdges": 1300,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 2,
+                "vertices": [
+                         [   790,  1080],
+                         [   705,   120],
+                         [  1220,   150],
+                         [  1630,  1080]
+                            ],
+                "base_nEdges": 17000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 3,
+                "vertices": [
+                         [    0,   375],
+                         [  150,   100],
+                         [  590,   100],
+                         [  630,  1080],
+                         [    0,  1080]
+                            ],
+                "base_nEdges": 7700,
+                "monthly": 0,
+                "handicap": 0
+            }
+        ]
+    },
+
+    "cam2": {
+        "number": 2,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam2.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts2.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam2.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts2.js",
+        "spots": [
+            {
+                "number": 4,
+                "vertices": [
+                                [ 234.983871, 222.467742],
+                                [ 223.370968, 1.177419],
+                                [ 318.209677, 2.467742],
+                                [ 397.564516, 221.177419]
+                            ],
+                "base_nEdges": 600,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 5,
+                "vertices": [
+                                [ 2.080645, 222.467742],
+                                [ 2.080645, 186.983871],
+                                [ 73.048387, 1.177419],
+                                [ 189.177419, 2.467742],
+                                [ 190.467742, 221.822581]
+                            ],
+                "base_nEdges": 1000,
+                "monthly": 0,
+                "handicap": 0
+            }
+        ]
+    },
+
+    "cam3": {
+        "number": 3,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam3.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts3.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam3.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts3.js",
+        "spots": [
+            {
+                "number": 6,
+                "vertices": [
+                                [ 1365.177419, 56.403226],
+                                [ 1619.112903, 50.209677],
+                                [ 1919.500000, 564.274194],
+                                [ 1916.403226, 1069.048387],
+                                [ 1662.467742, 1065.951613]
+                            ],
+                "base_nEdges": 5000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 7,
+                "vertices": [
+                                [ 844.919355, 9.951613],
+                                [ 1188.661290, 3.758065],
+                                [ 1405.435484, 1069.048387],
+                                [ 699.370968, 1062.854839]
+                            ],
+                "base_nEdges": 7000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 8,
+                "vertices": [
+                                [ 380.403226, 136.919355],
+                                [ 683.887097, 133.822581],
+                                [ 516.661290, 1041.177419],
+                                [ 439.241935, 1072.145161],
+                                [ 2.596774, 1072.145161],
+                                [ 2.596774, 957.564516]
+                            ],
+                "base_nEdges": 5000,
+                "monthly": 0,
+                "handicap": 0
+            }
+        ]
+    },
+
+    "cam4": {
+        "number": 4,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam4.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts4.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam4.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts4.js",
+        "spots": [
+            {
+                "number": 9,
+                "vertices": [
+                                [ 1526.209677, 112.145161],
+                                [ 1600.532258, 158.596774],
+                                [ 1789.435484, 1072.145161],
+                                [ 1721.306452, 1062.854839]
+                            ],
+                "base_nEdges": 200,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 10,
+                "vertices": [
+                                [ 1145.306452, 19.241935],
+                                [ 1328.016129, 16.145161],
+                                [ 1451.887097, 1047.370968],
+                                [ 1129.822581, 1053.564516]
+                            ],
+                "base_nEdges": 13000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 11,
+                "vertices": [
+                                [ 411.370968, 3.758065],
+                                [ 897.564516, 6.854839],
+                                [ 804.661290, 1075.241935],
+                                [ 83.112903, 1072.145161]
+                            ],
+                "base_nEdges": 17000,
+                "monthly": 1,
+                "handicap": 0
+            }
+        ]
+    },
+
+    "cam5": {
+        "number": 5,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam5.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts5.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam5.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts5.js",
+        "spots": [
+            {
+                "number": 12,
+                "vertices": [
+                             [ 330,   0],
+                             [ 400,   0],
+                             [ 400, 224],
+                             [ 370, 224]
+                            ],
+                "base_nEdges": 60,
+                "monthly": 1,
+                "handicap": 0
+            },
+            {
+                "number": 13,
+                "vertices": [
+                             [ 130,  25],
+                             [ 290,  25],
+                             [ 330, 224],
+                             [  90, 224]
+                            ],
+                "base_nEdges": 380,
+                "monthly": 1,
+                "handicap": 0
+            },
+            {
+                "number": 14,
+                "vertices": [
+                             [   0,  50],
+                             [ 100,  50],
+                             [  50, 224],
+                             [   0, 224]
+                            ],
+                "base_nEdges": 100,
+                "monthly": 1,
+                "handicap": 0
+            }
+        ]
+    },
+
+    "cam6": {
+        "number": 6,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam6.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts6.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam6.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts6.js",
+        "spots": [
+            {
+                "number": 15,
+                "vertices": [
+                                [ 1396.145161, 316.532258],
+                                [ 1609.822581, 332.016129],
+                                [ 1913.306452, 666.467742],
+                                [ 1907.112903, 1065.951613],
+                                [ 1684.145161, 1062.854839]
+                            ],
+                "base_nEdges": 3000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 16,
+                "vertices": [
+                                [ 906.854839, 263.887097],
+                                [ 1204.145161, 279.370968],
+                                [ 1445.693548, 1072.145161],
+                                [ 640.532258, 1065.951613]
+                            ],
+                "base_nEdges": 7000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 17,
+                "vertices": [
+                                [ 541.435484, 279.370968],
+                                [ 717.951613, 297.951613],
+                                [ 386.596774, 1053.564516],
+                                [ 2.596774, 1062.854839],
+                                [ 11.887097, 904.919355]
+                            ],
+                "base_nEdges": 4000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 22,
+                "vertices": [
+                                [ 727.241935, 19.241935],
+                                [ 1253.693548, 28.532258],
+                                [ 1262.983871, 158.596774],
+                                [ 727.241935, 164.790323]
+                            ],
+                "base_nEdges": 2000,
+                "monthly": 0,
+                "handicap": 0
+            }
+        ]
+    },
+
+    "cam7": {
+        "number": 7,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam7.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts7.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam7.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts7.js",
+        "spots": [
+            {
+                "number": 18,
+                "vertices": [
+                                [ 114.080645, 50.209677],
+                                [ 882.080645, 37.822581],
+                                [ 875.887097, 799.629032],
+                                [ 488.790323, 753.177419]
+                            ],
+                "base_nEdges": 10000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 19,
+                "vertices": [
+                                [ 1101.951613, 93.564516],
+                                [ 1783.241935, 90.467742],
+                                [ 1368.274194, 743.887097],
+                                [ 1030.725806, 725.306452]
+                            ],
+                "base_nEdges": 7000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 23,
+                "vertices": [
+                                [ 767.500000, 886.338710],
+                                [ 1318.725806, 889.435484],
+                                [ 1269.177419, 1007.112903],
+                                [ 795.370968, 1022.596774]
+                            ],
+                "base_nEdges": 2500,
+                "monthly": 0,
+                "handicap": 0
+            }
+        ]
+    },
+
+    "cam8": {
+        "number": 8,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam8.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts8.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam8.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts8.js",
+        "spots": [
+            {
+                "number": 20,
+                "vertices": [
+                                [ 0.790323, 20.532258],
+                                [ 154.338710, 19.241935],
+                                [ 123.370968, 148.274194],
+                                [ 80.145161, 222.467742],
+                                [ 2.080645, 212.790323]
+                            ],
+                "base_nEdges": 910,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 21,
+                "vertices": [
+                                [ 299.500000, 0.532258],
+                                [ 398.209677, 1.177419],
+                                [ 398.209677, 160.532258],
+                                [ 322.080645, 221.177419],
+                                [ 176.274194, 222.467742]
+                            ],
+                "base_nEdges": 1000,
+                "monthly": 0,
+                "handicap": 0
+            }
+        ]
+    },
+
+    "cam9": {
+        "number": 9,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam9.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts9.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam9.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts9.js",
+        "spots": [
+            {
+                "number": 24,
+                "vertices": [
+                             [  80,  40],
+                             [ 155,  30],
+                             [  95, 170],
+                             [  35, 165],
+                             [  15, 120]
+                            ],
+                "base_nEdges": 200,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 25,
+                "vertices": [
+                             [ 172,  30],
+                             [ 260,  30],
+                             [ 290, 100],
+                             [ 145, 100]
+                            ],
+                "base_nEdges": 425,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 26,
+                "vertices": [
+                             [ 300,  20],
+                             [ 340,  20],
+                             [ 400,  75],
+                             [ 400, 160],
+                             [ 370, 165]
+                            ],
+                "base_nEdges": 200,
+                "monthly": 0,
+                "handicap": 0
+            }
+        ]
+    },
+
+    "cam10": {
+        "number": 10,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam10.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts10.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam10.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts10.js",
+        "spots": [
+            {
+                "number": 27,
+                "vertices": [
+                             [ 489,  474],
+                             [ 835,  446],
+                             [ 711,  867],
+                             [ 272,  839]
+                            ],
+                "base_nEdges": 2000,
+                "monthly": 0,
+                "handicap": 1
+            },
+            {
+                "number": 28,
+                "vertices": [
+                                [ 1656.274194, 1041.177419],
+                                [ 1377.564516, 428.016129],
+                                [ 1693.435484, 403.241935],
+                                [ 1907.112903, 632.403226],
+                                [ 1907.112903, 963.758065]
+                            ],
+                "base_nEdges": 1500,
+                "monthly": 0,
+                "handicap": 1
+            }
+        ]
+    },
+
+    "cam11": {
+        "number": 11,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam11.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts11.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam11.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts11.js",
+        "spots": [
+            {
+                "number": 36,
+                "vertices": [
+                                [ 327.758065, 350.596774],
+                                [ 544.532258, 350.596774],
+                                [ 371.112903, 1069.048387],
+                                [ 5.693548, 1069.048387],
+                                [ 2.596774, 889.435484]
+                            ],
+                "base_nEdges": 2500,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 37,
+                "vertices": [
+                                [ 810.854839, 316.532258],
+                                [ 1157.693548, 325.822581],
+                                [ 1393.048387, 1069.048387],
+                                [ 668.403226, 1062.854839]
+                            ],
+                "base_nEdges": 4000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 38,
+                "vertices": [
+                                [ 1405.435484, 387.758065],
+                                [ 1554.080645, 387.758065],
+                                [ 1916.403226, 852.274194],
+                                [ 1907.112903, 1069.048387],
+                                [ 1674.854839, 1053.564516]
+                            ],
+                "base_nEdges": 3000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 43,
+                "vertices": [
+                                [ 838.725806, 65.693548],
+                                [ 1005.951613, 68.790323],
+                                [ 1061.693548, 226.725806],
+                                [ 798.467742, 236.016129]
+                            ],
+                "base_nEdges": 2000,
+                "monthly": 0,
+                "handicap": 0
+            }
+        ]
+    },
+
+    "cam12": {
+        "number": 12,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam12.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts12.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam12.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts12.js",
+        "spots": [
+            {
+                "number": 33,
+                "vertices": [
+                                [ 0,          982.338710],
+                                [ 318.467742, 505.435484],
+                                [ 665.306452, 483.758065],
+                                [ 494.983871, 1080],
+                                [ 0,          1080]
+                            ],
+                "base_nEdges": 8000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 34,
+                "vertices": [
+                                [ 696.274194, 1080],
+                                [ 813.951613, 483.758065],
+                                [ 1219.629032, 483.758065],
+                                [ 1346.596774, 1080]
+                            ],
+                "base_nEdges": 4000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 35,
+                "vertices": [
+                                [ 1547.887097, 1080],
+                                [ 1362.080645, 480.661290],
+                                [ 1687.241935, 480.661290],
+                                [ 1916.403226, 824.403226],
+                                [ 1920,         1080]
+                            ],
+                "base_nEdges": 2000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 44,
+                "vertices": [
+                                [ 1541.693548, 121.435484],
+                                [ 1746.080645, 276.274194],
+                                [ 1653.177419, 301.048387],
+                                [ 1619.112903, 211.241935]
+                            ],
+                "base_nEdges": 40,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 45,
+                "vertices": [
+                                [ 1163.887097, 84.274194],
+                                [ 1300.145161, 90.467742],
+                                [ 1349.693548, 140.016129],
+                                [ 1188.661290, 143.112903]
+                            ],
+                "base_nEdges": 200,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 46,
+                "vertices": [
+                                [ 900.661290, 84.274194],
+                                [ 1089.564516, 84.274194],
+                                [ 1086.467742, 130.725806],
+                                [ 900.661290, 140.016129]
+                            ],
+                "base_nEdges": 580,
+                "monthly": 0,
+                "handicap": 0
+            }
+        ]
+    },
+
+    "cam13": {
+        "number": 13,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam13_old.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts13.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam13.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts13.js",
+        "spots": [
+            {
+                "number": 29,
+                "vertices": [
+                                [ 13.048387, 45.693548],
+                                [ 60.790323, 52.790323],
+                                [ 84.661290, 126.983871],
+                                [ 62.080645, 221.822581],
+                                [  0.000000, 221.822581],
+                                [  0.000000, 66.338710]
+                            ],
+                "base_nEdges": 50,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 30,
+                "vertices": [
+                                [ 167.887097, 48.274194],
+                                [ 295.629032, 50.854839],
+                                [ 325.306452, 221.822581],
+                                [ 138.209677, 222.467742]
+                            ],
+                "base_nEdges": 100,
+                "monthly": 0,
+                "handicap": 0
+            }
+        ]
+    },
+
+    "cam14": {
+        "number": 14,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam14.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts14.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam14.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts14.js",
+        "spots": [
+            {
+                "number": 31,
+                "vertices": [
+                                [ 337.048387, 527.112903],
+                                [ 693.177419, 524.016129],
+                                [ 445.435484, 1069.048387],
+                                [ 2.596774, 1072.145161],
+                                [ 8.790323, 966.854839]
+                            ],
+                "base_nEdges": 4000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 32,
+                "vertices": [
+                                [ 801.564516, 524.016129],
+                                [ 1256.790323, 539.500000],
+                                [ 1343.500000, 1069.048387],
+                                [ 625.048387, 1069.048387]
+                            ],
+                "base_nEdges": 8000,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 47,
+                "vertices": [
+                         [ 1173,  161],
+                         [ 1349,  155],
+                         [ 1454,  260],
+                         [ 1213,  260]
+                            ],
+                "base_nEdges": 500,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 48,
+                "vertices": [
+                         [  940,  155],
+                         [ 1123,  152],
+                         [ 1151,  239],
+                         [  891,  248]
+                            ],
+                "base_nEdges": 1400,
+                "monthly": 0,
+                "handicap": 0
+            },
+            {
+                "number": 49,
+                "vertices": [
+                         [  714,  143],
+                         [  885,  143],
+                         [  817,  242],
+                         [  590,  254]
+                            ],
+                "base_nEdges": 1500,
+                "monthly": 0,
+                "handicap": 0
+            }
+        ]
+    },
+
+    "cam15": {
+        "number": 15,
+        "local_im_full_path": "/home/c/work/ggp/imgs/ap2/cam15.jpg",
+        "local_ts_full_path": "/home/c/work/ggp/imgs/ap2/ts15.js",
+        "im_full_path": "/mnt/data/catch/images_and_timestamps/cam15.jpg",
+        "ts_full_path": "/mnt/data/catch/images_and_timestamps/ts15.js",
+        "spots": [
+            {
+                "number": 39,
+                "vertices": [
+                             [ 150, 130],
+                             [ 280, 140],
+                             [ 290, 224],
+                             [ 105, 224]
+                            ],
+                "base_nEdges": 100,
+                "monthly": 1,
+                "handicap": 0
+            },
+            {
+                "number": 40,
+                "vertices": [
+                             [ 270,   0],
+                             [ 305,  10],
+                             [ 330,  35],
+                             [ 275,  25]
+                            ],
+                "base_nEdges": 84,
+                "monthly": 1,
+                "handicap": 0
+            },
+            {
+                "number": 41,
+                "vertices": [
+                             [ 205,   0],
+                             [ 250,   0],
+                             [ 255,  25],
+                             [ 190,  20]
+                            ],
+                "base_nEdges": 140,
+                "monthly": 1,
+                "handicap": 0
+            },
+            {
+                "number": 42,
+                "vertices": [
+                             [ 162,   0],
+                             [ 190,   0],
+                             [ 180,  20],
+                             [ 160,  20]
+                            ],
+                "base_nEdges": 30,
+                "monthly": 1,
+                "handicap": 0
+            }
+        ]
+    }
+
+}
