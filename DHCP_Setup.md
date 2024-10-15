@@ -1,4 +1,4 @@
-# DHCP Server Setup
+# DHCP Server and Camera Setup
 
 ### 1. Create Netplan Configuration and Backup
 In the terminal, run the following commands:
