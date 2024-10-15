@@ -79,12 +79,6 @@ subnet 10.110.70.0 netmask 255.255.255.0 {
   option subnet-mask 255.255.255.0;
   option broadcast-address 10.110.70.255; 
 }
-
-host cam_01 {
-  option host-name "cam_01";
-  hardware ethernet f0:00:00:b8:39:35;
-  fixed-address 10.110.70.4;
-}
 ```
 4. Save this configuration and exit nano by doing CTRL+X, then pressing the y key, and pressing ENTER.
 
@@ -101,6 +95,7 @@ to
 ```
 INTERFACESv4="eth0"
 ```
+3. Save this configuration and exit nano by doing CTRL+X, then pressing the y key, and pressing ENTER.
 ### 6. Enable and Start isc-dhcp-server
 Run the following commands in the terminal:
 ```
@@ -119,22 +114,101 @@ sudo apt install nmap
 ```
 sudo nmap -sP 10.110.70.1/24
 ```
-4. 
-* sudo nmap -sP 192.168.0.1/24 (address of router)
-* Curl ip of suspected camera
-    * keep track of MAC address
-* sudo nano /etc/dhcp/dhcpd.conf
-    * host cam_01 {
-    *     option host-name "Camera01";
-    *     hardware ethernet 00:fc:01:fd:a6:61; #MAC ADDRESS OF WHAT YOU JUST FOUND
-    *     fixed-address 10.10.110.101;
-    * }
-* In another terminal:
-    * ssh -L 8080:10.10.110.10:80 goodspeed4@100.107.148.66
-* Then, in a browser, go to http://localhost:8080
-    * Then, login with admin and 123456, then go to system ->factory reset
-* Clear leases
-* Reset dhcp 
-* Sudo reboot
-* Set camera to have lowest frame rate and h264 instead of h265, and best quality, and set time and date
-* sudo apt install ffmpeg
+4. The output will be a list of devices connected to the network, with their ip addresses and MAC addresses. The camera's entry will likely say "unknown" next to it and have a MAC adress starting with f0:00.
+```
+Nmap scan report for 10.110.70.3
+Host is up (0.00022s latency).
+MAC Address: F0:00:00:B8:39:35 (Unknown)
+```
+5. Curl can be used too determine if an ip is the address of the camera. First, install curl:
+```
+sudo apt install curl
+```
+6. Then, do the following command with the suspected ip:
+```
+sudo curl 
+```
+7. If the result of this command is a bunch of HTML code for an IP Camera login, record the ip and associated MAC adress you used. If not, try using curl for the other ip's from step 4 in this section.
+
+### 7. Set Static IP for Camera
+1. Run the following command:
+```
+sudo nano /etc/dhcp/dhcpd.conf
+```
+2. Then, add an entry for the camera, using the MAC address found in the last step. Set the static IP with the subnet of the router and the fourth number within the range 3 to 256.
+host cam_01 {
+  option host-name "cam_01";
+  #MAC address you found from nmap:
+  hardware ethernet f0:00:00:b8:39:35;
+  #Static IP you want to set for the camera. Make sure it is in the same subnet as the router.
+  fixed-address 10.110.70.4;
+}
+3. Save this configuration and exit nano by doing CTRL+X, then pressing the y key, and pressing ENTER.
+
+### 8. Clear DHCP Leases and Restart DHCP Server
+1. Run the following terminal commands:
+```bash
+sudo rm /var/lib/dhcp/dhcpd.leases
+sudo systemctl restart isc-dhcp-server
+sudo reboot
+```
+### 9. Remotely Factory Reset Camera
+1. Open another terminal window on your local machine (not SSH'd into the pi) and run the following command with the IP of your camera, the name of your raspberry pi, and the tailscale IP of the raspberry pi:
+```
+ssh -L 8080:CameraIPAdress:80 PiName@TailscaleIPAddress
+```
+For example:
+```
+ssh -L 8080:10.110.70.3:80 goodspeed4@100.107.148.66
+```
+2. Then, open an internet browser, and go to http://localhost:8080
+3. A login page should show up. Login with the username as "admin" and the password as "123456".
+4. At the top, click on the "Configuration" tab. Then, on the side, click the System tab, then go to the Factory Reset tab. Click "Restore to Factory."
+
+### 10. Verify Camera DHCP Connection
+1. Verify the DHCP server's status by running
+```
+sudo systemctl status isc-dhcp-server
+```
+2. Verify that the camera is connected to the DHCP server, by checking that it now has the static ip you specified in step 7. Use nmap:
+```
+sudo nmap -sP 10.110.70.1/24
+```
+3. Verify that the camera received a DHCP lease:
+```
+sudo cat /var/lib/dhcp/dhcpd.leases
+```
+
+### 11. Configure Camera settings
+1. Open another terminal window on your local machine (not SSH'd into the pi) and run the following command with the IP of your camera, the name of your raspberry pi, and the tailscale IP of the raspberry pi:
+```
+ssh -L 8080:CameraIPAdress:80 PiName@TailscaleIPAddress
+```
+For example:
+```
+ssh -L 8080:10.110.70.3:80 goodspeed4@100.107.148.66
+```
+2. Then, open an internet browser, and go to http://localhost:8080
+3. A login page should show up. Login with the username as "admin" and the password as "123456".
+4. Go to the Configuration tab. Then, under the Camera section, go to Video tab. Make sure video compression is set to h264.
+
+### 12. Take a Picture
+1. In the raspberry pi's terminal, run:
+```
+sudo apt install ffmpeg
+```
+2. Then, run the following command, with the ip adress of your camera and the name of your raspberry pi:
+```
+ffmpeg -i "rtsp://CameraIPAdress/h264?username=admin&password=123456" -frames:v 1 /home/RaspberryPiName/camera_snapshot_$(date +%Y%m%d%H%M%S).jpg
+```
+For example:
+```
+ffmpeg -i "rtsp://10.110.70.3/h264?username=admin&password=123456" -frames:v 1 /home/goodspeed3/camera_snapshot_$(date +%Y%m%d%H%M%S).jpg
+```
+3. If there are any error messages, diagnose and fix.
+4. Open another terminal window on your machine (not SSH'd into the Pi) and run the following command with the name of your pi, its Tailscale IP, and the directory on your machine where you want the picture to be transferred to. In the following example, my pi is goodspeed3@100.110.70.3, and I am transferring the photo to my desktop.
+```
+scp goodspeed3@100.110.70.3:/home/goodspeed3/camera_snapshot_20241014180343.jpg ~/Desktop/
+```
+5. Open the picture, and make sure it is not gray. If it is a gray box, then lower the framerate of the camera's video in step 11.
+🥳
