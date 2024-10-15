@@ -1,4 +1,5 @@
 #!/bin/bash
+#put this file in /home/user/remote_cam_upload
 
 DATETIME=`date +%Y%m%d%H%M%S`
 

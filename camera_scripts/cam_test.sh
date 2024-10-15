@@ -1,4 +1,5 @@
 #!/bin/bash
+#put this file in /home/user/remote_cam_upload
 
 # Set the IP address of the camera
 camera_ip="10.10.110.10"
