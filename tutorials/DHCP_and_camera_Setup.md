@@ -211,8 +211,18 @@ ffmpeg -i "rtsp://10.110.70.3/h264?username=admin&password=123456" -frames:v 1 /
 scp goodspeed3@100.110.70.3:/home/goodspeed3/camera_snapshot_20241014180343.jpg ~/Desktop/
 ```
 5. Open the picture, and make sure it is not gray. If it is a gray box, then lower the framerate of the camera's video in step 11.
-🥳
 
 ### 13. Misc
-```ssh -L 8080:10.10.110.103:443``` goodspeed4@100.107.148.66 for Reolink cameras
 ```sudo ip -s -s neigh flush all``` to reset arp cache
+
+### 14. Reolink
+Reolink cameras have different security protocols for accessing them. 
+To curl a Reolink camera's IP:
+```
+curl -Lk 10.110.70.5
+```
+To port forward a Reolink camera's IP to view its webpage:
+```
+ssh -L 8443:10.110.70.5:443 goodspeed3@100.70.182.33
+```
+
