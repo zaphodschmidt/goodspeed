@@ -225,4 +225,4 @@ To port forward a Reolink camera's IP to view its webpage:
 ```
 ssh -L 8443:10.110.70.5:443 goodspeed3@100.70.182.33
 ```
-The browser will give a security warning before showing the page
+Then, go to https://localhost:8443/. The browser will give a security warning; click "Advanced" and then proceed to site.
