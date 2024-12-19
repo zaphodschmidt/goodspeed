@@ -6,7 +6,9 @@
 *.pot
 *.pyc
 __pycache__/
-backend/__pycache__
+__pycache__
+/pycache/*
+/backend/config/__pycache__/*
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -311,5 +313,9 @@ poetry.toml
 
 # LSP config files
 pyrightconfig.json
+
+# env
+.env.prod 
+.env.dev 
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,python,django,linux
