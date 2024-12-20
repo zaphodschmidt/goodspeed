@@ -81,6 +81,7 @@ subnet 10.110.70.0 netmask 255.255.255.0 {
 }
 ```
 4. Save this configuration and exit nano by doing CTRL+X, then pressing the y key, and pressing ENTER.
+5. Check that your syntax for the dhcpd.conf file is correct by using ```sudo dhcpd -t -cf /etc/dhcp/dhcpd.conf```
 
 ### 5. Configure default interface 
 1. Run the command:
@@ -96,6 +97,7 @@ to
 INTERFACESv4="eth0"
 ```
 3. Save this configuration and exit nano by doing CTRL+X, then pressing the y key, and pressing ENTER.
+4. 
 ### 6. Enable and Start isc-dhcp-server
 Run the following commands in the terminal:
 ```
@@ -136,6 +138,8 @@ sudo curl
 sudo nano /etc/dhcp/dhcpd.conf
 ```
 2. Then, add an entry for the camera, using the MAC address found in the last step. Set the static IP with the subnet of the router and the fourth number within the range 3 to 256.
+
+```
 host cam_01 {
   option host-name "cam_01";
   #MAC address you found from nmap:
@@ -143,7 +147,9 @@ host cam_01 {
   #Static IP you want to set for the camera. Make sure it is in the same subnet as the router.
   fixed-address 10.110.70.4;
 }
-3. Save this configuration and exit nano by doing CTRL+X, then pressing the y key, and pressing ENTER.
+```
+
+4. Save this configuration and exit nano by doing CTRL+X, then pressing the y key, and pressing ENTER.
 
 ### 8. Clear DHCP Leases and Restart DHCP Server
 1. Run the following terminal commands:
