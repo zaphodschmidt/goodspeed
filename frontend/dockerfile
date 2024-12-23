@@ -1,25 +1,32 @@
-# Use Node.js for building the React app
-FROM node:18 as builder
+# Use Node.js image
+FROM node:20-alpine
 
-# Set working directory
+# Set the working directory
 WORKDIR /app
 
-# Copy package.json and install dependencies
+# Copy package.json and package-lock.json
 COPY package.json package-lock.json ./
+
+# Install dependencies
 RUN npm install
 
-# Copy source files
+# Copy the rest of the frontend code
 COPY . .
 
-# Build the app
-RUN npm run build
+# Expose the Vite development server's default port
+EXPOSE 5173
+
+# Start the development server
+CMD ["npm", "run", "dev"]
+
 
 # Serve the app using a lightweight web server
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
+# RUN npm run build #????????
+# FROM nginx:alpine
+# COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Expose the port
-EXPOSE 80
+# # Expose the port
+# EXPOSE 80
 
-# Start the server
-CMD ["nginx", "-g", "daemon off;"]
+# # Start the server
+# CMD ["nginx", "-g", "daemon off;"]

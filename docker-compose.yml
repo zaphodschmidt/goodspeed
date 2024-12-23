@@ -11,16 +11,19 @@ services:
     environment:
       DJANGO_SETTINGS_MODULE: config.settings
     env_file:
-      - ${ENV_FILE:-.env.dev}
+      - ${ENV_FILE:-.env}
 
   frontend:
     build: ./frontend
     container_name: frontend
     ports:
       - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     env_file:
-      - ${ENV_FILE:-.env.dev}
+      - ${ENV_FILE:-.env}
     environment:
-      - VITE_BACKEND_API_URL=${BACKEND_URL}
+      - VITE_BACKEND_URL=${BACKEND_URL}
     depends_on:
       - backend
