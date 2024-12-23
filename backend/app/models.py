@@ -30,7 +30,7 @@ class ParkingSpot(models.Model):
         return f"Spot {self.spot_num} (Camera {self.camera.cam_num})"
 
 class Vertex(models.Model):
-    spot = models.ForeignKey(ParkingSpot, on_delete=models.CASCADE, related_name='vertex')
+    spot = models.ForeignKey(ParkingSpot, on_delete=models.CASCADE, related_name='vertices')
     x = models.IntegerField()
     y = models.IntegerField()
 
