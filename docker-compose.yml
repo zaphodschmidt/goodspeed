@@ -12,3 +12,15 @@ services:
       DJANGO_SETTINGS_MODULE: config.settings
     env_file:
       - ${ENV_FILE:-.env.dev}
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    env_file:
+      - ${ENV_FILE:-.env.dev}
+    environment:
+      - VITE_BACKEND_API_URL=${BACKEND_URL}
+    depends_on:
+      - backend
