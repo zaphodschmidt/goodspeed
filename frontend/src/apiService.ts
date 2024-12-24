@@ -19,7 +19,6 @@ export async function getBuildings() {
     if (response.status !== 200) {
         throw new Error('Could not get building data.');
     }
-    console.log(response.data);
     return response.data;
 }
 

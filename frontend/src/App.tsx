@@ -1,36 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { MantineProvider } from '@mantine/core';
 import './App.css'
-import { getBuildings } from './apiService'
+import '@mantine/core/styles.css'; // Import Mantine core styles
+import { Building } from './types';
+import { getBuildings } from './apiService';
+import BuildingsPage from './components/BuildingsPage';
+
 
 function App() {
-  const [count, setCount] = useState(0)
-  getBuildings()
+
+  const [buildings, setBuildings] = useState<Building[]>([])
+
+  // Fetch buildings only once when the component mounts
+  useEffect(() => {
+    getBuildings().then((data: Building[]) => setBuildings(data));
+  }, []); // Empty dependency array ensures this runs only once
+
+  console.log(buildings);
+
+
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <MantineProvider
+      theme={{
+        fontFamily: 'Montserrat, sans-serif',
+        headings: { fontFamily: 'Montserrat, sans-serif' },
+      }}
+    >
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<BuildingsPage buildings={buildings} />} />
+          {/* <Route
+              path="/building/:buildingId"
+              element={<CamerasPage buildings={buildings} />}
+            />
+            <Route
+              path="/building/:buildingId/camera/:cameraId"
+              element={<ParkingSpotsPage buildings={buildings} />}
+            /> */}
+        </Routes>
+      </BrowserRouter>
+    </MantineProvider>
+  );
 }
 
 export default App

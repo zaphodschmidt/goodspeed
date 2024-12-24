@@ -1,10 +1,4 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
+import ReactDOM from 'react-dom/client'; //provides necessary components to render React components as DOM (Document Object Model)
 import App from './App.tsx'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+ReactDOM.createRoot(document.getElementById('root')!).render(<App />);
