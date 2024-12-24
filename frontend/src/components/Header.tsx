@@ -13,8 +13,25 @@ function Header({ title, home }: HeaderProps) {
         navigate('/');
     };
 
+    const handleBackRedirect = () => {
+        navigate(-1); // Navigate to the previous page
+    };
+
     return (
-        <Flex justify="space-between" align="center" style={{ position: 'relative', width: '100%' }}>
+        <Flex justify="space-between" align="center" mb='lg' mt='sm' style={{ position: 'relative', width: '100%' }}>
+            {/* Left-aligned Back Button */}
+            {!home && (
+                <Button
+                    variant="light"
+                    radius="md"
+                    color="blue"
+                    onClick={handleBackRedirect}
+                    style={{ position: 'absolute', left: '0', marginLeft: '10px' }}
+                >
+                    Back
+                </Button>
+            )}
+
             {/* Left-aligned Home Button */}
             {!home && (
                 <Button
@@ -22,12 +39,12 @@ function Header({ title, home }: HeaderProps) {
                     radius="md"
                     color="blue"
                     onClick={handleHomeRedirect}
-                    style={{ position: 'absolute', left: 0 }}
+                    style={{ position: 'absolute', left: '90px' }}
                 >
                     Home
                 </Button>
             )}
-            
+
             {/* Center-aligned Title */}
             <Title style={{ margin: '0 auto', textAlign: 'center' }}>
                 {title}

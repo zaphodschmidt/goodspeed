@@ -6,6 +6,8 @@ import '@mantine/core/styles.css'; // Import Mantine core styles
 import { Building } from './types';
 import { getBuildings } from './apiService';
 import BuildingsPage from './components/BuildingsPage';
+import CamerasPage from './components/CamerasPage';
+import ParkingSpotsPage from './components/ParkingSpotsPage'
 
 
 function App() {
@@ -30,14 +32,14 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<BuildingsPage buildings={buildings} />} />
-          {/* <Route
-              path="/building/:buildingId"
+          <Route
+              path="/building/:buildingSlug"
               element={<CamerasPage buildings={buildings} />}
             />
             <Route
-              path="/building/:buildingId/camera/:cameraId"
+              path="/building/:buildingSlug/camera/:camNum"
               element={<ParkingSpotsPage buildings={buildings} />}
-            /> */}
+            />
         </Routes>
       </BrowserRouter>
     </MantineProvider>
