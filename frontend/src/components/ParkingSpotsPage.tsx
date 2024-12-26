@@ -24,7 +24,7 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
 
     // Example hardcoded vertices (in relative percentages)
     const vertices = [
-        { x: 5, y: 10 }, // Top-left
+        { x: 30, y: 10 }, // Top-left
         { x: 80, y: 5 }, // Top-right
         { x: 90, y: 100 }, // Bottom-right
         { x: 10, y: 90 }, // Bottom-left
@@ -47,6 +47,7 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
                 maw="1000px"
                 mx="auto"
                 mt="lg"
+                z="0"
                 style={{
                     position: 'relative',
                     aspectRatio: '16 / 9', // Maintain 16:9 aspect ratio for the image
@@ -89,13 +90,11 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
                         />
                     </svg>
                 </BackgroundImage>
-
-
             </Box>
 
             {/* Parking Spot Buttons */}
             <Flex align="center" justify="center" mt="lg">
-                <Stack h="500px" w="500px">
+                <Stack h="500px" w="500px" z="1">
                     {camera?.parking_spots.map((spot) => (
                         <Button
                             key={spot.id}
