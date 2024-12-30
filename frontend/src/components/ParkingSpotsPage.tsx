@@ -1,62 +1,35 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Building } from "../types";
-import { Button, Stack, Flex, Box, BackgroundImage } from "@mantine/core";
+import { Building, Camera, ParkingSpot, Vertex } from "../types";
+import {
+  Button,
+  Stack,
+  Flex,
+  Box,
+  BackgroundImage,
+  Group,
+} from "@mantine/core";
 import Header from "./Header";
 import cam1 from "../assets/cam1.jpg"; // Import the image
 import { generateSlug } from "../generateSlug";
-import '../App.css';
-import Draggable, {DraggableEvent, DraggableData} from 'react-draggable';
+import "../App.css";
+import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
+import { createParkingSpot, createVertex } from "../apiService.ts";
 
-
-interface BuildingsPageProps {
+interface BuildingsPageProps {  
   buildings: Building[];
 }
 
-const VerticesDiv = () => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-
-  const handleDrag = (e: DraggableEvent, data: DraggableData) => {
-    setPosition({ x: data.x, y: data.y });
-  };
-
-  const handleStop = (e: DraggableEvent, data: DraggableData) => {
-    setPosition({ x: data.x, y: data.y });
-  };
-
-  return (
-    <div>
-      {/* <p>Position: X-{position.x}, Y-{position.y}</p> */}
-      {/* <div className='box'> */}
-      <Draggable onDrag={handleDrag} onStop={handleStop} bounds="parent">
-        <div className="ball" />
-      </Draggable>
-    </div>
-  );
-};
-
 function BuildingsPage({ buildings }: BuildingsPageProps) {
-  const { buildingSlug, camNum } = useParams<{
-    buildingSlug: string;
-    camNum: string;
-  }>();
-
   const building = buildings.find((b) => generateSlug(b.name) === buildingSlug);
   const camera = building?.cameras.find((c) => c.cam_num === Number(camNum));
+  const [spots, setSpots] = useState<ParkingSpot[]>(camera!.parking_spots);
 
   // Reference to the BackgroundImage to get its dimensions
   const imageRef = useRef<HTMLDivElement>(null);
 
   // State to store the image dimensions
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
-
-  // Example hardcoded vertices (in relative percentages)
-  const vertices = [
-    { x: 30, y: 10 }, // Top-left
-    { x: 80, y: 5 }, // Top-right
-    { x: 90, y: 100 }, // Bottom-right
-    { x: 10, y: 90 }, // Bottom-left
-  ];
 
   // Update the image dimensions when the component mounts
   useEffect(() => {
@@ -66,6 +39,87 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
     }
   }, []);
 
+  const AddNewSpot = (camera: Camera) => {
+    const spotNum = camera.parking_spots.length - 1;
+    const newSpot: ParkingSpot = {
+      camera: camera.id!,
+      spot_num: spotNum,
+      vertices: [],
+    };
+
+    const VerticesDiv = () => {
+      const [position, setPosition] = useState({ x: 0, y: 0 });
+
+      const handleDrag = (e: DraggableEvent, data: DraggableData) => {
+        setPosition({ x: data.x, y: data.y });
+      };
+
+      const handleStop = (e: DraggableEvent, data: DraggableData) => {
+        setPosition({ x: data.x, y: data.y });
+      };
+
+      return (
+        <Draggable onDrag={handleDrag} onStop={handleStop} bounds="parent">
+          <div className="ball" />
+        </Draggable>
+      );
+    };
+
+    const AddNewVertex = (spot: ParkingSpot, x: number, y: number) => {
+      const newVertex: Vertex = {
+        spot: spot.id!,
+        x: x,
+        y: y,
+      };
+      createVertex(newVertex)
+        .then(() => {
+          console.log("Vertex spot created");
+        })
+        .catch(() => {
+          console.error("Error in creating Vertex");
+        });
+      return newVertex;
+    };
+    const middleX = 0;
+    const middleY = 0;
+    const offset = 40;
+
+    newSpot.vertices[0] = AddNewVertex(
+      newSpot,
+      middleX - offset,
+      middleY - offset
+    );
+    newSpot.vertices[1] = AddNewVertex(
+      newSpot,
+      middleX - offset,
+      middleY + offset
+    );
+    newSpot.vertices[2] = AddNewVertex(
+      newSpot,
+      middleX + offset,
+      middleY - offset
+    );
+    newSpot.vertices[3] = AddNewVertex(
+      newSpot,
+      middleX + offset,
+      middleY + offset
+    );
+
+    createParkingSpot(newSpot)
+      .then(() => {
+        console.log("Parking spot created");
+        setSpots(newSpot);
+      })
+      .catch(() => {
+        console.error("Error in creating parking spot");
+      });
+  };
+
+  const { buildingSlug, camNum } = useParams<{
+    buildingSlug: string;
+    camNum: string;
+  }>();
+
   return (
     <div>
       <Header title={`Camera ${camNum} Feed`} home={false} />
@@ -73,8 +127,8 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
         maw="1000px"
         mx="auto"
         mt="lg"
-        z="0"
         style={{
+          // background: "black",
           position: "relative",
           aspectRatio: "16 / 9", // Maintain 16:9 aspect ratio for the image
           overflow: "hidden", // Prevent overflow of content outside the box
@@ -90,22 +144,17 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
             borderRadius: "8px", // Optional: Rounded corners
           }}
         >
-         
+          {/* <VerticesDiv/>
+          <VerticesDiv/>
+          <VerticesDiv/>
+          <VerticesDiv/> */}
         </BackgroundImage>
       </Box>
       <Flex align="center" justify="center" mt="lg">
-        <Stack h="500px" w="500px">
-          {camera?.parking_spots.map((spot) => (
-            <Button
-              key={spot.id}
-              // onClick={() =>
-              //     navigate(`/building/${buildingSlug}/camera/${cameraNum}/spot/${spot.id}`)
-              // }
-            >
-              Edit Vertices for Spot {spot.spot_num}
-            </Button>
-          ))}
-        </Stack>
+        <Group gap="lg">
+          <Button>Add Spot To Camera</Button>
+          <Button>Delete Spot From Camera</Button>
+        </Group>
       </Flex>
     </div>
   );
