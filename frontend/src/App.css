@@ -5,3 +5,12 @@
 body {
   font-family: 'Montserrat', sans-serif;
 }
+
+.ball {
+  width: 40px;
+  height: 40px;
+  background-color: #3498db;
+  border-radius: 50%;
+  cursor: grab;
+  display: flex;
+}

@@ -53,13 +53,14 @@ export async function deleteCamera(camera: Camera) {
 }
 
 // Create/Update/Delete for parking spots
-const PARKING_SPOTS_URL = `${API_BASE_URL}/api/parking_spots`;
+const PARKING_SPOTS_URL = `${API_BASE_URL}/api/parking_spots/`;
 
 export async function createParkingSpot(spot: ParkingSpot) {
     const response = await axios.post(`${PARKING_SPOTS_URL}`, spot, { withCredentials: true });
     if (response.status !== 201) {
         throw new Error('Failed to create parking spot');
     }
+    return response.data;
 }
 
 export async function updateParkingSpot(spot: ParkingSpot) {

@@ -1,5 +1,4 @@
 services:
-
   backend:
     container_name: backend
     build: ./backend
