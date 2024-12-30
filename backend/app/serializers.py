@@ -8,7 +8,7 @@ class VertexSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ParkingSpotSerializer(serializers.ModelSerializer):
-    vertices = VertexSerializer(many=True)
+    vertices = VertexSerializer(many=True, required=False)
 
     class Meta:
         model = ParkingSpot
