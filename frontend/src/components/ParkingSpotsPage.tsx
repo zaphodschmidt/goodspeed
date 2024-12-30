@@ -21,9 +21,17 @@ interface BuildingsPageProps {
 }
 
 function BuildingsPage({ buildings }: BuildingsPageProps) {
+  
+  const { buildingSlug, camNum } = useParams<{
+    buildingSlug: string;
+    camNum: string;
+  }>();
+
   const building = buildings.find((b) => generateSlug(b.name) === buildingSlug);
   const camera = building?.cameras.find((c) => c.cam_num === Number(camNum));
-  const [spots, setSpots] = useState<ParkingSpot[]>(camera!.parking_spots);
+  console.log('Camera Parking Spots:',camera?.parking_spots)
+
+  // const [spots, setSpots] = useState<ParkingSpot[]>(camera!.parking_spots);
 
   // Reference to the BackgroundImage to get its dimensions
   const imageRef = useRef<HTMLDivElement>(null);
@@ -39,6 +47,24 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
     }
   }, []);
 
+  const VerticesDiv = () => {
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+
+    const handleDrag = (e: DraggableEvent, data: DraggableData) => {
+      setPosition({ x: data.x, y: data.y });
+    };
+
+    const handleStop = (e: DraggableEvent, data: DraggableData) => {
+      setPosition({ x: data.x, y: data.y });
+    };
+    
+    return (
+      <Draggable onDrag={handleDrag} onStop={handleStop} bounds="parent">
+        <div className="ball" />
+      </Draggable>
+    );
+  };
+  
   const AddNewSpot = (camera: Camera) => {
     const spotNum = camera.parking_spots.length - 1;
     const newSpot: ParkingSpot = {
@@ -46,82 +72,44 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
       spot_num: spotNum,
       vertices: [],
     };
-
-    const VerticesDiv = () => {
-      const [position, setPosition] = useState({ x: 0, y: 0 });
-
-      const handleDrag = (e: DraggableEvent, data: DraggableData) => {
-        setPosition({ x: data.x, y: data.y });
-      };
-
-      const handleStop = (e: DraggableEvent, data: DraggableData) => {
-        setPosition({ x: data.x, y: data.y });
-      };
-
-      return (
-        <Draggable onDrag={handleDrag} onStop={handleStop} bounds="parent">
-          <div className="ball" />
-        </Draggable>
-      );
-    };
-
-    const AddNewVertex = (spot: ParkingSpot, x: number, y: number) => {
-      const newVertex: Vertex = {
-        spot: spot.id!,
-        x: x,
-        y: y,
-      };
-      createVertex(newVertex)
-        .then(() => {
-          console.log("Vertex spot created");
-        })
-        .catch(() => {
-          console.error("Error in creating Vertex");
-        });
-      return newVertex;
-    };
-    const middleX = 0;
-    const middleY = 0;
-    const offset = 40;
-
-    newSpot.vertices[0] = AddNewVertex(
-      newSpot,
-      middleX - offset,
-      middleY - offset
-    );
-    newSpot.vertices[1] = AddNewVertex(
-      newSpot,
-      middleX - offset,
-      middleY + offset
-    );
-    newSpot.vertices[2] = AddNewVertex(
-      newSpot,
-      middleX + offset,
-      middleY - offset
-    );
-    newSpot.vertices[3] = AddNewVertex(
-      newSpot,
-      middleX + offset,
-      middleY + offset
-    );
-
+    console.log("newSpot:", newSpot)
     createParkingSpot(newSpot)
-      .then(() => {
-        console.log("Parking spot created");
-        setSpots(newSpot);
+      .then((createdSpot) => {
+        console.log("Parking spot created", createdSpot);
+        // setSpots(newSpot);
+        const middleX = 0;
+        const middleY = 0;
+        const offset = 40;
+
+        const vertices = [
+          { x: middleX - offset, y: middleY - offset },
+          { x: middleX - offset, y: middleY + offset },
+          { x: middleX + offset, y: middleY - offset },
+          { x: middleX + offset, y: middleY + offset }
+        ];
+
+        vertices.forEach(({x,y}) => {
+          const newVertex: Vertex = {
+            spot: createdSpot.id,
+            x: x,
+            y: y,
+          };
+          createVertex(newVertex)
+          .then(() => {
+            console.log("Vertex spot created");
+          })
+          .catch((error) => {
+            console.error("Error in creating Vertex", error);
+          });
+        });
       })
-      .catch(() => {
-        console.error("Error in creating parking spot");
+      .catch((error) => {
+        console.error("Error in creating parking spot", error);
       });
-  };
-
-  const { buildingSlug, camNum } = useParams<{
-    buildingSlug: string;
-    camNum: string;
-  }>();
-
-  return (
-    <div>
+  }
+    
+    return (
+      <div>
       <Header title={`Camera ${camNum} Feed`} home={false} />
       <Box
         maw="1000px"
@@ -152,7 +140,7 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
       </Box>
       <Flex align="center" justify="center" mt="lg">
         <Group gap="lg">
-          <Button>Add Spot To Camera</Button>
+          <Button onClick={() => AddNewSpot(camera)}>Add Spot To Camera</Button>
           <Button>Delete Spot From Camera</Button>
         </Group>
       </Flex>
