@@ -104,10 +104,11 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
           }}
         >
           {spots.length > 0 &&
-            spots.map((spot) => (
+            spots.map((spot, index) => (
               <SpotPolygon
                 key={spot.id}
                 parking_spot={spot}
+                colorKey={index}
               />
             ))}
         </BackgroundImage>

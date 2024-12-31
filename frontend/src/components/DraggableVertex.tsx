@@ -22,7 +22,6 @@ function DraggableVertex({ vertex, color, vertexSize, updateVertices }: Draggabl
     };
 
     const handleStop = (e: DraggableEvent, data: DraggableData) => {
-        console.log(position)
         const updatedVertex: Vertex = { ...vertex, x: data.x, y: data.y };
         updateVertex(updatedVertex);
     };

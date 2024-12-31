@@ -54,14 +54,16 @@ class ParkingSpotSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
 
         #Update each vertice individually
-        for vertex_data in vertices_data:
-            vertex_id = vertex_data.get('id')
-            existing_vertex_object= Vertex.objects.get(id=vertex_id) 
-            vertex_serializer_instance = VertexSerializer(existing_vertex_object, data=vertex_data)
-            vertex_serializer_instance.is_valid(raise_exception=True)
-            vertex_serializer_instance.save()
+        # for vertex_data in vertices_data:
+        #     vertex_id = vertex_data.get('id')
+        #     existing_vertex_object= Vertex.objects.get(id=vertex_id) 
+        #     vertex_serializer_instance = VertexSerializer(existing_vertex_object, data=vertex_data)
+        #     vertex_serializer_instance.is_valid(raise_exception=True)
+        #     vertex_serializer_instance.save()
 
         instance.save()
+
+        return instance
         
 
 class CameraSerializer(serializers.ModelSerializer):
