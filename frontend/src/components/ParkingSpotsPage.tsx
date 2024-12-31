@@ -115,7 +115,7 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
       <Flex align="center" justify="center" mt="lg">
         <Group gap="lg">
           <Button onClick={() => AddNewSpot(camera)}>Add Spot To Camera</Button>
-          <Button onClick={deleteAllSpots}>Delete Spot From Camera</Button>
+          <Button onClick={deleteAllSpots}>Delete Spots From Camera</Button>
         </Group>
       </Flex>
     </div>

@@ -6,12 +6,11 @@ import { updateVertex } from "../apiService.ts";
 interface DraggableVertexProps {
     vertex: Vertex;
     color: string;
+    vertexSize: number;
     updateVertices: (vertex: Vertex) => void
 };
 
-const size = 20
-
-function DraggableVertex({ vertex, color, updateVertices }: DraggableVertexProps) {
+function DraggableVertex({ vertex, color, vertexSize, updateVertices }: DraggableVertexProps) {
     const [position, setPosition] = useState({ x: vertex.x, y: vertex.y });
 
     const handleDrag = (e: DraggableEvent, data: DraggableData) => {
@@ -39,10 +38,9 @@ function DraggableVertex({ vertex, color, updateVertices }: DraggableVertexProps
                 className="ball"
                 style={{
                     backgroundColor: color,
-                    width: `${size}px`,
-                    height: `${size}px`,
+                    width: `${vertexSize}px`,
+                    height: `${vertexSize}px`,
                     position: 'absolute',
-                    transform: 'translate(-50%, -50%)'
                 }}
             />
         </Draggable>
