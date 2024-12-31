@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { Building, Camera, ParkingSpot, Vertex } from "../types";
 import {
   Button,
-  Stack,
   Flex,
   Box,
   BackgroundImage,
@@ -13,15 +12,15 @@ import Header from "./Header";
 import cam1 from "../assets/cam1.jpg"; // Import the image
 import { generateSlug } from "../generateSlug";
 import "../App.css";
-import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
-import { createParkingSpot, createVertex } from "../apiService.ts";
+import { createParkingSpot } from "../apiService.ts";
+import DraggableVertex from "./DraggableVertex.tsx";
 
-interface BuildingsPageProps {  
+interface BuildingsPageProps {
   buildings: Building[];
 }
 
 function BuildingsPage({ buildings }: BuildingsPageProps) {
-  
+
   const { buildingSlug, camNum } = useParams<{
     buildingSlug: string;
     camNum: string;
@@ -29,9 +28,6 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
 
   const building = buildings.find((b) => generateSlug(b.name) === buildingSlug);
   const camera = building?.cameras.find((c) => c.cam_num === Number(camNum));
-  console.log('Camera Parking Spots:',camera?.parking_spots)
-
-  // const [spots, setSpots] = useState<ParkingSpot[]>(camera!.parking_spots);
 
   // Reference to the BackgroundImage to get its dimensions
   const imageRef = useRef<HTMLDivElement>(null);
@@ -47,69 +43,36 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
     }
   }, []);
 
-  const VerticesDiv = () => {
-    const [position, setPosition] = useState({ x: 0, y: 0 });
-
-    const handleDrag = (e: DraggableEvent, data: DraggableData) => {
-      setPosition({ x: data.x, y: data.y });
-    };
-
-    const handleStop = (e: DraggableEvent, data: DraggableData) => {
-      setPosition({ x: data.x, y: data.y });
-    };
-    
-    return (
-      <Draggable onDrag={handleDrag} onStop={handleStop} bounds="parent">
-        <div className="ball" />
-      </Draggable>
-    );
-  };
-  
   const AddNewSpot = (camera: Camera) => {
     const spotNum = camera.parking_spots.length - 1;
+    const middleX = 0;
+    const middleY = 0;
+    const offset = 40;
+
+    const vertices: Vertex[] = [
+      { x: middleX - offset, y: middleY - offset },
+      { x: middleX - offset, y: middleY + offset },
+      { x: middleX + offset, y: middleY - offset },
+      { x: middleX + offset, y: middleY + offset }
+    ];
+
     const newSpot: ParkingSpot = {
       camera: camera.id!,
       spot_num: spotNum,
-      vertices: [],
+      vertices,
     };
     console.log("newSpot:", newSpot)
     createParkingSpot(newSpot)
       .then((createdSpot) => {
         console.log("Parking spot created", createdSpot);
-        // setSpots(newSpot);
-        const middleX = 0;
-        const middleY = 0;
-        const offset = 40;
-
-        const vertices = [
-          { x: middleX - offset, y: middleY - offset },
-          { x: middleX - offset, y: middleY + offset },
-          { x: middleX + offset, y: middleY - offset },
-          { x: middleX + offset, y: middleY + offset }
-        ];
-
-        vertices.forEach(({x,y}) => {
-          const newVertex: Vertex = {
-            spot: createdSpot.id,
-            x: x,
-            y: y,
-          };
-          createVertex(newVertex)
-          .then(() => {
-            console.log("Vertex spot created");
-          })
-          .catch((error) => {
-            console.error("Error in creating Vertex", error);
-          });
-        });
       })
       .catch((error) => {
         console.error("Error in creating parking spot", error);
       });
   }
-    
-    return (
-      <div>
+
+  return (
+    <div>
       <Header title={`Camera ${camNum} Feed`} home={false} />
       <Box
         maw="1000px"
@@ -132,10 +95,13 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
             borderRadius: "8px", // Optional: Rounded corners
           }}
         >
-          {/* <VerticesDiv/>
-          <VerticesDiv/>
-          <VerticesDiv/>
-          <VerticesDiv/> */}
+          {camera && camera.parking_spots && camera!.parking_spots.length > 0 &&
+            camera!.parking_spots[1].vertices.map((vertex) => (
+              <DraggableVertex
+                key={vertex.id}
+                vertex={vertex}
+              />
+            ))}
         </BackgroundImage>
       </Box>
       <Flex align="center" justify="center" mt="lg">

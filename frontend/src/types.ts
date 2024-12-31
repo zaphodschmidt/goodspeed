@@ -24,7 +24,7 @@ export interface ParkingSpot {
 
 export interface Vertex {
     id?: number; //backend id of Vertex
-    spot: number; //backend id of associated parking spot
+    spot?: number; //backend id of associated parking spot
     x: number;
     y: number;
 }
