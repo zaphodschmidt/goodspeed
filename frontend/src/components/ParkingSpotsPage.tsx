@@ -12,8 +12,8 @@ import Header from "./Header";
 import cam1 from "../assets/cam1.jpg"; // Import the image
 import { generateSlug } from "../generateSlug";
 import "../App.css";
-import { createParkingSpot } from "../apiService.ts";
-import DraggableVertex from "./DraggableVertex.tsx";
+import { createParkingSpot, deleteParkingSpot } from "../apiService.ts";
+import SpotPolygon from "./SpotPolygon.tsx";
 
 interface BuildingsPageProps {
   buildings: Building[];
@@ -26,8 +26,9 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
     camNum: string;
   }>();
 
-  const building = buildings.find((b) => generateSlug(b.name) === buildingSlug);
-  const camera = building?.cameras.find((c) => c.cam_num === Number(camNum));
+  const building = (buildings.find((b) => generateSlug(b.name) === buildingSlug));
+  const camera = (building?.cameras.find((c) => c.cam_num === Number(camNum)));
+  const [spots, setSpots] = useState<ParkingSpot[]>(camera?.parking_spots || [])
 
   // Reference to the BackgroundImage to get its dimensions
   const imageRef = useRef<HTMLDivElement>(null);
@@ -43,17 +44,21 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
     }
   }, []);
 
+  const deleteAllSpots = () => {
+    for(const parking_spot of spots){
+      deleteParkingSpot(parking_spot)
+    }
+    setSpots([])
+  }
+
   const AddNewSpot = (camera: Camera) => {
-    const spotNum = camera.parking_spots.length - 1;
-    const middleX = 0;
-    const middleY = 0;
-    const offset = 40;
+    const spotNum = spots.length;
 
     const vertices: Vertex[] = [
-      { x: middleX - offset, y: middleY - offset },
-      { x: middleX - offset, y: middleY + offset },
-      { x: middleX + offset, y: middleY - offset },
-      { x: middleX + offset, y: middleY + offset }
+      { x: Math.round(imageSize.width * 0.25), y: Math.round(imageSize.height * 0.25) },
+      { x: Math.round(imageSize.width * 0.75), y: Math.round(imageSize.height * 0.25) },
+      { x: Math.round(imageSize.width * 0.75), y: Math.round(imageSize.height * 0.75) },
+      { x: Math.round(imageSize.width * 0.25), y: Math.round(imageSize.height * 0.75) },
     ];
 
     const newSpot: ParkingSpot = {
@@ -65,10 +70,12 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
     createParkingSpot(newSpot)
       .then((createdSpot) => {
         console.log("Parking spot created", createdSpot);
+        setSpots([...spots, createdSpot])
       })
       .catch((error) => {
         console.error("Error in creating parking spot", error);
       });
+
   }
 
   return (
@@ -89,17 +96,18 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
           ref={imageRef}
           src={cam1}
           style={{
+            position: 'relative',
             width: "100%",
             height: "100%",
             objectFit: "cover", // Ensure the image scales properly without being cut off
             borderRadius: "8px", // Optional: Rounded corners
           }}
         >
-          {camera && camera.parking_spots && camera!.parking_spots.length > 0 &&
-            camera!.parking_spots[1].vertices.map((vertex) => (
-              <DraggableVertex
-                key={vertex.id}
-                vertex={vertex}
+          {spots.length > 0 &&
+            spots.map((spot) => (
+              <SpotPolygon
+                key={spot.id}
+                parking_spot={spot}
               />
             ))}
         </BackgroundImage>
@@ -107,7 +115,7 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
       <Flex align="center" justify="center" mt="lg">
         <Group gap="lg">
           <Button onClick={() => AddNewSpot(camera)}>Add Spot To Camera</Button>
-          <Button>Delete Spot From Camera</Button>
+          <Button onClick={deleteAllSpots}>Delete Spot From Camera</Button>
         </Group>
       </Flex>
     </div>

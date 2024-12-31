@@ -36,7 +36,7 @@ export async function updateCamera(camera: Camera) {
     if (!camera.id) {
         throw new Error('Cannot update a camera that does not have an id.');
     }
-    const response = await axios.put(`${CAMERAS_URL}/${camera.id}/`, camera, { withCredentials: true });
+    const response = await axios.put(`${CAMERAS_URL}${camera.id}/`, camera, { withCredentials: true });
     if (response.status !== 200) {
         throw new Error('Failed to update camera');
     }
@@ -46,17 +46,17 @@ export async function deleteCamera(camera: Camera) {
     if (!camera.id) {
         throw new Error('Cannot delete a camera that does not have an id.');
     }
-    const response = await axios.delete(`${CAMERAS_URL}/${camera.id}/`, { withCredentials: true });
+    const response = await axios.delete(`${CAMERAS_URL}${camera.id}/`, { withCredentials: true });
     if (response.status !== 204) {
         throw new Error('Failed to delete camera');
     }
 }
 
 // Create/Update/Delete for parking spots
-const PARKING_SPOTS_URL = `${API_BASE_URL}/api/parking_spots/`;
+const PARKING_SPOTS_URL = `${API_BASE_URL}/api/parking_spots`;
 
 export async function createParkingSpot(spot: ParkingSpot) {
-    const response = await axios.post(`${PARKING_SPOTS_URL}`, spot, { withCredentials: true });
+    const response = await axios.post(`${PARKING_SPOTS_URL}/`, spot, { withCredentials: true });
     if (response.status !== 201) {
         throw new Error('Failed to create parking spot');
     }

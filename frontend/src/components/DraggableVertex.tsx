@@ -1,36 +1,52 @@
 import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
 import { Vertex } from "../types";
-import { useState } from "react";
-import {updateVertex} from "../apiService.ts";
+import React, { useState } from "react";
+import { updateVertex } from "../apiService.ts";
 
-type DraggableVertexProps = {
+interface DraggableVertexProps {
     vertex: Vertex;
+    color: string;
+    updateVertices: (vertex: Vertex) => void
 };
 
-function DraggableVertex({ vertex }: DraggableVertexProps) {
+const size = 20
+
+function DraggableVertex({ vertex, color, updateVertices }: DraggableVertexProps) {
     const [position, setPosition] = useState({ x: vertex.x, y: vertex.y });
-  
+
     const handleDrag = (e: DraggableEvent, data: DraggableData) => {
-    //   const updatedVertex: Vertex = { ...vertex, x: data.x, y: data.y };
-      setPosition({ x: data.x, y: data.y });
-    //   updateVertex(updatedVertex);
+        setPosition({ x: data.x, y: data.y });
+
+        // Update the vertex in the array
+        const updatedVertex: Vertex = { ...vertex, x: data.x, y: data.y };
+        updateVertices(updatedVertex);
     };
-  
+
     const handleStop = (e: DraggableEvent, data: DraggableData) => {
-      const updatedVertex: Vertex = { ...vertex, x: data.x, y: data.y };
-      updateVertex(updatedVertex);
+        console.log(position)
+        const updatedVertex: Vertex = { ...vertex, x: data.x, y: data.y };
+        updateVertex(updatedVertex);
     };
-  
+
     return (
-      <Draggable
-        position={position}
-        onDrag={handleDrag}
-        onStop={handleStop}
-        bounds="parent"
-      >
-        <div className="ball" style={{ backgroundColor: 'red' }} />
-      </Draggable>
+        <Draggable
+            position={position}
+            onDrag={handleDrag}
+            onStop={handleStop}
+            bounds='parent'
+        >
+            <div
+                className="ball"
+                style={{
+                    backgroundColor: color,
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    position: 'absolute',
+                    transform: 'translate(-50%, -50%)'
+                }}
+            />
+        </Draggable>
     );
-  }
+}
 
 export default DraggableVertex

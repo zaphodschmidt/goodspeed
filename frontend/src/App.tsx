@@ -11,16 +11,18 @@ import ParkingSpotsPage from './components/ParkingSpotsPage'
 
 
 function App() {
+  const [buildings, setBuildings] = useState<Building[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [buildings, setBuildings] = useState<Building[]>([])
-
-  // Fetch buildings only once when the component mounts
   useEffect(() => {
-    getBuildings().then((data: Building[]) => setBuildings(data));
-  }, []); // Empty dependency array ensures this runs only once
+    getBuildings()
+      .then((data: Building[]) => setBuildings(data))
+      .finally(() => setLoading(false));
+  }, []);
 
-  console.log(buildings);
-
+  if (loading) {
+    return <div>Loading...</div>; // You can use a spinner or skeleton loader here
+  }
 
   return (
     <MantineProvider
