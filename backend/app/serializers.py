@@ -6,6 +6,10 @@ class VertexSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vertex
         fields = '__all__'
+        extra_kwargs = {
+            'spot': {'required': False}
+        }
+
 
 class ParkingSpotSerializer(serializers.ModelSerializer):
     vertices = VertexSerializer(many=True, required=False)
@@ -59,8 +63,6 @@ class ParkingSpotSerializer(serializers.ModelSerializer):
 
         instance.save()
         
-
-    
 
 class CameraSerializer(serializers.ModelSerializer):
     parking_spots = ParkingSpotSerializer(many=True, read_only=True)

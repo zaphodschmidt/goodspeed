@@ -23,8 +23,8 @@ class ParkingSpot(models.Model):
     spot_num = models.IntegerField()
     camera = models.ForeignKey(Camera, on_delete=models.CASCADE, related_name='parking_spots')
 
-    class Meta:
-        unique_together = ('spot_num', 'camera')
+    # class Meta:
+    #     unique_together = ('spot_num', 'camera')
 
     def __str__(self):
         return f"Spot {self.spot_num} (Camera {self.camera.cam_num})"

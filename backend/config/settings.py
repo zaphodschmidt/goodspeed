@@ -29,7 +29,6 @@ DEBUG = config('DJANGO_DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='').split(',')
 
-print(ALLOWED_HOSTS)
 
 # Application definition
 
@@ -126,8 +125,6 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 
-print(CORS_ALLOWED_ORIGINS)
-print(CSRF_TRUSTED_ORIGINS)
 
 
 # Internationalization
