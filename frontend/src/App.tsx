@@ -5,22 +5,24 @@ import './App.css'
 import '@mantine/core/styles.css'; // Import Mantine core styles
 import { Building } from './types';
 import { getBuildings } from './apiService';
-import BuildingsPage from './components/BuildingsPage';
-import CamerasPage from './components/CamerasPage';
-import ParkingSpotsPage from './components/ParkingSpotsPage'
+import BuildingsPage from './components/pages/BuildingsPage';
+import CamerasPage from './components/pages/CamerasPage';
+import ParkingSpotsPage from './components/pages/ParkingSpotsPage'
 
 
 function App() {
+  const [buildings, setBuildings] = useState<Building[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [buildings, setBuildings] = useState<Building[]>([])
-
-  // Fetch buildings only once when the component mounts
   useEffect(() => {
-    getBuildings().then((data: Building[]) => setBuildings(data));
-  }, []); // Empty dependency array ensures this runs only once
+    getBuildings()
+      .then((data: Building[]) => setBuildings(data))
+      .finally(() => setLoading(false));
+  }, []);
 
-  console.log(buildings);
-
+  if (loading) {
+    return <div>Loading...</div>; // You can use a spinner or skeleton loader here
+  }
 
   return (
     <MantineProvider

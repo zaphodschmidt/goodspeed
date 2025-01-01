@@ -1,37 +1,34 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Building, Camera, ParkingSpot, Vertex } from "../types";
+import { Building, Camera, ParkingSpot, Vertex } from "../../types.ts";
 import {
   Button,
-  Stack,
   Flex,
   Box,
   BackgroundImage,
   Group,
+  Loader,
 } from "@mantine/core";
-import Header from "./Header";
-import cam1 from "../assets/cam1.jpg"; // Import the image
-import { generateSlug } from "../generateSlug";
-import "../App.css";
-import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
-import { createParkingSpot, createVertex } from "../apiService.ts";
+import Header from "../misc/Header.tsx";
+import cam1 from "../../assets/cam1.jpg"; // Import the image
+import { generateSlug } from "../misc/generateSlug.ts";
+import { createParkingSpot, deleteParkingSpot } from "../../apiService.ts";
+import SpotPolygon from "../spotComponents/SpotPolygon.tsx";
 
-interface BuildingsPageProps {  
+interface BuildingsPageProps {
   buildings: Building[];
 }
 
 function BuildingsPage({ buildings }: BuildingsPageProps) {
-  
+
   const { buildingSlug, camNum } = useParams<{
     buildingSlug: string;
     camNum: string;
   }>();
 
-  const building = buildings.find((b) => generateSlug(b.name) === buildingSlug);
-  const camera = building?.cameras.find((c) => c.cam_num === Number(camNum));
-  console.log('Camera Parking Spots:',camera?.parking_spots)
-
-  // const [spots, setSpots] = useState<ParkingSpot[]>(camera!.parking_spots);
+  const building = (buildings.find((b) => generateSlug(b.name) === buildingSlug));
+  const camera = (building?.cameras.find((c) => c.cam_num === Number(camNum)));
+  const [spots, setSpots] = useState<ParkingSpot[]>(camera?.parking_spots || [])
 
   // Reference to the BackgroundImage to get its dimensions
   const imageRef = useRef<HTMLDivElement>(null);
@@ -47,69 +44,51 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
     }
   }, []);
 
-  const VerticesDiv = () => {
-    const [position, setPosition] = useState({ x: 0, y: 0 });
+  const deleteAllSpots = () => {
+    for(const parking_spot of spots){
+      deleteParkingSpot(parking_spot)
+    }
+    setSpots([])
+  }
 
-    const handleDrag = (e: DraggableEvent, data: DraggableData) => {
-      setPosition({ x: data.x, y: data.y });
-    };
+  const deleteSpot = (spotToDelete: ParkingSpot) => {
+    deleteParkingSpot(spotToDelete)
+    setSpots(spots.filter((spot) => spot.id !== spotToDelete.id))
+  }
 
-    const handleStop = (e: DraggableEvent, data: DraggableData) => {
-      setPosition({ x: data.x, y: data.y });
-    };
-    
-    return (
-      <Draggable onDrag={handleDrag} onStop={handleStop} bounds="parent">
-        <div className="ball" />
-      </Draggable>
-    );
-  };
-  
   const AddNewSpot = (camera: Camera) => {
-    const spotNum = camera.parking_spots.length - 1;
+    const spotNum = spots.length;
+
+    const vertices: Vertex[] = [
+      { x: Math.round(imageSize.width * 0.25), y: Math.round(imageSize.height * 0.25) },
+      { x: Math.round(imageSize.width * 0.75), y: Math.round(imageSize.height * 0.25) },
+      { x: Math.round(imageSize.width * 0.75), y: Math.round(imageSize.height * 0.75) },
+      { x: Math.round(imageSize.width * 0.25), y: Math.round(imageSize.height * 0.75) },
+    ];
+
     const newSpot: ParkingSpot = {
       camera: camera.id!,
       spot_num: spotNum,
-      vertices: [],
+      vertices,
     };
     console.log("newSpot:", newSpot)
     createParkingSpot(newSpot)
       .then((createdSpot) => {
         console.log("Parking spot created", createdSpot);
-        // setSpots(newSpot);
-        const middleX = 0;
-        const middleY = 0;
-        const offset = 40;
-
-        const vertices = [
-          { x: middleX - offset, y: middleY - offset },
-          { x: middleX - offset, y: middleY + offset },
-          { x: middleX + offset, y: middleY - offset },
-          { x: middleX + offset, y: middleY + offset }
-        ];
-
-        vertices.forEach(({x,y}) => {
-          const newVertex: Vertex = {
-            spot: createdSpot.id,
-            x: x,
-            y: y,
-          };
-          createVertex(newVertex)
-          .then(() => {
-            console.log("Vertex spot created");
-          })
-          .catch((error) => {
-            console.error("Error in creating Vertex", error);
-          });
-        });
+        setSpots([...spots, createdSpot])
       })
       .catch((error) => {
         console.error("Error in creating parking spot", error);
       });
+
   }
-    
-    return (
-      <div>
+
+  if (!building || !camera){
+    return <Loader/>
+  }
+
+  return (
+    <div>
       <Header title={`Camera ${camNum} Feed`} home={false} />
       <Box
         maw="1000px"
@@ -126,22 +105,28 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
           ref={imageRef}
           src={cam1}
           style={{
+            position: 'relative',
             width: "100%",
             height: "100%",
             objectFit: "cover", // Ensure the image scales properly without being cut off
             borderRadius: "8px", // Optional: Rounded corners
           }}
         >
-          {/* <VerticesDiv/>
-          <VerticesDiv/>
-          <VerticesDiv/>
-          <VerticesDiv/> */}
+          {spots.length > 0 &&
+            spots.map((spot, index) => (
+              <SpotPolygon
+                key={spot.id}
+                parking_spot={spot}
+                colorKey={index}
+                deleteSpot={deleteSpot}
+              />
+            ))}
         </BackgroundImage>
       </Box>
       <Flex align="center" justify="center" mt="lg">
         <Group gap="lg">
           <Button onClick={() => AddNewSpot(camera)}>Add Spot To Camera</Button>
-          <Button>Delete Spot From Camera</Button>
+          <Button onClick={deleteAllSpots}>Delete All Spots From Camera</Button>
         </Group>
       </Flex>
     </div>

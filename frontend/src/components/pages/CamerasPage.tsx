@@ -1,8 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { Building } from '../types';
+import { Building } from '../../types';
 import { Button, Stack, Flex } from '@mantine/core'
-import Header from './Header'
-import { generateSlug } from '../generateSlug';
+import Header from '../misc/Header'
+import { generateSlug } from '../misc/generateSlug';
 
 interface BuildingsPageProps {
     buildings: Building[];
