@@ -7,6 +7,7 @@ import {
   Box,
   BackgroundImage,
   Group,
+  Loader,
 } from "@mantine/core";
 import Header from "./Header";
 import cam1 from "../assets/cam1.jpg"; // Import the image
@@ -51,6 +52,11 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
     setSpots([])
   }
 
+  const deleteSpot = (spotToDelete: ParkingSpot) => {
+    deleteParkingSpot(spotToDelete)
+    setSpots(spots.filter((spot) => spot.id !== spotToDelete.id))
+  }
+
   const AddNewSpot = (camera: Camera) => {
     const spotNum = spots.length;
 
@@ -76,6 +82,10 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
         console.error("Error in creating parking spot", error);
       });
 
+  }
+
+  if (!building || !camera){
+    return <Loader/>
   }
 
   return (
@@ -109,6 +119,7 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
                 key={spot.id}
                 parking_spot={spot}
                 colorKey={index}
+                deleteSpot={deleteSpot}
               />
             ))}
         </BackgroundImage>
@@ -116,7 +127,7 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
       <Flex align="center" justify="center" mt="lg">
         <Group gap="lg">
           <Button onClick={() => AddNewSpot(camera)}>Add Spot To Camera</Button>
-          <Button onClick={deleteAllSpots}>Delete Spots From Camera</Button>
+          <Button onClick={deleteAllSpots}>Delete All Spots From Camera</Button>
         </Group>
       </Flex>
     </div>

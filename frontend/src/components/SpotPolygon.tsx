@@ -7,16 +7,17 @@ import { updateParkingSpot } from "../apiService";
 interface SpotPolygonProps {
     parking_spot: ParkingSpot;
     colorKey: number;
+    deleteSpot: (spot: ParkingSpot) => void
 }
 
 const colors = ['red', 'orange', 'yellow', 'green', 'teal', 'blue', 'cyan', 'purple', 'pink', 'indigo', 'lime']
 const vertexSize = 20
 
-function SpotPolygon({ parking_spot, colorKey }: SpotPolygonProps) {
+function SpotPolygon({ parking_spot, colorKey, deleteSpot }: SpotPolygonProps) {
     const [vertices, setVertices] = useState<Vertex[]>(parking_spot.vertices)
     const [spotLabel, setSpotLabel] = useState<string | number>(parking_spot.spot_num)
-    // const [popoverOpened, setPopoverOpened] = useState(false);
-    // const [popoverPosition, setPopoverPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+    const [popoverOpened, setPopoverOpened] = useState(false);
+    const [popoverPosition, setPopoverPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
     const color = (colors[colorKey % colors.length])
 
     const updateSpotNumber = () => {
@@ -53,7 +54,6 @@ function SpotPolygon({ parking_spot, colorKey }: SpotPolygonProps) {
     const [centerX, centerY] = calculateCentroid(vertices)
 
     const handleRightClick = (event: React.MouseEvent) => {
-        console.log("wow")
         event.preventDefault(); // Prevent the default context menu
         setPopoverPosition({ x: event.clientX, y: event.clientY });
         setPopoverOpened(true);
@@ -112,7 +112,7 @@ function SpotPolygon({ parking_spot, colorKey }: SpotPolygonProps) {
                     },
                 }}
             />
-            {/* <Popover
+            <Popover
                 opened={popoverOpened}
                 onClose={() => setPopoverOpened(false)}
                 onChange={setPopoverOpened}
@@ -126,11 +126,11 @@ function SpotPolygon({ parking_spot, colorKey }: SpotPolygonProps) {
                     <Box style={{ position: 'absolute', left: 0, top: 0 }}></Box>
                 </Popover.Target>
                 <Popover.Dropdown>
-                    <Button variant='subtle' color='gray' onClick={() => console.log("yey")}>
+                    <Button variant='subtle' color='gray' onClick={() => deleteSpot(parking_spot)}>
                         Delete Spot {parking_spot.spot_num}
                     </Button>
                 </Popover.Dropdown>
-            </Popover> */}
+            </Popover>
         </>
     )
 }
