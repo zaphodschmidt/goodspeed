@@ -1,8 +1,8 @@
 import DraggableVertex from "./DraggableVertex";
-import { ParkingSpot, Vertex } from "../types";
+import { ParkingSpot, Vertex } from "../../types";
 import { useState } from "react";
 import { Box, NumberInput, Popover, Button } from '@mantine/core'
-import { updateParkingSpot } from "../apiService";
+import { updateParkingSpot } from "../../apiService";
 
 interface SpotPolygonProps {
     parking_spot: ParkingSpot;

@@ -1,7 +1,7 @@
 import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
-import { Vertex } from "../types";
+import { Vertex } from "../../types.ts";
 import React, { useState } from "react";
-import { updateVertex } from "../apiService.ts";
+import { updateVertex } from "../../apiService.ts";
 
 interface DraggableVertexProps {
     vertex: Vertex;

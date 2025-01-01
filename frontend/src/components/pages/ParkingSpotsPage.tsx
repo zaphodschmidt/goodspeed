@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Building, Camera, ParkingSpot, Vertex } from "../types";
+import { Building, Camera, ParkingSpot, Vertex } from "../../types.ts";
 import {
   Button,
   Flex,
@@ -9,12 +9,11 @@ import {
   Group,
   Loader,
 } from "@mantine/core";
-import Header from "./Header";
-import cam1 from "../assets/cam1.jpg"; // Import the image
-import { generateSlug } from "../generateSlug";
-import "../App.css";
-import { createParkingSpot, deleteParkingSpot } from "../apiService.ts";
-import SpotPolygon from "./SpotPolygon.tsx";
+import Header from "../misc/Header.tsx";
+import cam1 from "../../assets/cam1.jpg"; // Import the image
+import { generateSlug } from "../misc/generateSlug.ts";
+import { createParkingSpot, deleteParkingSpot } from "../../apiService.ts";
+import SpotPolygon from "../spotComponents/SpotPolygon.tsx";
 
 interface BuildingsPageProps {
   buildings: Building[];
