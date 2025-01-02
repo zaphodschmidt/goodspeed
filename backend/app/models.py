@@ -1,5 +1,8 @@
 from django.db import models
 
+class Image(models.Model):
+    image = models.ImageField(upload_to='uploads/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
 class Building(models.Model):
     name = models.CharField(max_length=127)
@@ -12,6 +15,7 @@ class Camera(models.Model):
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='cameras')
     MAC = models.CharField(max_length=50, unique=True)
     IP = models.GenericIPAddressField()
+    image = models.OneToOneField(Image, null=True, on_delete=models.CASCADE, related_name='camera')
 
     class Meta:
         unique_together = ('cam_num', 'building')
@@ -36,7 +40,3 @@ class Vertex(models.Model):
 
     def __str__(self):
         return f"Vertex ({self.x}, {self.y}) for Spot {self.spot.spot_num}"
-
-class UploadedImage(models.Model):
-    image = models.ImageField(upload_to='uploads/')
-    uploaded_at = models.DateTimeField(auto_now_add=True)
