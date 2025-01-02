@@ -36,3 +36,7 @@ class Vertex(models.Model):
 
     def __str__(self):
         return f"Vertex ({self.x}, {self.y}) for Spot {self.spot.spot_num}"
+
+class UploadedImage(models.Model):
+    image = models.ImageField(upload_to='uploads/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
