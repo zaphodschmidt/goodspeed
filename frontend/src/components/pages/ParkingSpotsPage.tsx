@@ -4,16 +4,15 @@ import { Building, Camera, ParkingSpot, Vertex } from "../../types.ts";
 import {
   Button,
   Flex,
-  Box,
   AspectRatio,
   BackgroundImage,
   Group,
   Loader,
 } from "@mantine/core";
 import Header from "../misc/Header.tsx";
-import no_image from "../../assets/no_image.jpeg"; 
+import no_image from "../../assets/no_image.jpeg";
 import { generateSlug } from "../misc/generateSlug.ts";
-import { createParkingSpot, deleteParkingSpot } from "../../apiService.ts";
+import { createParkingSpot, deleteParkingSpot, getCameraByID } from "../../apiService.ts";
 import SpotPolygon from "../spotComponents/SpotPolygon.tsx";
 
 interface BuildingsPageProps {
@@ -27,26 +26,26 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
     camNum: string;
   }>();
 
-  const building = (buildings.find((b) => generateSlug(b.name) === buildingSlug));
-  const camera = (building?.cameras.find((c) => c.cam_num === Number(camNum)));
-  const [spots, setSpots] = useState<ParkingSpot[]>(camera?.parking_spots || [])
+  const building: Building | undefined = (buildings.find((b) => generateSlug(b.name) === buildingSlug));
+  const camera_id = (building?.cameras.find((c) => c.cam_num === Number(camNum)))?.id || undefined
+  const [camera, setCamera] = useState<Camera | undefined>()
+  const [spots, setSpots] = useState<ParkingSpot[]>([])
 
   // Reference to the BackgroundImage to get its dimensions
   const imageRef = useRef<HTMLDivElement>(null);
 
-  // State to store the image dimensions
-  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
-
-  // Update the image dimensions when the component mounts
+  // Update the image dimensions when the component mounts, and fetch updated camera data.
   useEffect(() => {
-    if (imageRef.current) {
-      const rect = imageRef.current.getBoundingClientRect();
-      setImageSize({ width: rect.width, height: rect.height });
+    if (camera_id) {
+      getCameraByID(camera_id).then((fetched_cam: Camera) => {
+        setCamera(fetched_cam)
+        setSpots(fetched_cam.parking_spots)
+      })
     }
   }, []);
 
   const deleteAllSpots = () => {
-    for(const parking_spot of spots){
+    for (const parking_spot of spots) {
       deleteParkingSpot(parking_spot)
     }
     setSpots([])
@@ -58,6 +57,8 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
   }
 
   const AddNewSpot = (camera: Camera) => {
+    const rect = imageRef.current!.getBoundingClientRect();
+    const imageSize = { width: rect.width, height: rect.height };
     const spotNum = spots.length;
 
     const vertices: Vertex[] = [
@@ -84,8 +85,8 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
 
   }
 
-  if (!building || !camera){
-    return <Loader/>
+  if (!building || !camera) {
+    return <Loader />
   }
 
   return (
@@ -104,7 +105,7 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
             position: 'relative',
             width: "100%",
             height: "100%",
-            objectFit: "contain", 
+            objectFit: "contain",
           }}
         >
           {spots.length > 0 &&
