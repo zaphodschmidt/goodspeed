@@ -8,10 +8,8 @@ services:
       - ./backend/media:/usr/src/app/media
     ports:
       - "8000:8000"
-    environment:
-      DJANGO_SETTINGS_MODULE: config.settings
     env_file:
-      - ${ENV_FILE:-.env}
+      - path: ${ENV_FILE:-.env.dev}
 
   frontend:
     build: ./frontend
@@ -22,8 +20,6 @@ services:
       - ./frontend:/app
       - /app/node_modules
     env_file:
-      - ${ENV_FILE:-.env}
-    environment:
-      - VITE_BACKEND_URL=${BACKEND_URL}
+      - path: ${ENV_FILE:-.env.dev}
     depends_on:
       - backend

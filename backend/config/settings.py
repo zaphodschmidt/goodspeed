@@ -26,10 +26,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DJANGO_DEBUG', default=False, cast=bool)
+PROD = config('PROD', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='').split(',')
-
+if(PROD):
+    ALLOWED_HOSTS = config('BACKEND_URL', default='').split(',')
+else:
+    ALLOWED_HOSTS = ['localhost','127.0.0.1']
+    
 
 # Application definition
 
