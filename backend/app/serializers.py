@@ -3,13 +3,13 @@ from .models import *
 
 
 class ImageSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Image
-        fields = ['id', 'image', 'uploaded_at']
+        fields = ['id', 'image_url', 'uploaded_at']
     
-    def get_image(self,obj):
+    def get_image_url(self,obj):
         return self.context['request'].build_absolute_uri(obj.image.url)
     
 

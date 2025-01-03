@@ -3,24 +3,29 @@ from rest_framework import viewsets
 from .models import *
 from .serializers import *
 from django.http import JsonResponse
+from rest_framework import status, permissions
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.files.storage import default_storage
 
 
 class BuildingViewSet(viewsets.ModelViewSet):
+    # permission_classes = [permissions.AllowAny]
     queryset = Building.objects.all()
     serializer_class = BuildingSerializer
 
 class CameraViewSet(viewsets.ModelViewSet):
+    # permission_classes = [permissions.AllowAny]
     queryset = Camera.objects.all()
     serializer_class = CameraSerializer
 
 class ParkingSpotViewSet(viewsets.ModelViewSet):
+    # permission_classes = [permissions.AllowAny]
     queryset = ParkingSpot.objects.all()
     serializer_class = ParkingSpotSerializer
 
 class VertexViewSet(viewsets.ModelViewSet):
+    # permission_classes = [permissions.AllowAny]
     queryset = Vertex.objects.all()
     serializer_class = VertexSerializer
 
