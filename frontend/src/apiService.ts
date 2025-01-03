@@ -25,6 +25,14 @@ export async function getBuildings() {
 // Create/Update/Delete for cameras
 const CAMERAS_URL = `${API_BASE_URL}/api/cameras`;
 
+export async function getCameraByID(id: number) {
+    const response = await axios.get(`${CAMERAS_URL}/${id}/`, { withCredentials: true });
+    if (response.status !== 200) {
+        throw new Error('Could not get camera by id.');
+    }
+    return response.data;
+}
+
 export async function createCamera(camera: Camera) {
     const response = await axios.post(`${CAMERAS_URL}`, camera, { withCredentials: true });
     if (response.status !== 201) {
