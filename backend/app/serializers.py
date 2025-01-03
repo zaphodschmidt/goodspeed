@@ -79,7 +79,7 @@ class ParkingSpotSerializer(serializers.ModelSerializer):
         
 
 class CameraSerializer(serializers.ModelSerializer):
-    image = ImageSerializer()
+    image = ImageSerializer(required=False)
     parking_spots = ParkingSpotSerializer(many=True, read_only=True)
 
     class Meta:
