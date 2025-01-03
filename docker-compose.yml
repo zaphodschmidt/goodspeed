@@ -5,6 +5,7 @@ services:
     volumes:
       - ./backend/:/usr/src/app/
       - ./backend/db.sqlite3:/app/db.sqlite3
+      - ./backend/media:/usr/src/app/media
     ports:
       - "8000:8000"
     environment:

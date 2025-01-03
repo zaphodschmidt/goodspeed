@@ -1,6 +1,18 @@
 from rest_framework import serializers
 from .models import * 
 
+
+class ImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Image
+        fields = ['id', 'image_url', 'uploaded_at']
+    
+    def get_image_url(self,obj):
+        return self.context['request'].build_absolute_uri(obj.image.url)
+    
+
 class VertexSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -67,6 +79,7 @@ class ParkingSpotSerializer(serializers.ModelSerializer):
         
 
 class CameraSerializer(serializers.ModelSerializer):
+    image = ImageSerializer()
     parking_spots = ParkingSpotSerializer(many=True, read_only=True)
 
     class Meta:

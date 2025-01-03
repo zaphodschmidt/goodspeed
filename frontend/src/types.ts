@@ -1,5 +1,11 @@
 //id's are marked as optional with ? since they are assigned by backend and not known until then.
 
+export interface Image {
+    id?: number 
+    image_url: string;
+    uploaded_at: string
+}
+
 export interface Building {
     id?: number 
     name: string;
@@ -7,6 +13,7 @@ export interface Building {
 }
 
 export interface Camera {
+    image?: Image
     building: number; //backend id of associated building
     id?: number //backend id of camera
     cam_num: number; //number in parking garage
