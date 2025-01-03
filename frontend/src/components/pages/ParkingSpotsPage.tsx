@@ -5,12 +5,13 @@ import {
   Button,
   Flex,
   Box,
+  AspectRatio,
   BackgroundImage,
   Group,
   Loader,
 } from "@mantine/core";
 import Header from "../misc/Header.tsx";
-import cam1 from "../../assets/cam1.jpg"; // Import the image
+import no_image from "../../assets/no_image.jpeg"; 
 import { generateSlug } from "../misc/generateSlug.ts";
 import { createParkingSpot, deleteParkingSpot } from "../../apiService.ts";
 import SpotPolygon from "../spotComponents/SpotPolygon.tsx";
@@ -90,26 +91,20 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
   return (
     <div>
       <Header title={`Camera ${camNum} Feed`} home={false} />
-      <Box
-        maw="1000px"
+      <AspectRatio
+        maw={1000}
         mx="auto"
-        mt="lg"
-        style={{
-          // background: "black",
-          position: "relative",
-          aspectRatio: "16 / 9", // Maintain 16:9 aspect ratio for the image
-          overflow: "hidden", // Prevent overflow of content outside the box
-        }}
+        pos='relative'
+        ratio={4 / 3}
       >
         <BackgroundImage
           ref={imageRef}
-          src={cam1}
+          src={camera.image?.image_url || no_image}
           style={{
             position: 'relative',
             width: "100%",
             height: "100%",
-            objectFit: "cover", // Ensure the image scales properly without being cut off
-            borderRadius: "8px", // Optional: Rounded corners
+            objectFit: "contain", 
           }}
         >
           {spots.length > 0 &&
@@ -122,7 +117,7 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
               />
             ))}
         </BackgroundImage>
-      </Box>
+      </AspectRatio>
       <Flex align="center" justify="center" mt="lg">
         <Group gap="lg">
           <Button onClick={() => AddNewSpot(camera)}>Add Spot To Camera</Button>
