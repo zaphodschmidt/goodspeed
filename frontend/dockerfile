@@ -2,7 +2,8 @@
 FROM node:20-alpine
 
 # Set the working directory
-WORKDIR /app
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json
 COPY package.json package-lock.json ./
@@ -10,14 +11,25 @@ COPY package.json package-lock.json ./
 # Install dependencies
 RUN npm install
 
+# Install bash
+RUN apk add --no-cache bash
+
+# Copy the entry point script
+COPY entrypoint.sh /usr/src/app/entrypoint.sh
+RUN chmod +x /usr/src/app/entrypoint.sh
+
 # Copy the rest of the frontend code
 COPY . .
 
 # Expose the Vite development server's default port
 EXPOSE 5173
 
-# Start the development server
-CMD ["npm", "run", "dev"]
+#Expose prod port
+EXPOSE 3000
+
+ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+
+# CMD ["npm", "run", "dev"]
 
 
 # Serve the app using a lightweight web server
