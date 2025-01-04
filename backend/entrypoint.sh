@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 # Default to development environment
 PROD=${PROD:-True}
 

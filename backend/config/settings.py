@@ -23,17 +23,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('DJANGO_SECRET_KEY')
+SECRET_KEY = 'NLECCK2TyiE-1NmH4Xcd18dmWF4HvEMrObs_LPBnPdp5JicA4KOlC6tpYa7-E1SUxNQ' #config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 PROD = config('PROD', default=True, cast=bool)
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-if(PROD):
-    ALLOWED_HOSTS = config('BACKEND_URL', default='').split(',')
-else:
-    ALLOWED_HOSTS = ['localhost','127.0.0.1']
+# if(PROD):
+#     ALLOWED_HOSTS = config('BACKEND_URL', default='').split(',')
+# else:
+#     ALLOWED_HOSTS = ['localhost','127.0.0.1']
     
+ALLOWED_HOSTS = ['goodspeedparking.fly.dev']
 
 # Application definition
 
@@ -100,7 +101,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": "/mnt/db/db.sqlite3",
     }
 }
 
@@ -135,13 +136,15 @@ CORS_ALLOW_HEADERS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    config('FRONTEND_URL'),
-    config('BACKEND_URL'),
+    # config('FRONTEND_URL'),
+    # config('BACKEND_URL'),
+    'https://goodspeedparking.fly.dev'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    config('FRONTEND_URL'),
-    config('BACKEND_URL'),
+    # config('FRONTEND_URL'),
+    # config('BACKEND_URL'),
+    'https://goodspeedparking.fly.dev'
 ]
 
 # Internationalization

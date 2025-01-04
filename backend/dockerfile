@@ -1,26 +1,21 @@
-FROM python:3.11.3
+ARG PYTHON_VERSION=3.13-slim
 
-# Set the working directory in the container
-# Create the app directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+FROM python:${PYTHON_VERSION}
 
-#ensure that python output is sent to terminal and not buffered
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-# Copy and install python requirements
-# Copy the project files to the container
-COPY ./requirements.txt ./
+RUN mkdir -p /code
 
-# Install project dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+WORKDIR /code
 
-# Expose the port that the Django app runs on
+COPY requirements.txt /tmp/requirements.txt
+RUN set -ex && \
+    pip install --upgrade pip && \
+    pip install -r /tmp/requirements.txt && \
+    rm -rf /root/.cache/
+COPY . /code
+
 EXPOSE 8000
 
-# Copy and set the entry point script
-COPY entrypoint.sh /usr/src/app/entrypoint.sh
-RUN chmod +x /usr/src/app/entrypoint.sh
-
-# Use the entry point script as the container's command
-ENTRYPOINT ["./entrypoint.sh"]
+CMD ["gunicorn","--bind",":8000","--workers","2","config.wsgi"]
