@@ -17,8 +17,10 @@ console_command = '/code/manage.py shell'
   DEBUG = 'True'
   BACKEND_URL = 'https://goodspeedbackend.fly.dev'
   FRONTEND_URL = 'https://goodspeedfrontend.fly.dev'
+  PROXY_URL = 'https://goodspeedparking.info'
   ALLOWED_HOSTS = 'goodspeedbackend.fly.dev,goodspeedparking.info'
   DATABASE_PATH = '/mnt/db/db.sqlite3'
+  MEDIA_PATH = '/mnt/db/media/'
 
 
 [[mounts]]

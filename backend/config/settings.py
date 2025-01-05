@@ -130,12 +130,15 @@ CORS_ALLOW_HEADERS = [
 CORS_ALLOWED_ORIGINS = [
     os.getenv('FRONTEND_URL'),
     os.getenv('BACKEND_URL'),
+    os.getenv('PROXY_URL', ''),
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     os.getenv('FRONTEND_URL'),
-    os.getenv('BACKEND_URL'),
+    os.getenv('PROXY_URL', ''),
 ]
+
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -157,7 +160,7 @@ STATIC_URL = "static/"
 # Media
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.getenv('MEDIA_PATH')#os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
