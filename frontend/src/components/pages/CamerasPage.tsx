@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { Building, Camera } from '../../types';
-import { Stack, Pagination, Grid, AspectRatio, Image, Center, Text, Group } from '@mantine/core'
+import { Stack, Pagination, Grid, AspectRatio, Image, Text, Group } from '@mantine/core'
 import Header from '../misc/Header'
 import { generateSlug } from '../misc/generateSlug';
 import no_image from "../../assets/no_image.jpeg";

@@ -1,7 +1,7 @@
 import axios, { AxiosRequestHeaders } from 'axios';
-import { Building, Camera, ParkingSpot, Vertex } from './types';
+import { Camera, ParkingSpot, Vertex } from './types';
 
-export const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
+export const API_BASE_URL = 'https://goodspeedbackend.fly.dev'//import.meta.env.VITE_BACKEND_URL;
 
 export function getAuthHeaders(): AxiosRequestHeaders['headers'] {
     const token = localStorage.getItem('access_token');
