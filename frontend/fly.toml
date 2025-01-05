@@ -19,6 +19,9 @@ primary_region = 'den'
   min_machines_running = 1
   processes = ['app']
 
+  [[services.tls]]
+    certs = ["goodspeedparking.info"]
+
 [[vm]]
   memory = '1gb'
   cpu_kind = 'shared'
