@@ -7,6 +7,7 @@ app = 'goodspeedfrontend'
 primary_region = 'den'
 
 [build]
+  build_target = 'production'
   [build.args]
     API_URL = "https://goodspeedbackend.fly.dev"
 

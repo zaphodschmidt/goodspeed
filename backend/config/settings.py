@@ -130,12 +130,12 @@ CORS_ALLOW_HEADERS = [
 CORS_ALLOWED_ORIGINS = [
     os.getenv('FRONTEND_URL'),
     os.getenv('BACKEND_URL'),
-    os.getenv('PROXY_URL', ''),
+    os.getenv('PROXY_URL'),
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     os.getenv('FRONTEND_URL'),
-    os.getenv('PROXY_URL', ''),
+    os.getenv('PROXY_URL'),
 ]
 
 

@@ -1,30 +1,41 @@
-# Step 1: Use Node.js as the base image
-FROM node:20-alpine AS builder
+# Base stage for both dev and prod
+FROM node:20-alpine AS base
 
-# Set the working directory inside the container
+# Set the working directory
 WORKDIR /app
 
-# Copy only package.json and package-lock.json to leverage Docker caching
+# Copy package.json and package-lock.json
 COPY package.json package-lock.json ./
 
-# Install all dependencies, including devDependencies (required for TypeScript build)
+# Install all dependencies
 RUN npm install
 
 # Copy the rest of the application code
 COPY . .
 
-# Set API_URL at build time and provide a fallback
+# Set build-time argument to specify API_URL
 ARG API_URL=https://example.com
 ENV VITE_API_URL=$API_URL
 
-# Build the React app
+# Final production image
+FROM base AS production
+
 RUN npm run build
 
-# Step 2: Serve the static files with `serve`
 RUN npm install -g serve
 
-# Expose the port for the frontend
+# Expose the production port
 EXPOSE 80
 
-# Command to serve the React app on port 80 and bind to 0.0.0.0
+# Start the production server
+
 CMD ["serve", "-s", "build", "-l", "80", "--single"]
+
+# Development stage (for Docker Compose)
+FROM base AS development
+
+# Expose the development server port
+EXPOSE 5173
+
+# Start the development server
+CMD ["npm", "run", "dev"]
