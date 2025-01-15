@@ -34,10 +34,11 @@ take_snapshot() {
     local cam_number=$1
     local cam_ip="$SUBNET.$cam_number"
     local rs=$(date +%s | md5sum | head -c 8)  # Random string for `rs` parameter
-    local output_file="$SNAPSHOT_DIR/camera_snapshot_$(date +%Y%m%d%H%M%S)_cam${cam_number}.jpg"
+    local output_file="$SNAPSHOT_DIR/camera_snapshot_$(date +%Y%m%d%H%M%S)_cam${cam_number}.jpeg"
     local timeout=10  # Timeout in seconds
     local max_width=3840  # Replace with your camera's maximum width
     local max_height=2160  # Replace with your camera's maximum height
+    local placeholder_image="./no_image.jpeg"  # Path to your placeholder image
 
     echo "Taking snapshot for Camera $cam_number at $cam_ip..." >&2
     curl -s --max-time "$timeout" -o "$output_file" \
@@ -45,14 +46,20 @@ take_snapshot() {
 
     # Check if the file was created and is not empty
     if [[ -f "$output_file" && -s "$output_file" ]]; then
-        echo "$output_file"
+        # Validate the file type to ensure it's a JPEG
+        if file "$output_file" | grep -q "JPEG image data"; then
+            echo "$output_file"
+        else
+            echo "Warning: Snapshot for Camera $cam_number is not a valid JPEG. Using placeholder image instead." >&2
+            cp "$placeholder_image" "$output_file"
+            echo "$output_file"
+        fi
     else
-        echo "Warning: Snapshot for Camera $cam_number timed out or failed." >&2
-        echo ""
+        echo "Warning: Snapshot for Camera $cam_number timed out or failed. Using placeholder image instead." >&2
+        cp "$placeholder_image" "$output_file"
+        echo "$output_file"
     fi
 }
-
-
 
 # Function to upload the snapshot
 upload_snapshot() {
