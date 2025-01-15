@@ -344,3 +344,9 @@ pyrightconfig.json
 fly.toml
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,python,django,linux
+
+# PI scripts
+snapshots/
+dhcp_config_generated.txt
+
+# End of https://www.toptal.com/developers/gitignore/api/macos,python,django,linux
