@@ -1,22 +1,34 @@
-FROM python:3.11.3
+# Unified Dockerfile
+ARG PYTHON_VERSION=3.13-slim
+FROM python:${PYTHON_VERSION}
 
-# Set the working directory in the container
-# Create the app directory
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Create app directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-#ensure that python output is sent to terminal and not buffered
-ENV PYTHONUNBUFFERED=1
+# Install dependencies
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install -r /tmp/requirements.txt
 
-# Copy and install python requirements
-# Copy the project files to the container
-COPY ./requirements.txt ./
+# Copy app files
+COPY . /usr/src/app
 
-# Install project dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Build argument to determine environment
+ARG ENV=production
 
-# Expose the port that the Django app runs on
+# Development-specific configuration
+RUN if [ "$ENV" = "development" ]; then pip install debugpy; fi
+
+# Expose port
 EXPOSE 8000
 
-# Command to run the Django app
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Command based on the environment
+CMD if [ "$ENV" = "development" ]; then \
+        python manage.py runserver 0.0.0.0:8000; \
+    else \
+        gunicorn --bind :8000 --workers 2 config.wsgi; \
+    fi

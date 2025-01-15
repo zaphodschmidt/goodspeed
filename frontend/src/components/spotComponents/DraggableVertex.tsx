@@ -1,6 +1,6 @@
 import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
 import { Vertex } from "../../types.ts";
-import React, { useState } from "react";
+import { useState } from "react";
 import { updateVertex } from "../../apiService.ts";
 
 interface DraggableVertexProps {
@@ -13,7 +13,7 @@ interface DraggableVertexProps {
 function DraggableVertex({ vertex, color, vertexSize, updateVertices }: DraggableVertexProps) {
     const [position, setPosition] = useState({ x: vertex.x, y: vertex.y });
 
-    const handleDrag = (e: DraggableEvent, data: DraggableData) => {
+    const handleDrag = (_: DraggableEvent, data: DraggableData) => {
         setPosition({ x: data.x, y: data.y });
 
         // Update the vertex in the array
@@ -21,7 +21,7 @@ function DraggableVertex({ vertex, color, vertexSize, updateVertices }: Draggabl
         updateVertices(updatedVertex);
     };
 
-    const handleStop = (e: DraggableEvent, data: DraggableData) => {
+    const handleStop = (_: DraggableEvent, data: DraggableData) => {
         const updatedVertex: Vertex = { ...vertex, x: data.x, y: data.y };
         updateVertex(updatedVertex);
     };

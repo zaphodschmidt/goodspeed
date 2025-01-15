@@ -1,5 +1,5 @@
-# Use Node.js image
-FROM node:20-alpine
+# Base stage for both dev and prod
+FROM node:20-alpine AS base
 
 # Set the working directory
 WORKDIR /app
@@ -7,26 +7,35 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package.json package-lock.json ./
 
-# Install dependencies
+# Install all dependencies
 RUN npm install
 
-# Copy the rest of the frontend code
+# Copy the rest of the application code
 COPY . .
 
-# Expose the Vite development server's default port
+# Set build-time argument to specify API_URL
+ARG API_URL=https://example.com
+ENV VITE_API_URL=$API_URL
+
+# Final production image
+FROM base AS production
+
+RUN npm run build
+
+RUN npm install -g serve
+
+# Expose the production port
+EXPOSE 80
+
+# Start the production server
+
+CMD ["serve", "-s", "build", "-l", "80", "--single"]
+
+# Development stage (for Docker Compose)
+FROM base AS development
+
+# Expose the development server port
 EXPOSE 5173
 
 # Start the development server
 CMD ["npm", "run", "dev"]
-
-
-# Serve the app using a lightweight web server
-# RUN npm run build #????????
-# FROM nginx:alpine
-# COPY --from=builder /app/dist /usr/share/nginx/html
-
-# # Expose the port
-# EXPOSE 80
-
-# # Start the server
-# CMD ["nginx", "-g", "daemon off;"]

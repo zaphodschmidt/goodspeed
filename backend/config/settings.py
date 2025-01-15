@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config
 import os
 from corsheaders.defaults import default_headers
 
@@ -23,14 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('DJANGO_SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DJANGO_DEBUG', default=False, cast=bool)
-
-ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='').split(',')
-
-
+DEBUG = os.getenv('DEBUG').lower() in ['true', '1', 'yes']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
+    
 # Application definition
 
 INSTALLED_APPS = [
@@ -96,7 +93,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": os.getenv('DATABASE_PATH'),
     }
 }
 
@@ -131,14 +128,17 @@ CORS_ALLOW_HEADERS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    config('FRONTEND_URL'),
-    config('BACKEND_URL'),
+    os.getenv('FRONTEND_URL'),
+    os.getenv('BACKEND_URL'),
+    os.getenv('PROXY_URL'),
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    config('FRONTEND_URL'),
-    config('BACKEND_URL'),
+    os.getenv('FRONTEND_URL'),
+    os.getenv('PROXY_URL'),
 ]
+
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -160,7 +160,7 @@ STATIC_URL = "static/"
 # Media
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.getenv('MEDIA_PATH')#os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -19,4 +19,7 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  build: {
+    outDir: 'build', // Ensure this matches the Dockerfile
+  },
 })
