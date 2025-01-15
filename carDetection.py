@@ -1,16 +1,24 @@
 from ultralytics import YOLO
 import os
+import imghdr
+from PIL import Image
 
-# from PIL import Image
 # test_file = "./backend/media/uploads/camera_snapshot_20250114192003_cam5.jpg"
 # img = Image.open(test_file)
 # img.show()
 
-PATH = './backend/media/other'
+def is_jpeg(file_path):
+    try:
+        with Image.open(file_path) as img:
+            return img.format == 'JPEG'
+    except (IOError, OSError):
+        return False
+
+PATH = './backend/media/uploads'
 def getDirs(path: str):
     files = []
     for fileName in os.scandir(path):
-        if fileName.is_file():
+        if fileName.is_file() and is_jpeg(fileName):
             files.append(PATH+"/"+fileName.name)
     return files
 
