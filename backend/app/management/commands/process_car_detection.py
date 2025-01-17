@@ -2,17 +2,19 @@ import os
 from PIL import Image
 import cv2
 import numpy as np
+import json
 from ultralytics import solutions
 from ultralytics.solutions.solutions import BaseSolution
 from ultralytics.utils import LOGGER
 from ultralytics.utils.checks import check_requirements
 from ultralytics.utils.plotting import Annotator
+from app.models import Building, Camera, ParkingSpot, Vertex
+from django.core.management.base import BaseCommand
 
-# PATH = './camera_snapshot_20250114210012_cam11.jpeg'
-PATH = './commercial-parking-lots.jpg'
+PATH = '/Users/zaphodschmidt/Desktop/coding/goodspeed/backend/media/uploads/camera_snapshot_20250116222005_vertex1_cam6.jpeg'
 MODEL = 'yolov8n.pt'
-BOUNDING = './bounding_boxes.json'
 IMG_SAVE = './wow1.jpeg'
+BOUNDING = './bounding_boxes.json'
 
 class ParkingManagement(BaseSolution):
     """
@@ -43,20 +45,41 @@ class ParkingManagement(BaseSolution):
         """Initializes the parking management system with a YOLO model and visualization settings."""
         super().__init__(**kwargs)
 
-        self.json_file = self.CFG["json_file"]  # Load JSON data
-        if self.json_file is None:
-            LOGGER.warning("❌ json_file argument missing. Parking region details required.")
-            raise ValueError("❌ Json file path can not be empty")
-
-        with open(self.json_file) as f:
-            self.json = json.load(f)
-
         self.pr_info = {"Occupancy": 0, "Available": 0}  # dictionary for parking information
 
         self.arc = (0, 0, 255)  # available region color
         self.occ = (0, 255, 0)  # occupied region color
         self.dc = (255, 0, 189)  # centroid color for each box
+    
+    def loadCameraVertecies(self, photo: str):
+        buildingName = photo.split('_')[3]
+        cameraNum = int(photo.split('_')[4][3])
+        print(f"Bulding = {buildingName}")
+        print(f"Camera# = {cameraNum}")
+
+        if buildingName.lower() == "vertex1":
+            buildingName = "Vertex"
+        # cameraNum = f"Camera {cameraNum} in Vertex"
+
+        try:
+            building = Building.objects.get(name=buildingName)
+        except Building.DoesNotExist:
+            print(f"Building '{buildingName}' does not exist.")
+            return
+
+        print(f"Cameras in {building.name}: {building.cameras.all()}")
+
+        try:
+            camera = building.cameras.get(cam_num=cameraNum)
+        except Camera.DoesNotExist:
+            print(f"Camera {cameraNum} does not exist in building {building.name}.")
+            return
         
+        print(f"Spots in {camera.cam_num} : {camera.parking_spots.all()}")
+
+        # try:
+            
+
     def isJpeg(self, file_path:str):
         try:
             with Image.open(file_path) as img:
@@ -87,8 +110,10 @@ class ParkingManagement(BaseSolution):
             >>> image = cv2.imread("parking_lot.jpg")
             >>> parking_manager.process_data(image)
         """
+
         self.extract_tracks(im0)  # extract tracks from im0
         es, fs = len(self.json), 0  # empty slots, filled slots
+        print(f"JSON_FILE: {self.json_file}")
         annotator = Annotator(im0, self.line_width)  # init annotator
 
         for region in self.json:
@@ -130,7 +155,11 @@ class ParkingManagement(BaseSolution):
             cv2.imwrite(IMG_SAVE, output)
             print("Saved img!!")
 
-if __name__ == "__main__":
-    parking = ParkingManagement(model_path = MODEL, json_file = BOUNDING)
-    parking.runParkingDetection(PATH, BOUNDING)
-    # solutions.ParkingPtsSelection()
+class Command(BaseCommand):
+    help = "Detects where the cars are in the parking lot"
+
+    def handle(self, *args, **kwargs):
+        parking = ParkingManagement(model_path = MODEL, json_file = BOUNDING)
+        # parking.runParkingDetection(PATH, BOUNDING)
+        parking.loadCameraVertecies(PATH)
+        # solutions.ParkingPtsSelection()

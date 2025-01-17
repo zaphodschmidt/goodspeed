@@ -1,5 +1,5 @@
 # Unified Dockerfile
-ARG PYTHON_VERSION=3.13-slim
+ARG PYTHON_VERSION=3.12-slim
 FROM python:${PYTHON_VERSION}
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -9,11 +9,16 @@ ENV PYTHONUNBUFFERED=1
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+libgl1-mesa-glx \
+libglib2.0-0
+
 # Install dependencies
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install -r /tmp/requirements.txt
-
+    
 # Copy app files
 COPY . /usr/src/app
 
