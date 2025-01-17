@@ -10,6 +10,19 @@ else
     exit 1
 fi
 
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+######################################################
+#MAKE SURE TO SET LOCATION IN ENV FOR BASH SCRIPT
+#  |
+#  |
+#  |
+#  |
+#  |
+#  V
+LOCATION="${LOCATION1}"
+######################################################
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 CSV_FILE="${CSV_FILE}"
 SNAPSHOT_DIR="./snapshots"
 CAMERA_PASSWORD="${CAMERA_PASSWORD}"
@@ -34,7 +47,7 @@ take_snapshot() {
     local cam_number=$1
     local cam_ip="$SUBNET.$cam_number"
     local rs=$(date +%s | md5sum | head -c 8)  # Random string for `rs` parameter
-    local output_file="$SNAPSHOT_DIR/camera_snapshot_$(date +%Y%m%d%H%M%S)_cam${cam_number}.jpeg"
+    local output_file="$SNAPSHOT_DIR/camera_snapshot_$(date +%Y%m%d%H%M%S)_${LOCATION}_cam${cam_number}.jpeg"
     local timeout=10  # Timeout in seconds
     local max_width=3840  # Replace with your camera's maximum width
     local max_height=2160  # Replace with your camera's maximum height

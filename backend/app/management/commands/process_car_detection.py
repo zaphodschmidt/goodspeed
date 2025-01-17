@@ -134,4 +134,3 @@ if __name__ == "__main__":
     parking = ParkingManagement(model_path = MODEL, json_file = BOUNDING)
     parking.runParkingDetection(PATH, BOUNDING)
     # solutions.ParkingPtsSelection()
-
