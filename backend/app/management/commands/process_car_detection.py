@@ -11,7 +11,7 @@ from ultralytics.utils.plotting import Annotator
 from app.models import Building, Camera, ParkingSpot, Vertex
 from django.core.management.base import BaseCommand
 
-PATH = '/Users/zaphodschmidt/Desktop/coding/goodspeed/backend/media/uploads/camera_snapshot_20250116222005_vertex1_cam6.jpeg'
+PATH = './media/uploads/camera_snapshot_20250116222005_vertex1_cam6.jpeg'
 MODEL = 'yolov8n.pt'
 IMG_SAVE = './wow1.jpeg'
 BOUNDING = './bounding_boxes.json'
@@ -44,22 +44,24 @@ class ParkingManagement(BaseSolution):
     def __init__(self, **kwargs):
         """Initializes the parking management system with a YOLO model and visualization settings."""
         super().__init__(**kwargs)
-
+        self.json = None
         self.pr_info = {"Occupancy": 0, "Available": 0}  # dictionary for parking information
 
         self.arc = (0, 0, 255)  # available region color
         self.occ = (0, 255, 0)  # occupied region color
         self.dc = (255, 0, 189)  # centroid color for each box
-    
+
+        self.normalImgW = 2560
+        self.normalImgH = 1920
+        self.webpageImgW = 1000
+        self.webpageImgH = 750
+
     def loadCameraVertecies(self, photo: str):
         buildingName = photo.split('_')[3]
         cameraNum = int(photo.split('_')[4][3])
-        print(f"Bulding = {buildingName}")
-        print(f"Camera# = {cameraNum}")
 
         if buildingName.lower() == "vertex1":
             buildingName = "Vertex"
-        # cameraNum = f"Camera {cameraNum} in Vertex"
 
         try:
             building = Building.objects.get(name=buildingName)
@@ -77,8 +79,25 @@ class ParkingManagement(BaseSolution):
         
         print(f"Spots in {camera.cam_num} : {camera.parking_spots.all()}")
 
-        # try:
-            
+        #calc how much the boudning boxes need to be scaled
+        scaleW = self.normalImgW / self.webpageImgW
+        scaleH = self.normalImgH / self.webpageImgH
+
+        parkingSpotBounds = []
+        for spot in camera.parking_spots.all():
+            print(spot.vertices.all())
+            pointsDict = {"points": []}
+            for point in spot.vertices.all():
+                print(f"POINTS: {[point.x * scaleW, point.y * scaleH]}")
+                pointsDict["points"].append([point.x * scaleW, point.y * scaleH])
+            parkingSpotBounds.append(pointsDict)
+        print(parkingSpotBounds)
+
+        jsonData = json.dumps(parkingSpotBounds)
+        with open('vertexes.json', 'w') as f:
+            f.write(jsonData)
+
+        return parkingSpotBounds
 
     def isJpeg(self, file_path:str):
         try:
@@ -113,7 +132,7 @@ class ParkingManagement(BaseSolution):
 
         self.extract_tracks(im0)  # extract tracks from im0
         es, fs = len(self.json), 0  # empty slots, filled slots
-        print(f"JSON_FILE: {self.json_file}")
+        print(f"JSON_FILE: {self.json}")
         annotator = Annotator(im0, self.line_width)  # init annotator
 
         for region in self.json:
@@ -140,8 +159,9 @@ class ParkingManagement(BaseSolution):
         self.display_output(im0)  # display output with base class function
         return im0  # return output image for more usage
 
-    def runParkingDetection(self, imagePath: str, boundingBox: str):
-        managment = ParkingManagement(model_path = MODEL, json_file = boundingBox)
+    def runParkingDetection(self, imagePath: str):
+        managment = ParkingManagement(model_path = MODEL)
+        managment.json = managment.loadCameraVertecies(imagePath)
         imgBGR = cv2.imread(imagePath)
 
         if imgBGR is None:
@@ -160,6 +180,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         parking = ParkingManagement(model_path = MODEL, json_file = BOUNDING)
-        # parking.runParkingDetection(PATH, BOUNDING)
-        parking.loadCameraVertecies(PATH)
+        parking.runParkingDetection(PATH)
         # solutions.ParkingPtsSelection()

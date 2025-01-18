@@ -11,7 +11,7 @@ interface SpotPolygonProps {
 }
 
 const colors = ['red', 'orange', 'yellow', 'green', 'teal', 'blue', 'cyan', 'purple', 'pink', 'indigo', 'lime']
-const vertexSize = 20
+const vertexSize = 10
 
 function SpotPolygon({ parking_spot, colorKey, deleteSpot }: SpotPolygonProps) {
     const [vertices, setVertices] = useState<Vertex[]>(parking_spot.vertices)
