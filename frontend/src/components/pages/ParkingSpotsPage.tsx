@@ -14,6 +14,7 @@ import no_image from "../../assets/no_image.jpeg";
 import { generateSlug } from "../misc/generateSlug.ts";
 import { createParkingSpot, deleteParkingSpot, getCameraByID } from "../../apiService.ts";
 import SpotPolygon from "../spotComponents/SpotPolygon.tsx";
+import SpotTable from "../spotComponents/SpotTable.tsx";
 
 interface BuildingsPageProps {
   buildings: Building[];
@@ -40,6 +41,7 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
       getCameraByID(camera_id).then((fetched_cam: Camera) => {
         setCamera(fetched_cam)
         setSpots(fetched_cam.parking_spots)
+        console.log(fetched_cam.parking_spots)
       })
     }
   }, []);
@@ -92,39 +94,40 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
   return (
     <div>
       <Header title={`Camera ${camNum} Feed`} home={false} />
-      <AspectRatio
-        maw={1000}
-        mx="auto"
-        pos='relative'
-        ratio={4 / 3}
-      >
-        <BackgroundImage
-          ref={imageRef}
-          src={camera.image?.image_url || no_image}
-          style={{
-            position: 'relative',
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-          }}
+        <AspectRatio
+          maw={1000}
+          mx="auto"
+          pos='relative'
+          ratio={4 / 3}
         >
-          {spots.length > 0 &&
-            spots.map((spot, index) => (
-              <SpotPolygon
-                key={spot.id}
-                parking_spot={spot}
-                colorKey={index}
-                deleteSpot={deleteSpot}
-              />
-            ))}
-        </BackgroundImage>
-      </AspectRatio>
-      <Flex align="center" justify="center" mt="lg">
-        <Group gap="lg">
-          <Button onClick={() => AddNewSpot(camera)}>Add Spot To Camera</Button>
-          <Button onClick={deleteAllSpots}>Delete All Spots From Camera</Button>
-        </Group>
-      </Flex>
+          <BackgroundImage
+            ref={imageRef}
+            src={camera.image?.image_url || no_image}
+            style={{
+              position: 'relative',
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+            }}
+          >
+            {spots.length > 0 &&
+              spots.map((spot, index) => (
+                <SpotPolygon
+                  key={spot.id}
+                  parking_spot={spot}
+                  colorKey={index}
+                  deleteSpot={deleteSpot}
+                />
+              ))}
+          </BackgroundImage>
+        </AspectRatio>
+        <Flex align="center" justify="center" mt="lg">
+          <Group>
+            <Button onClick={() => AddNewSpot(camera)}>Add Spot To Camera</Button>
+            <Button onClick={deleteAllSpots}>Delete All Spots From Camera</Button>
+          </Group>
+        </Flex>
+        <SpotTable spots={spots} />
     </div>
   );
 }

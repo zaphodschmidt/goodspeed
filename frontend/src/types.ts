@@ -27,8 +27,8 @@ export interface ParkingSpot {
     spot_num: number; //number of parking spot in garage
     occupied: boolean; 
     monthly: boolean;
-    start_datetime: string;
-    end_datetime: string;
+    start_datetime?: string;
+    end_datetime?: string;
     camera: number; //backend id of associated camera
     vertices: Vertex[]; 
 }

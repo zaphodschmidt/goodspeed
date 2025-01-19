@@ -8,6 +8,7 @@ import { getBuildings } from './apiService';
 import BuildingsPage from './components/pages/BuildingsPage';
 import CamerasPage from './components/pages/CamerasPage';
 import ParkingSpotsPage from './components/pages/ParkingSpotsPage'
+import 'mantine-react-table/styles.css'; //import MRT styles
 
 
 function App() {
