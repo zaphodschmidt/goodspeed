@@ -5,9 +5,9 @@ import './App.css'
 import '@mantine/core/styles.css'; // Import Mantine core styles
 import { Building } from './types';
 import { getBuildings } from './apiService';
-import BuildingsPage from './components/pages/BuildingsPage';
-import CamerasPage from './components/pages/CamerasPage';
-import ParkingSpotsPage from './components/pages/ParkingSpotsPage'
+import BuildingsPage from './components/pages/BuildingsList';
+import CamerasPage from './components/pages/BuildingDetail';
+import ParkingSpotsPage from './components/pages/CameraDetail'
 import 'mantine-react-table/styles.css'; //import MRT styles
 
 
