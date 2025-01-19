@@ -44,14 +44,14 @@ function Welcome() {
                 </Title>
 
                 <List spacing="xs" fz='lg' withPadding>
-                    <List.Item>View camera feed snapshots for every building.</List.Item>
-                    <List.Item>Add and manage parking spots with a simple drag-and-drop interface.</List.Item>
-                    <List.Item>Gain insights into occupancy and streamline parking operations.</List.Item>
+                    <List.Item>View camera feed snapshots for each building.</List.Item>
+                    <List.Item>Add and manage parking spots and vertices with a simple drag-and-drop interface.</List.Item>
+                    <List.Item>Monitor spot occupancy and reservation information.</List.Item>
                 </List>
             </Stack>
 
             {/* Hardcoded building buttons */}
-            <Group justify='center' gap='5%' mt='lg'>
+            <Group justify='center' gap='5%' mt='xl'>
                 <Stack
                     align='center'
                     w='25%'
