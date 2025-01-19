@@ -7,7 +7,7 @@ import dayjs from 'dayjs'
 
 interface SpotTableProps{
     spots: ParkingSpot[];
-    // onSpotEdit: (spot: ParkingSpot) => void
+    onSpotEdit: (spot: ParkingSpot) => void
 }
 
 export default function SpotTable({ spots } : SpotTableProps){
@@ -26,11 +26,12 @@ export default function SpotTable({ spots } : SpotTableProps){
                 }
             },
             {
-                accessorKey: 'monthly',
-                header: 'Monthly?',
-                Cell: ({ cell }) => {
-                    return cell.getValue<boolean>() ? (<IconCheck color='green'/>) : (<IconX  color='red'/>)
-                }
+                accessorKey: 'occupied_by_lpn',
+                header: 'Occupied by (LPN)',
+            },
+            {
+                accessorKey: 'reserved_by_lpn',
+                header: 'Reserved by (LPN)',
             },
             {
                 accessorKey: 'start_datetime',
@@ -61,18 +62,12 @@ export default function SpotTable({ spots } : SpotTableProps){
         data: spots,
         enableSorting: false,
         enableColumnActions: false,
-        // enableTableHead: false,
+        enableEditing: true,
+        createDisplayMode: 'row',
+        editDisplayMode: 'cell',
         initialState: {
             density: 'xs',
-            // pagination: { pageSize: 10, pageIndex: 0 },
-            // columnVisibility: {
-            //     camera: (!!onAdd),
-            // },
         },
-        // mantinePaginationProps: {
-        //     showRowsPerPage: false,
-        //     withEdges: false, // Customizes pagination controls
-        // },
         enableTopToolbar: false,
         enableBottomToolbar: false,
     })

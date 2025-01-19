@@ -34,7 +34,8 @@ class ParkingSpot(models.Model):
     occupied = models.BooleanField(default=False) 
     start_datetime = models.DateTimeField(null=True) # start of parkmobile lease
     end_datetime = models.DateTimeField(null=True) # end of parkmobile lease
-    monthly = models.BooleanField(default=False) # is this spot reserved as a monthly subscription?
+    reserved_by_lpn = models.CharField(null=True, max_length=15)
+    occupied_by_lpn = models.CharField(null=True, max_length=15)
     camera = models.ForeignKey(Camera, on_delete=models.CASCADE, related_name='parking_spots')
 
     # class Meta:
