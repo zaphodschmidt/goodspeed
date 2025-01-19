@@ -12,15 +12,16 @@ import {
 import Header from "../misc/Header.tsx";
 import no_image from "../../assets/no_image.jpeg";
 import { generateSlug } from "../misc/generateSlug.ts";
-import { createParkingSpot, deleteParkingSpot, getCameraByID } from "../../apiService.ts";
+import { createParkingSpot, deleteParkingSpot, getCameraByID, updateParkingSpot } from "../../apiService.ts";
 import SpotPolygon from "../spotComponents/SpotPolygon.tsx";
 import SpotTable from "../spotComponents/SpotTable.tsx";
 
-interface BuildingsPageProps {
+
+interface ParkingSpotsPageProps {
   buildings: Building[];
 }
 
-function BuildingsPage({ buildings }: BuildingsPageProps) {
+function ParkingSpotsPage({ buildings }: ParkingSpotsPageProps) {
 
   const { buildingSlug, camNum } = useParams<{
     buildingSlug: string;
@@ -87,6 +88,11 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
 
   }
 
+  const handleUpdateSpot = async (updatedSpot: ParkingSpot) => {
+      await updateParkingSpot(updatedSpot)
+      setSpots(spots.map((spot) => spot.id === updatedSpot.id ? updatedSpot : spot))
+  }
+
   if (!building || !camera) {
     return <Loader />
   }
@@ -117,6 +123,7 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
                   parking_spot={spot}
                   colorKey={index}
                   deleteSpot={deleteSpot}
+                  handleUpdateSpot={handleUpdateSpot}
                 />
               ))}
           </BackgroundImage>
@@ -132,4 +139,4 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
   );
 }
 
-export default BuildingsPage;
+export default ParkingSpotsPage;

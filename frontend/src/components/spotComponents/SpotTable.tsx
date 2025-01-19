@@ -7,7 +7,7 @@ import dayjs from 'dayjs'
 
 interface SpotTableProps{
     spots: ParkingSpot[];
-    onSpotEdit: (spot: ParkingSpot) => void
+    // onSpotEdit: (spot: ParkingSpot) => void
 }
 
 export default function SpotTable({ spots } : SpotTableProps){
@@ -62,9 +62,6 @@ export default function SpotTable({ spots } : SpotTableProps){
         data: spots,
         enableSorting: false,
         enableColumnActions: false,
-        enableEditing: true,
-        createDisplayMode: 'row',
-        editDisplayMode: 'cell',
         initialState: {
             density: 'xs',
         },
