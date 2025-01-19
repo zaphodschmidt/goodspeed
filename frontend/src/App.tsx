@@ -10,6 +10,8 @@ import CamerasPage from './components/pages/BuildingDetail';
 import ParkingSpotsPage from './components/pages/CameraDetail'
 import 'mantine-react-table/styles.css'; //import MRT styles
 import { mantineTheme } from './theme.ts'
+import { mantineCssVariableResolver } from './cssVariableResolver.ts';
+import CustomAppShell from "./components/misc/CustomAppShell.tsx"
 
 
 function App() {
@@ -30,17 +32,18 @@ function App() {
     <MantineProvider
       defaultColorScheme="auto"
       theme={mantineTheme}
+      cssVariablesResolver={mantineCssVariableResolver}
     >
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<BuildingsPage buildings={buildings} />} />
+          <Route path="/" element={<CustomAppShell><BuildingsPage buildings={buildings} /></CustomAppShell>} />
           <Route
               path="/building/:buildingSlug"
-              element={<CamerasPage buildings={buildings} />}
+              element={<CustomAppShell><CamerasPage buildings={buildings} /></CustomAppShell>}
             />
             <Route
               path="/building/:buildingSlug/camera/:camNum"
-              element={<ParkingSpotsPage buildings={buildings} />}
+              element={<CustomAppShell><ParkingSpotsPage buildings={buildings} /></CustomAppShell>}
             />
         </Routes>
       </BrowserRouter>

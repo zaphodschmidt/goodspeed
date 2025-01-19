@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Building } from '../../types';
 import { Button, Stack, Center } from '@mantine/core';
-import Header from '../misc/Header';
 import { generateSlug } from '../misc/generateSlug';
 
 interface BuildingsPageProps {
@@ -13,7 +12,6 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
 
     return (
         <div>
-            <Header title="Buildings" home={true} />
             <Center>
                 <Stack h="500px" w="500px">
                     {buildings.map((building) => {

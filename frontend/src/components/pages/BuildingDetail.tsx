@@ -2,7 +2,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { Building, Camera, ParkingSpot } from '../../types';
 import { Stack, Pagination, Grid, AspectRatio, Image, Text, Group, Tabs, Center, Loader } from '@mantine/core'
-import Header from '../misc/Header'
 import { generateSlug } from '../misc/generateSlug';
 import no_image from "../../assets/no_image.jpeg";
 import SpotTable from '../spotComponents/SpotTable';
@@ -37,7 +36,6 @@ function CamerasPage({ buildings }: BuildingsPageProps) {
 
     return (
         <div>
-            <Header title={`Overview for ${building?.name}`} home={false} />
             <Tabs value={activeTab} onChange={setActiveTab}>
                 <Tabs.List>
                     <Tabs.Tab value="cameras">Cameras</Tabs.Tab>
