@@ -77,7 +77,7 @@ export default function CustomAppShell({ children }: { children: React.ReactNode
                         const slug = generateSlug(building.name)
                         const cameras = building.cameras
                         return (
-                            <>
+                            <div key={building.id ?? building.name}>
                                 <NavLink
                                     href="#required-for-focus"
                                     label={building.name}
@@ -90,12 +90,13 @@ export default function CustomAppShell({ children }: { children: React.ReactNode
                                         onClick={() => navigate(`/building/${slug}`)}
                                     />
                                     <NavLink
-                                        href="#required-for-focus"
+                                        // href="#required-for-focus"
                                         label='Cameras'
                                         childrenOffset={28}
                                     >
                                         {cameras.map((camera) =>
                                             <NavLink
+                                                key={camera.id ?? camera.MAC ?? camera.IP}
                                                 variant='subtle'
                                                 active={location.pathname === `/building/${slug}/camera/${camera.cam_num}`}
                                                 label={`Camera #${camera.cam_num}`}
@@ -103,8 +104,7 @@ export default function CustomAppShell({ children }: { children: React.ReactNode
                                             />)}
                                     </NavLink>
                                 </NavLink>
-
-                            </>
+                            </div>
                         )
                     })}
                 </ScrollArea>
