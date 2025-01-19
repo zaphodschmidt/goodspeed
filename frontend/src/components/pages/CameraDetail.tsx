@@ -43,7 +43,7 @@ function CameraDetail() {
         console.log(fetched_cam.parking_spots)
       })
     }
-  }, []);
+  }, [camera_id]);
 
   const deleteAllSpots = () => {
     for (const parking_spot of spots) {
