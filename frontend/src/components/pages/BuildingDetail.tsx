@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { Building, Camera, ParkingSpot } from '../../types';
-import { Stack, Pagination, Grid, AspectRatio, Image, Text, Group, Tabs, Center, Loader } from '@mantine/core'
+import { Stack, Pagination, Grid, AspectRatio, Image, Text, Group, Tabs } from '@mantine/core'
 import { generateSlug } from '../misc/generateSlug';
 import no_image from "../../assets/no_image.jpeg";
 import SpotTable from '../spotComponents/SpotTable';
@@ -28,10 +28,6 @@ function BuildingDetail() {
     ).sort((a, b) => a.spot_num - b.spot_num) || [];
 
     const [activeTab, setActiveTab] = useState<string | null>('cameras');
-
-    if(!cameras || !spots){
-        return(<Center><Loader/></Center>)
-    }
 
     return (
         <div>

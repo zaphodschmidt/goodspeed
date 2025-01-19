@@ -7,7 +7,6 @@ import {
   AspectRatio,
   BackgroundImage,
   Group,
-  Loader,
 } from "@mantine/core";
 import no_image from "../../assets/no_image.jpeg";
 import { generateSlug } from "../misc/generateSlug.ts";
@@ -15,6 +14,7 @@ import { createParkingSpot, deleteParkingSpot, getCameraByID, updateParkingSpot 
 import SpotPolygon from "../spotComponents/SpotPolygon.tsx";
 import SpotTable from "../spotComponents/SpotTable.tsx";
 import { useBuildings } from "../misc/useBuildingsContext.ts";
+import CustomLoader from "../misc/CustomLoader.tsx";
 
 
 function CameraDetail() {
@@ -92,7 +92,7 @@ function CameraDetail() {
   }
 
   if (!building || !camera) {
-    return <Loader />
+    return <CustomLoader/>
   }
 
   return (

@@ -1,16 +1,17 @@
-import { AppShell, Flex, Group, Title, ActionIcon, useMantineColorScheme, ThemeIcon, Burger, NavLink, ScrollArea, Tooltip } from '@mantine/core';
+import { AppShell, Flex, Group, Title, ActionIcon, useMantineColorScheme, ThemeIcon, Burger, NavLink, ScrollArea, Tooltip, Center, Loader, Box } from '@mantine/core';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { IconHome, IconSun, IconMoon, IconCar, IconBrandGithub } from '@tabler/icons-react'
 import { useDisclosure } from '@mantine/hooks';
 import { useBuildings } from './useBuildingsContext';
 import { generateSlug } from './generateSlug';
+import CustomLoader from './CustomLoader';
 
 export default function CustomAppShell({ children }: { children: React.ReactNode }) {
     const navigate = useNavigate();
     const location = useLocation();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme()
     const [opened, { toggle }] = useDisclosure();
-    const { buildings } = useBuildings()
+    const { buildings, loading } = useBuildings()
 
     return (
         <AppShell
@@ -65,6 +66,7 @@ export default function CustomAppShell({ children }: { children: React.ReactNode
             </AppShell.Header>
 
             <AppShell.Navbar p="md">
+                {loading ? <CustomLoader/> :
                 <ScrollArea>
                     <NavLink
                         // href="#required-for-focus"
@@ -108,9 +110,12 @@ export default function CustomAppShell({ children }: { children: React.ReactNode
                         )
                     })}
                 </ScrollArea>
+                }
             </AppShell.Navbar>
 
-            <AppShell.Main>{children}</AppShell.Main>
+            <AppShell.Main>
+                {loading ? <CustomLoader/> : children }
+            </AppShell.Main>
         </AppShell>
     );
 }
