@@ -57,7 +57,7 @@ export default function CustomAppShell({ children }: { children: React.ReactNode
             <AppShell.Navbar p="md">
                 <ScrollArea>
                     <NavLink
-                        href="#required-for-focus"
+                        // href="#required-for-focus"
                         label="Welcome"
                         active={location.pathname === '/'}
                         onClick={() => navigate(`/`)}

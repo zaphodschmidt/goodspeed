@@ -5,7 +5,7 @@ import './App.css'
 import '@mantine/core/styles.css'; // Import Mantine core styles
 import { Building } from './types';
 import { getBuildings } from './apiService';
-import BuildingsList from './components/pages/BuildingsList';
+import Welcome from './components/pages/Welcome.tsx';
 import BuildingDetail from './components/pages/BuildingDetail';
 import CameraDetail from './components/pages/CameraDetail'
 import 'mantine-react-table/styles.css'; //import MRT styles
@@ -38,7 +38,7 @@ function App() {
       <BuildingsProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<CustomAppShell><BuildingsList /></CustomAppShell>} />
+            <Route path="/" element={<CustomAppShell><Welcome /></CustomAppShell>} />
             <Route
               path="/building/:buildingSlug"
               element={<CustomAppShell><BuildingDetail /></CustomAppShell>}
