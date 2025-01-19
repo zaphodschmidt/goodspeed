@@ -1,11 +1,12 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { Building, Camera, ParkingSpot } from '../../types';
-import { Stack, Pagination, Grid, AspectRatio, Image, Text, Group, Tabs } from '@mantine/core'
+import { Stack, Pagination, Grid, AspectRatio, Image, Text, Group, Tabs, Title } from '@mantine/core'
 import { generateSlug } from '../misc/generateSlug';
 import no_image from "../../assets/no_image.jpeg";
 import SpotTable from '../spotComponents/SpotTable';
 import { useBuildings } from '../misc/useBuildingsContext';
+import CustomLoader from '../misc/CustomLoader';
 
 
 function BuildingDetail() {
@@ -29,15 +30,16 @@ function BuildingDetail() {
 
     const [activeTab, setActiveTab] = useState<string | null>('cameras');
 
+    if(!building) return <CustomLoader/>
+
     return (
-        <div>
+        <Stack mt='lg' mb='lg'>
+            <Title ta='center'>{building.name}</Title>
             <Tabs value={activeTab} onChange={setActiveTab}>
                 <Tabs.List>
                     <Tabs.Tab value="cameras">Cameras</Tabs.Tab>
                     <Tabs.Tab value="spots">Parking Spots</Tabs.Tab>
                 </Tabs.List>
-
-
                 <Tabs.Panel value="cameras">
                     <Stack align="center">
                         <Grid columns={5} align='center' justify="flex-start" p='md'>
@@ -66,13 +68,12 @@ function BuildingDetail() {
                         </Grid>
                         <Pagination value={activePage} onChange={setPage} total={numPages} />
                     </Stack>
-
                 </Tabs.Panel>
                 <Tabs.Panel value="spots">
                     <SpotTable spots={spots} detailed/>
                 </Tabs.Panel>
             </Tabs>
-        </div>
+        </Stack>
     );
 };
 

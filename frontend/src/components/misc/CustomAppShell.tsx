@@ -17,7 +17,7 @@ export default function CustomAppShell({ children }: { children: React.ReactNode
         <AppShell
             header={{ height: 75 }}
             navbar={{
-                width: 300,
+                width: 250,
                 breakpoint: 'sm',
                 collapsed: { mobile: !opened },
             }}
