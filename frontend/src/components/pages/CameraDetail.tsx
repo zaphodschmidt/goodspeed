@@ -14,19 +14,18 @@ import { generateSlug } from "../misc/generateSlug.ts";
 import { createParkingSpot, deleteParkingSpot, getCameraByID, updateParkingSpot } from "../../apiService.ts";
 import SpotPolygon from "../spotComponents/SpotPolygon.tsx";
 import SpotTable from "../spotComponents/SpotTable.tsx";
+import { useBuildings } from "../misc/useBuildingsContext.ts";
 
 
-interface ParkingSpotsPageProps {
-  buildings: Building[];
-}
-
-function ParkingSpotsPage({ buildings }: ParkingSpotsPageProps) {
+function CameraDetail() {
 
   const { buildingSlug, camNum } = useParams<{
     buildingSlug: string;
     camNum: string;
   }>();
-
+  
+  const { buildings } = useBuildings()
+  
   const building: Building | undefined = (buildings.find((b) => generateSlug(b.name) === buildingSlug));
   const camera_id = (building?.cameras.find((c) => c.cam_num === Number(camNum)))?.id || undefined
   const [camera, setCamera] = useState<Camera | undefined>()
@@ -137,4 +136,4 @@ function ParkingSpotsPage({ buildings }: ParkingSpotsPageProps) {
   );
 }
 
-export default ParkingSpotsPage;
+export default CameraDetail;

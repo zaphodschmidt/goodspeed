@@ -1,13 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import { Building } from '../../types';
 import { Button, Stack, Center } from '@mantine/core';
 import { generateSlug } from '../misc/generateSlug';
+import { useBuildings } from '../misc/useBuildingsContext';
 
-interface BuildingsPageProps {
-    buildings: Building[];
-}
 
-function BuildingsPage({ buildings }: BuildingsPageProps) {
+function BuildingsList() {
+    const { buildings } = useBuildings()
     const navigate = useNavigate();
 
     return (
@@ -31,4 +29,4 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
     );
 }
 
-export default BuildingsPage;
+export default BuildingsList;

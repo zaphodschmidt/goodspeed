@@ -5,13 +5,14 @@ import './App.css'
 import '@mantine/core/styles.css'; // Import Mantine core styles
 import { Building } from './types';
 import { getBuildings } from './apiService';
-import BuildingsPage from './components/pages/BuildingsList';
-import CamerasPage from './components/pages/BuildingDetail';
-import ParkingSpotsPage from './components/pages/CameraDetail'
+import BuildingsList from './components/pages/BuildingsList';
+import BuildingDetail from './components/pages/BuildingDetail';
+import CameraDetail from './components/pages/CameraDetail'
 import 'mantine-react-table/styles.css'; //import MRT styles
 import { mantineTheme } from './theme.ts'
 import { mantineCssVariableResolver } from './cssVariableResolver.ts';
 import CustomAppShell from "./components/misc/CustomAppShell.tsx"
+import { BuildingsProvider } from './components/misc/BuildingsProvider.tsx';
 
 
 function App() {
@@ -34,19 +35,21 @@ function App() {
       theme={mantineTheme}
       cssVariablesResolver={mantineCssVariableResolver}
     >
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<CustomAppShell><BuildingsPage buildings={buildings} /></CustomAppShell>} />
-          <Route
+      <BuildingsProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<CustomAppShell><BuildingsList /></CustomAppShell>} />
+            <Route
               path="/building/:buildingSlug"
-              element={<CustomAppShell><CamerasPage buildings={buildings} /></CustomAppShell>}
+              element={<CustomAppShell><BuildingDetail /></CustomAppShell>}
             />
             <Route
               path="/building/:buildingSlug/camera/:camNum"
-              element={<CustomAppShell><ParkingSpotsPage buildings={buildings} /></CustomAppShell>}
+              element={<CustomAppShell><CameraDetail /></CustomAppShell>}
             />
-        </Routes>
-      </BrowserRouter>
+          </Routes>
+        </BrowserRouter>
+      </BuildingsProvider>
     </MantineProvider>
   );
 }

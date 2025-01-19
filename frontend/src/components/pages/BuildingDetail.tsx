@@ -5,12 +5,11 @@ import { Stack, Pagination, Grid, AspectRatio, Image, Text, Group, Tabs, Center,
 import { generateSlug } from '../misc/generateSlug';
 import no_image from "../../assets/no_image.jpeg";
 import SpotTable from '../spotComponents/SpotTable';
+import { useBuildings } from '../misc/useBuildingsContext';
 
-interface BuildingsPageProps {
-    buildings: Building[];
-}
 
-function CamerasPage({ buildings }: BuildingsPageProps) {
+function BuildingDetail() {
+    const { buildings } = useBuildings()
     const { buildingSlug } = useParams<{ buildingSlug: string }>();
     const navigate = useNavigate();
     const building: Building | undefined = buildings.find((b) => generateSlug(b.name) === buildingSlug);
@@ -81,4 +80,4 @@ function CamerasPage({ buildings }: BuildingsPageProps) {
     );
 };
 
-export default CamerasPage;
+export default BuildingDetail;
