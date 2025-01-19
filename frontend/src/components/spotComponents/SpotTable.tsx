@@ -7,16 +7,21 @@ import dayjs from 'dayjs'
 
 interface SpotTableProps{
     spots: ParkingSpot[];
-    // onSpotEdit: (spot: ParkingSpot) => void
+    detailed?: boolean
 }
 
-export default function SpotTable({ spots } : SpotTableProps){
+export default function SpotTable({ spots, detailed } : SpotTableProps){
 
     const columns = useMemo<MRT_ColumnDef<ParkingSpot>[]>(
         () => [
             {
                 accessorKey: 'spot_num',
                 header: 'Spot #'
+            },
+            {
+                accessorKey: 'cam_num',
+                id: 'cam_num',
+                header: 'Camera #'
             },
             {
                 accessorKey: 'occupied',
@@ -64,6 +69,9 @@ export default function SpotTable({ spots } : SpotTableProps){
         enableColumnActions: false,
         initialState: {
             density: 'xs',
+            columnVisibility: {
+                cam_num: (detailed),
+            }
         },
         enableTopToolbar: false,
         enableBottomToolbar: false,

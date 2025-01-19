@@ -32,6 +32,7 @@ export interface ParkingSpot {
     end_datetime?: string;
     camera: number; //backend id of associated camera
     vertices: Vertex[]; 
+    cam_num?: number;
 }
 
 export interface Vertex {
