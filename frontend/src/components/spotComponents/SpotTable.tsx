@@ -100,7 +100,8 @@ export default function SpotTable({ spots, detailed }: SpotTableProps) {
         enablePagination: false,
         mantinePaperProps: {
             style: {
-                borderRadius: '0',
+                border: '0px',
+                boxShadow: 'none'
             },
         }
     })
