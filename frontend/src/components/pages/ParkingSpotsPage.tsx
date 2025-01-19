@@ -12,14 +12,16 @@ import {
 import Header from "../misc/Header.tsx";
 import no_image from "../../assets/no_image.jpeg";
 import { generateSlug } from "../misc/generateSlug.ts";
-import { createParkingSpot, deleteParkingSpot, getCameraByID } from "../../apiService.ts";
+import { createParkingSpot, deleteParkingSpot, getCameraByID, updateParkingSpot } from "../../apiService.ts";
 import SpotPolygon from "../spotComponents/SpotPolygon.tsx";
+import SpotTable from "../spotComponents/SpotTable.tsx";
 
-interface BuildingsPageProps {
+
+interface ParkingSpotsPageProps {
   buildings: Building[];
 }
 
-function BuildingsPage({ buildings }: BuildingsPageProps) {
+function ParkingSpotsPage({ buildings }: ParkingSpotsPageProps) {
 
   const { buildingSlug, camNum } = useParams<{
     buildingSlug: string;
@@ -40,6 +42,7 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
       getCameraByID(camera_id).then((fetched_cam: Camera) => {
         setCamera(fetched_cam)
         setSpots(fetched_cam.parking_spots)
+        console.log(fetched_cam.parking_spots)
       })
     }
   }, []);
@@ -85,6 +88,11 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
 
   }
 
+  const handleUpdateSpot = async (updatedSpot: ParkingSpot) => {
+      await updateParkingSpot(updatedSpot)
+      setSpots(spots.map((spot) => spot.id === updatedSpot.id ? updatedSpot : spot))
+  }
+
   if (!building || !camera) {
     return <Loader />
   }
@@ -92,41 +100,43 @@ function BuildingsPage({ buildings }: BuildingsPageProps) {
   return (
     <div>
       <Header title={`Camera ${camNum} Feed`} home={false} />
-      <AspectRatio
-        maw={1000}
-        mx="auto"
-        pos='relative'
-        ratio={4 / 3}
-      >
-        <BackgroundImage
-          ref={imageRef}
-          src={camera.image?.image_url || no_image}
-          style={{
-            position: 'relative',
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-          }}
+        <AspectRatio
+          maw={1000}
+          mx="auto"
+          pos='relative'
+          ratio={4 / 3}
         >
-          {spots.length > 0 &&
-            spots.map((spot, index) => (
-              <SpotPolygon
-                key={spot.id}
-                parking_spot={spot}
-                colorKey={index}
-                deleteSpot={deleteSpot}
-              />
-            ))}
-        </BackgroundImage>
-      </AspectRatio>
-      <Flex align="center" justify="center" mt="lg">
-        <Group gap="lg">
-          <Button onClick={() => AddNewSpot(camera)}>Add Spot To Camera</Button>
-          <Button onClick={deleteAllSpots}>Delete All Spots From Camera</Button>
-        </Group>
-      </Flex>
+          <BackgroundImage
+            ref={imageRef}
+            src={camera.image?.image_url || no_image}
+            style={{
+              position: 'relative',
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+            }}
+          >
+            {spots.length > 0 &&
+              spots.map((spot, index) => (
+                <SpotPolygon
+                  key={spot.id}
+                  parking_spot={spot}
+                  colorKey={index}
+                  deleteSpot={deleteSpot}
+                  handleUpdateSpot={handleUpdateSpot}
+                />
+              ))}
+          </BackgroundImage>
+        </AspectRatio>
+        <Flex align="center" justify="center" mt="lg">
+          <Group>
+            <Button onClick={() => AddNewSpot(camera)}>Add Spot To Camera</Button>
+            <Button onClick={deleteAllSpots}>Delete All Spots From Camera</Button>
+          </Group>
+        </Flex>
+        <SpotTable spots={spots} />
     </div>
   );
 }
 
-export default BuildingsPage;
+export default ParkingSpotsPage;

@@ -24,9 +24,15 @@ export interface Camera {
 
 export interface ParkingSpot {
     id?: number; //id of parking spot in backend
-    camera: number //backend id of associated camera
     spot_num: number; //number of parking spot in garage
+    occupied: boolean; 
+    occupied_by_lpn: string;
+    reserved_by_lpn: string
+    start_datetime?: string;
+    end_datetime?: string;
+    camera: number; //backend id of associated camera
     vertices: Vertex[]; 
+    cam_num?: number;
 }
 
 export interface Vertex {

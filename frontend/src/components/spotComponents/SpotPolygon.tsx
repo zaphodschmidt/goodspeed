@@ -2,18 +2,18 @@ import DraggableVertex from "./DraggableVertex";
 import { ParkingSpot, Vertex } from "../../types";
 import { useState } from "react";
 import { Box, NumberInput, Popover, Button } from '@mantine/core'
-import { updateParkingSpot } from "../../apiService";
 
 interface SpotPolygonProps {
     parking_spot: ParkingSpot;
     colorKey: number;
     deleteSpot: (spot: ParkingSpot) => void
+    handleUpdateSpot: (spot: ParkingSpot) => void
 }
 
 const colors = ['red', 'orange', 'yellow', 'green', 'teal', 'blue', 'cyan', 'purple', 'pink', 'indigo', 'lime']
 const vertexSize = 20
 
-function SpotPolygon({ parking_spot, colorKey, deleteSpot }: SpotPolygonProps) {
+function SpotPolygon({ parking_spot, colorKey, deleteSpot, handleUpdateSpot }: SpotPolygonProps) {
     const [vertices, setVertices] = useState<Vertex[]>(parking_spot.vertices)
     const [spotLabel, setSpotLabel] = useState<string | number>(parking_spot.spot_num)
     const [popoverOpened, setPopoverOpened] = useState(false);
@@ -23,7 +23,7 @@ function SpotPolygon({ parking_spot, colorKey, deleteSpot }: SpotPolygonProps) {
     const updateSpotNumber = () => {
         const newNum = parseInt(spotLabel.toString())
         const updatedSpot: ParkingSpot = { ...parking_spot, spot_num: newNum }
-        updateParkingSpot(updatedSpot)
+        handleUpdateSpot(updatedSpot)
     }
 
     const calculateCentroid = (vertices: Vertex[]): [number, number] => {
