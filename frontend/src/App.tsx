@@ -9,6 +9,7 @@ import BuildingsPage from './components/pages/BuildingsList';
 import CamerasPage from './components/pages/BuildingDetail';
 import ParkingSpotsPage from './components/pages/CameraDetail'
 import 'mantine-react-table/styles.css'; //import MRT styles
+import { mantineTheme } from './theme.ts'
 
 
 function App() {
@@ -27,10 +28,8 @@ function App() {
 
   return (
     <MantineProvider
-      theme={{
-        fontFamily: 'Montserrat, sans-serif',
-        headings: { fontFamily: 'Montserrat, sans-serif' },
-      }}
+      defaultColorScheme="auto"
+      theme={mantineTheme}
     >
       <BrowserRouter>
         <Routes>
