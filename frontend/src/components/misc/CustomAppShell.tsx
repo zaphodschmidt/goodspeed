@@ -20,7 +20,6 @@ export default function CustomAppShell({ children }: { children: React.ReactNode
                 breakpoint: 'sm',
                 collapsed: { mobile: !opened },
             }}
-            padding="md"
         >
             <AppShell.Header>
                 <Group justify='space-between'>
@@ -43,8 +42,8 @@ export default function CustomAppShell({ children }: { children: React.ReactNode
                             Goodspeed.info
                         </Title>
                     </Flex>
-                    <Flex align='center' p='md' justify='flex-end' gap='md' onClick={() => navigate('/')}>
-                        <ActionIcon size='xl' variant='light' >
+                    <Flex align='center' p='md' justify='flex-end' gap='md' >
+                        <ActionIcon size='xl' variant='light' onClick={() => navigate('/')}>
                             <IconHome />
                         </ActionIcon>
                         <ActionIcon size='xl' variant='light' onClick={toggleColorScheme}>
