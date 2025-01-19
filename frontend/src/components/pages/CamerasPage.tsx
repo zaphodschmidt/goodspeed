@@ -23,7 +23,11 @@ function CamerasPage({ buildings }: BuildingsPageProps) {
     const numPages = Math.ceil(cameras.length / camsPerPage)
     const displayedCameras: Camera[] = cameras.slice((activePage - 1) * 15, (activePage * 15))
 
-    const spots: ParkingSpot[] = cameras?.flatMap((camera) => camera.parking_spots.map((spot) => ({...spot, cam_num: camera.cam_num })))
+    const spots: ParkingSpot[] = cameras?.flatMap((camera) => 
+        camera.parking_spots.map((spot) => 
+            ({...spot, cam_num: camera.cam_num })
+        )
+    ).sort((a, b) => a.spot_num - b.spot_num) || [];
 
     const [activeTab, setActiveTab] = useState<string | null>('cameras');
 
