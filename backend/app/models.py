@@ -1,4 +1,5 @@
 from django.db import models
+from pytz import common_timezones
 
 class Image(models.Model):
     image = models.ImageField(upload_to='uploads/')
@@ -6,6 +7,11 @@ class Image(models.Model):
 
 class Building(models.Model):
     name = models.CharField(max_length=127)
+    timezone = models.CharField(
+        max_length=63,
+        choices=[(tz, tz) for tz in common_timezones],
+        default='UTC'
+    )
 
     def __str__(self):
         return self.name
@@ -25,6 +31,11 @@ class Camera(models.Model):
     
 class ParkingSpot(models.Model):
     spot_num = models.IntegerField()
+    occupied = models.BooleanField(default=False) 
+    start_datetime = models.DateTimeField(null=True) # start of parkmobile lease
+    end_datetime = models.DateTimeField(null=True) # end of parkmobile lease
+    reserved_by_lpn = models.CharField(null=True, max_length=15)
+    occupied_by_lpn = models.CharField(null=True, max_length=15)
     camera = models.ForeignKey(Camera, on_delete=models.CASCADE, related_name='parking_spots')
 
     # class Meta:

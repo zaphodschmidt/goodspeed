@@ -6,3 +6,4 @@ pillow
 gunicorn
 opencv-python
 ultralytics
+pytz
