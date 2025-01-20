@@ -7,6 +7,10 @@ import {
   AspectRatio,
   BackgroundImage,
   Group,
+  Stack,
+  Title,
+  ActionIcon,
+  Tooltip,
 } from "@mantine/core";
 import no_image from "../../assets/no_image.jpeg";
 import { generateSlug } from "../misc/generateSlug.ts";
@@ -15,6 +19,7 @@ import SpotPolygon from "../spotComponents/SpotPolygon.tsx";
 import SpotTable from "../spotComponents/SpotTable.tsx";
 import { useBuildings } from "../misc/useBuildingsContext.ts";
 import CustomLoader from "../misc/CustomLoader.tsx";
+import { IconCheck, IconEdit } from "@tabler/icons-react";
 
 
 function CameraDetail() {
@@ -23,9 +28,10 @@ function CameraDetail() {
     buildingSlug: string;
     camNum: string;
   }>();
-  
+
   const { buildings } = useBuildings()
-  
+  const [editMode, setEditMode] = useState(false)
+
   const building: Building | undefined = (buildings.find((b) => generateSlug(b.name) === buildingSlug));
   const camera_id = (building?.cameras.find((c) => c.cam_num === Number(camNum)))?.id || undefined
   const [camera, setCamera] = useState<Camera | undefined>()
@@ -92,13 +98,21 @@ function CameraDetail() {
   }
 
   if (!building || !camera) {
-    return <CustomLoader/>
+    return <CustomLoader />
   }
 
   return (
-    <div>
+    <Stack mt="lg" mb='lg' align="center">
+      <Group align='center'>
+        <Title ml='50px'>Camera {camera.cam_num}</Title>
+        <Tooltip label={editMode ? 'Close editor' : 'Edit spots'}>
+          <ActionIcon size='lg' variant='subtle' onClick={() => setEditMode(!editMode)}>
+            {editMode ? <IconCheck /> : <IconEdit />}
+          </ActionIcon>
+        </Tooltip>
+      </Group>
       <AspectRatio
-        maw={1000}
+        w={1000}
         mx="auto"
         pos='relative'
         ratio={4 / 3}
@@ -121,18 +135,17 @@ function CameraDetail() {
                 colorKey={index}
                 deleteSpot={deleteSpot}
                 handleUpdateSpot={handleUpdateSpot}
+                editMode={editMode}
               />
             ))}
         </BackgroundImage>
       </AspectRatio>
-      <Flex align="center" justify="center" mt="lg">
-        <Group>
-          <Button onClick={() => AddNewSpot(camera)}>Add Spot To Camera</Button>
-          <Button onClick={deleteAllSpots}>Delete All Spots From Camera</Button>
-        </Group>
-      </Flex>
+      {editMode && <Group align="center" justify="center">
+        <Button onClick={() => AddNewSpot(camera)}>Add Spot</Button>
+        <Button onClick={deleteAllSpots}>Delete All Spots</Button>
+      </Group>}
       <SpotTable spots={spots} />
-    </div>
+    </Stack>
   );
 }
 
