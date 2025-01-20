@@ -177,8 +177,8 @@ class ParkingManagement(BaseSolution):
 
         if results and results[0].boxes:
             output = managment.process_data(imgBGR)
-            cv2.imwrite(imagePath, output)
-            print("Saved img!!")
+            # cv2.imwrite(imagePath, output)
+            # print("Saved img!!")
 
 @csrf_exempt
 def upload_image(request):
