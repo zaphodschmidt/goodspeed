@@ -126,6 +126,16 @@ function CameraDetail() {
             objectFit: "contain",
           }}
         >
+          <img
+            src={camera.image?.image_url}
+            alt=""
+            style={{ display: 'none' }}
+            onError={() => {
+              // Update the fallback image in case of error
+              imageRef.current!.style.backgroundImage = `url(${no_image})`;
+            }}
+          />
+
           {spots.length > 0 &&
             spots.map((spot, index) => (
               <SpotPolygon
@@ -144,7 +154,7 @@ function CameraDetail() {
         <Button onClick={deleteAllSpots}>Delete All Spots</Button>
       </Group>}
       <SpotTable spots={spots.sort((a, b) => a.spot_num - b.spot_num)
-} />
+      } />
     </Stack>
   );
 }
