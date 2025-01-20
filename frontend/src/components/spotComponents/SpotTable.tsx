@@ -2,9 +2,9 @@ import { useMemo } from "react";
 import { ParkingSpot } from "../../types"
 import { MantineReactTable, MRT_ColumnDef, useMantineReactTable } from 'mantine-react-table';
 import { IconCheck, IconX } from "@tabler/icons-react";
-import { Group, Text } from '@mantine/core'
+import { Group, Text, } from '@mantine/core'
 import dayjs from 'dayjs'
-import hashSpotColor from "./hashSpotColor";
+// import hashSpotColor from "./hashSpotColor";
 
 interface SpotTableProps {
     spots: ParkingSpot[];
@@ -26,18 +26,23 @@ export default function SpotTable({ spots, detailed }: SpotTableProps) {
                 accessorKey: 'spot_num',
                 header: 'Spot #',
                 Cell: ({ cell, row }) => {
-                    const color = hashSpotColor(row.index)
+                    // const color = hashSpotColor(row.index)
                     return (
                         <Group>
-                            <Text>{cell.getValue<string>()}</Text>
-                            <div
-                                className="ball"
-                                style={{
-                                    backgroundColor: color,
-                                    width: `7px`,
-                                    height: `7px`,
-                                }}
-                            />
+                            <Text size='sm'>{cell.getValue<string>()}</Text>
+                            {/* {!detailed &&
+                                <Tooltip label='Spot color' openDelay={500}>
+                                    <div
+                                        className="ball"
+                                        style={{
+                                            backgroundColor: color,
+                                            width: `7px`,
+                                            height: `7px`,
+                                            cursor: 'default'
+                                        }}
+                                    />
+                                </Tooltip>
+                            } */}
                         </Group>
                     )
                 }

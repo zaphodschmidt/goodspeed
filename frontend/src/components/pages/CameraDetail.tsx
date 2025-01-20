@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { Building, Camera, ParkingSpot, Vertex } from "../../types.ts";
 import {
   Button,
-  Flex,
   AspectRatio,
   BackgroundImage,
   Group,
@@ -144,7 +143,8 @@ function CameraDetail() {
         <Button onClick={() => AddNewSpot(camera)}>Add Spot</Button>
         <Button onClick={deleteAllSpots}>Delete All Spots</Button>
       </Group>}
-      <SpotTable spots={spots} />
+      <SpotTable spots={spots.sort((a, b) => a.spot_num - b.spot_num)
+} />
     </Stack>
   );
 }
