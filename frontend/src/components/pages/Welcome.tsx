@@ -36,7 +36,7 @@ function Welcome() {
                         WebkitTextFillColor: 'transparent',
                     }}
                 >
-                    Welcome to goodspeed.info, the all-in-one management platform for Goodspeed Parking.
+                    Welcome to goodspeed.info, the management platform for Goodspeed Parking.
                 </Highlight>
 
                 <Title order={3} ta='center' mt='lg' >
