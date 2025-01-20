@@ -343,7 +343,6 @@ pyrightconfig.json
 **/*.njsproj
 **/*.sln
 **/*.sw?
-fly.toml
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,python,django,linux
 
@@ -354,7 +353,7 @@ dhcp_config_generated.txt
 # ML
 
 yolo11n.pt
-backend/yolo11n.pt
+/backend/yolo11n.pt
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,python,django,linux
 
