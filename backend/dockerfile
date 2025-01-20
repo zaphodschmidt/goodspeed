@@ -1,39 +1,44 @@
-# Unified Dockerfile
+# Base stage for installing dependencies
 ARG PYTHON_VERSION=3.12-slim
-FROM python:${PYTHON_VERSION}
+FROM python:${PYTHON_VERSION} AS base
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# General environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/usr/local/bin:$PATH"
 
-# Create app directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+# Install required system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-libgl1-mesa-glx \
-libglib2.0-0
-
-# Install dependencies
+# Install Python dependencies in a separate layer
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install -r /tmp/requirements.txt
-    
-# Copy app files
+    pip install --no-cache-dir -r /tmp/requirements.txt
+
+# App stage to copy code
+FROM base AS app
+
+WORKDIR /usr/src/app
+
+# Copy only necessary files to avoid large image size
 COPY . /usr/src/app
 
-# Build argument to determine environment
+# Set build argument for environment
 ARG ENV=production
 
-# Development-specific configuration
-RUN if [ "$ENV" = "development" ]; then pip install debugpy; fi
+# Install development dependencies conditionally
+RUN if [ "$ENV" = "development" ]; then pip install --no-cache-dir debugpy; fi
 
-# Expose port
+# Expose port for the app
 EXPOSE 8000
 
-# Command based on the environment
+# Command to run based on the environment
 CMD if [ "$ENV" = "development" ]; then \
         python manage.py runserver 0.0.0.0:8000; \
     else \
-        gunicorn --bind :8000 --workers 2 config.wsgi; \
+        gunicorn --bind :8000 --workers 2 config.wsgi:application; \
     fi

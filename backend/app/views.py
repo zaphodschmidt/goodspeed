@@ -64,7 +64,6 @@ class ParkingManagement(BaseSolution):
         cameraNumStr = photo.split('_')[4]  # This will be "cam11.jpeg"
         cameraNum = int(cameraNumStr[3:].split('.')[0])  # Remove "cam" and ".jpeg"
         
-        print("bruh", cameraNum)
 
         if buildingName.lower() == "vertex1":
             buildingName = "Vertex"
@@ -177,7 +176,7 @@ class ParkingManagement(BaseSolution):
 
         if results and results[0].boxes:
             output = managment.process_data(imgBGR)
-            # cv2.imwrite(imagePath, output)
+            cv2.imwrite(imagePath, output)
             # print("Saved img!!")
 
 @csrf_exempt
@@ -199,7 +198,6 @@ def upload_image(request):
         except Camera.DoesNotExist:
             return JsonResponse({'error': 'Camera not found'}, status=404)
         
-        print(camera.parking_spots.all())
 
         # Handle image replacement
         new_image = Image.objects.create(image=image)
@@ -213,7 +211,6 @@ def upload_image(request):
 
         camera.image = new_image
         camera.save()
-        print(camera.parking_spots.all())
 
         # Run parking detection on the uploaded image
         image_path = new_image.image.path  # Get the path to the saved image
