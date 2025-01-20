@@ -21,7 +21,7 @@ class Camera(models.Model):
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='cameras')
     MAC = models.CharField(max_length=50, unique=True)
     IP = models.GenericIPAddressField()
-    image = models.OneToOneField(Image, null=True, on_delete=models.CASCADE, related_name='camera')
+    image = models.OneToOneField(Image, null=True, on_delete=models.SET_NULL, related_name='camera')
 
     class Meta:
         unique_together = ('cam_num', 'building')

@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.files.storage import default_storage
 import os
-from PIL import Image
+from PIL import Image as PILImage
 import cv2
 import numpy as np
 import json
@@ -18,6 +18,7 @@ from ultralytics.utils import LOGGER
 from ultralytics.utils.checks import check_requirements
 from ultralytics.utils.plotting import Annotator
 from app.models import Building, Camera, ParkingSpot, Vertex
+from django.db import transaction
 
 #consts
 MODEL = 'yolov8n.pt'
@@ -57,9 +58,13 @@ class ParkingManagement(BaseSolution):
         self.webpageImgW = 1000
         self.webpageImgH = 750
 
-    def loadCameraVertecies(self, photo: str):
+    def loadCameraVertices(self, photo: str):
+        # Extract building name and camera number from the filename
         buildingName = photo.split('_')[3]
-        cameraNum = int(photo.split('_')[4][3])
+        cameraNumStr = photo.split('_')[4]  # This will be "cam11.jpeg"
+        cameraNum = int(cameraNumStr[3:].split('.')[0])  # Remove "cam" and ".jpeg"
+        
+        print("bruh", cameraNum)
 
         if buildingName.lower() == "vertex1":
             buildingName = "Vertex"
@@ -81,21 +86,32 @@ class ParkingManagement(BaseSolution):
         scaleH = self.normalImgH / self.webpageImgH
 
         parkingSpotBounds = []
+        self.spot_ids = []
+
         for spot in camera.parking_spots.all():
-            pointsDict = {"points": []}
-            for point in spot.vertices.all():
-                pointsDict["points"].append([point.x * scaleW, point.y * scaleH])
-            parkingSpotBounds.append(pointsDict)
+            print(f"Found parking spot: {spot}")
+            if not spot.vertices.exists():
+                print(f"Parking spot {spot.id} has no vertices.")
+            else:
+                pointsDict = {"points": []}
+                for point in spot.vertices.all():
+                    pointsDict["points"].append([point.x * scaleW, point.y * scaleH])
+                parkingSpotBounds.append(pointsDict)
+                self.spot_ids.append(spot.id)
 
         # jsonData = json.dumps(parkingSpotBounds)
         # with open('vertexes.json', 'w') as f:
         #     f.write(jsonData)
 
+        print(f"Loaded parking spots: {self.spot_ids}")
         return parkingSpotBounds
+
+
+
 
     def isJpeg(self, file_path:str):
         try:
-            with Image.open(file_path) as img:
+            with PILImage.open(file_path) as img:
                 return img.format == 'JPEG'
         except (IOError, OSError):
             return False
@@ -108,11 +124,17 @@ class ParkingManagement(BaseSolution):
         return files
 
     def process_data(self, im0):
+        if not self.json:
+            print("No parking spot data loaded.")
+            return im0
+    
         self.extract_tracks(im0)  # extract tracks from im0
         es, fs = len(self.json), 0  # empty slots, filled slots
         annotator = Annotator(im0, self.line_width)  # init annotator
 
-        for region in self.json:
+        parking_spots_to_update = []
+
+        for region , spot_id in zip(self.json, self.spot_ids):
             # Convert points to a NumPy array with the correct dtype and reshape properly
             pts_array = np.array(region["points"], dtype=np.int32).reshape((-1, 1, 2))
             rg_occupied = False  # occupied region initialization
@@ -130,6 +152,12 @@ class ParkingManagement(BaseSolution):
             # Plotting regions
             cv2.polylines(im0, [pts_array], isClosed=True, color=self.occ if rg_occupied else self.arc, thickness=2)
 
+            parking_spots_to_update.append({"spot_id": spot_id, "occupied": rg_occupied})
+            
+        with transaction.atomic():
+            for spot in parking_spots_to_update:
+                ParkingSpot.objects.filter(id=spot["spot_id"]).update(occupied=spot["occupied"])
+
         self.pr_info["Occupancy"], self.pr_info["Available"] = fs, es
 
         annotator.display_analytics(im0, self.pr_info, (104, 31, 17), (255, 255, 255), 10)
@@ -138,7 +166,7 @@ class ParkingManagement(BaseSolution):
 
     def runParkingDetection(self, imagePath: str):
         managment = ParkingManagement(model_path = MODEL)
-        managment.json = managment.loadCameraVertecies(imagePath)
+        managment.json = managment.loadCameraVertices(imagePath)
         imgBGR = cv2.imread(imagePath)
 
         if imgBGR is None:
@@ -171,6 +199,8 @@ def upload_image(request):
         except Camera.DoesNotExist:
             return JsonResponse({'error': 'Camera not found'}, status=404)
         
+        print(camera.parking_spots.all())
+
         # Handle image replacement
         new_image = Image.objects.create(image=image)
 
@@ -183,6 +213,7 @@ def upload_image(request):
 
         camera.image = new_image
         camera.save()
+        print(camera.parking_spots.all())
 
         # Run parking detection on the uploaded image
         image_path = new_image.image.path  # Get the path to the saved image
