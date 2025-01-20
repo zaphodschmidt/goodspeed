@@ -57,7 +57,7 @@ function SpotPolygon({ parking_spot, colorKey, deleteSpot, handleUpdateSpot, edi
 
     const handleRightClick = (event: React.MouseEvent) => {
         event.preventDefault(); // Prevent the default context menu
-        setPopoverPosition({ x: event.clientX, y: event.clientY });
+        setPopoverPosition({ x: event.pageX, y: event.pageY }); // Use pageX and pageY for proper positioning
         setPopoverOpened(true);
     };
 
