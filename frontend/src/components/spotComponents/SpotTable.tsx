@@ -2,8 +2,9 @@ import { useMemo } from "react";
 import { ParkingSpot } from "../../types"
 import { MantineReactTable, MRT_ColumnDef, useMantineReactTable } from 'mantine-react-table';
 import { IconCheck, IconX } from "@tabler/icons-react";
-import { Text } from '@mantine/core'
+import { Group, Text, } from '@mantine/core'
 import dayjs from 'dayjs'
+// import hashSpotColor from "./hashSpotColor";
 
 interface SpotTableProps {
     spots: ParkingSpot[];
@@ -23,7 +24,28 @@ export default function SpotTable({ spots, detailed }: SpotTableProps) {
         () => [
             {
                 accessorKey: 'spot_num',
-                header: 'Spot #'
+                header: 'Spot #',
+                Cell: ({ cell, row }) => {
+                    // const color = hashSpotColor(row.index)
+                    return (
+                        <Group>
+                            <Text size='sm'>{cell.getValue<string>()}</Text>
+                            {/* {!detailed &&
+                                <Tooltip label='Spot color' openDelay={500}>
+                                    <div
+                                        className="ball"
+                                        style={{
+                                            backgroundColor: color,
+                                            width: `7px`,
+                                            height: `7px`,
+                                            cursor: 'default'
+                                        }}
+                                    />
+                                </Tooltip>
+                            } */}
+                        </Group>
+                    )
+                }
             },
             {
                 accessorKey: 'cam_num',
@@ -100,7 +122,8 @@ export default function SpotTable({ spots, detailed }: SpotTableProps) {
         enablePagination: false,
         mantinePaperProps: {
             style: {
-                borderRadius: '0',
+                border: '0px',
+                boxShadow: 'none'
             },
         }
     })

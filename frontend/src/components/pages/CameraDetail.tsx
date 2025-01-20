@@ -3,30 +3,33 @@ import { useParams } from "react-router-dom";
 import { Building, Camera, ParkingSpot, Vertex } from "../../types.ts";
 import {
   Button,
-  Flex,
   AspectRatio,
   BackgroundImage,
   Group,
-  Loader,
+  Stack,
+  Title,
+  ActionIcon,
+  Tooltip,
 } from "@mantine/core";
-import Header from "../misc/Header.tsx";
 import no_image from "../../assets/no_image.jpeg";
 import { generateSlug } from "../misc/generateSlug.ts";
 import { createParkingSpot, deleteParkingSpot, getCameraByID, updateParkingSpot } from "../../apiService.ts";
 import SpotPolygon from "../spotComponents/SpotPolygon.tsx";
 import SpotTable from "../spotComponents/SpotTable.tsx";
+import { useBuildings } from "../misc/useBuildingsContext.ts";
+import CustomLoader from "../misc/CustomLoader.tsx";
+import { IconCheck, IconEdit } from "@tabler/icons-react";
 
 
-interface ParkingSpotsPageProps {
-  buildings: Building[];
-}
-
-function ParkingSpotsPage({ buildings }: ParkingSpotsPageProps) {
+function CameraDetail() {
 
   const { buildingSlug, camNum } = useParams<{
     buildingSlug: string;
     camNum: string;
   }>();
+
+  const { buildings } = useBuildings()
+  const [editMode, setEditMode] = useState(false)
 
   const building: Building | undefined = (buildings.find((b) => generateSlug(b.name) === buildingSlug));
   const camera_id = (building?.cameras.find((c) => c.cam_num === Number(camNum)))?.id || undefined
@@ -45,7 +48,7 @@ function ParkingSpotsPage({ buildings }: ParkingSpotsPageProps) {
         console.log(fetched_cam.parking_spots)
       })
     }
-  }, []);
+  }, [camera_id]);
 
   const deleteAllSpots = () => {
     for (const parking_spot of spots) {
@@ -89,54 +92,71 @@ function ParkingSpotsPage({ buildings }: ParkingSpotsPageProps) {
   }
 
   const handleUpdateSpot = async (updatedSpot: ParkingSpot) => {
-      await updateParkingSpot(updatedSpot)
-      setSpots(spots.map((spot) => spot.id === updatedSpot.id ? updatedSpot : spot))
+    await updateParkingSpot(updatedSpot)
+    setSpots(spots.map((spot) => spot.id === updatedSpot.id ? updatedSpot : spot))
   }
 
   if (!building || !camera) {
-    return <Loader />
+    return <CustomLoader />
   }
 
   return (
-    <div>
-      <Header title={`Camera ${camNum} Feed`} home={false} />
-        <AspectRatio
-          maw={1000}
-          mx="auto"
-          pos='relative'
-          ratio={4 / 3}
+    <Stack mt="lg" mb='lg' align="center">
+      <Group align='center'>
+        <Title ml='50px'>Camera {camera.cam_num}</Title>
+        <Tooltip label={editMode ? 'Close editor' : 'Edit spots'}>
+          <ActionIcon size='lg' variant='subtle' onClick={() => setEditMode(!editMode)}>
+            {editMode ? <IconCheck /> : <IconEdit />}
+          </ActionIcon>
+        </Tooltip>
+      </Group>
+      <AspectRatio
+        w={1000}
+        mx="auto"
+        pos='relative'
+        ratio={4 / 3}
+      >
+        <BackgroundImage
+          ref={imageRef}
+          src={camera.image?.image_url || no_image}
+          style={{
+            position: 'relative',
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+          }}
         >
-          <BackgroundImage
-            ref={imageRef}
-            src={camera.image?.image_url || no_image}
-            style={{
-              position: 'relative',
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
+          <img
+            src={camera.image?.image_url}
+            alt=""
+            style={{ display: 'none' }}
+            onError={() => {
+              // Update the fallback image in case of error
+              imageRef.current!.style.backgroundImage = `url(${no_image})`;
             }}
-          >
-            {spots.length > 0 &&
-              spots.map((spot, index) => (
-                <SpotPolygon
-                  key={spot.id}
-                  parking_spot={spot}
-                  colorKey={index}
-                  deleteSpot={deleteSpot}
-                  handleUpdateSpot={handleUpdateSpot}
-                />
-              ))}
-          </BackgroundImage>
-        </AspectRatio>
-        <Flex align="center" justify="center" mt="lg">
-          <Group>
-            <Button onClick={() => AddNewSpot(camera)}>Add Spot To Camera</Button>
-            <Button onClick={deleteAllSpots}>Delete All Spots From Camera</Button>
-          </Group>
-        </Flex>
-        <SpotTable spots={spots} />
-    </div>
+          />
+
+          {spots.length > 0 &&
+            spots.map((spot, index) => (
+              <SpotPolygon
+                key={spot.id}
+                parking_spot={spot}
+                colorKey={index}
+                deleteSpot={deleteSpot}
+                handleUpdateSpot={handleUpdateSpot}
+                editMode={editMode}
+              />
+            ))}
+        </BackgroundImage>
+      </AspectRatio>
+      {editMode && <Group align="center" justify="center">
+        <Button onClick={() => AddNewSpot(camera)}>Add Spot</Button>
+        <Button onClick={deleteAllSpots}>Delete All Spots</Button>
+      </Group>}
+      <SpotTable spots={spots.sort((a, b) => a.spot_num - b.spot_num)
+      } />
+    </Stack>
   );
 }
 
-export default ParkingSpotsPage;
+export default CameraDetail;

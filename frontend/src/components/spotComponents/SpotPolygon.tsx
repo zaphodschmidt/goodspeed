@@ -2,23 +2,25 @@ import DraggableVertex from "./DraggableVertex";
 import { ParkingSpot, Vertex } from "../../types";
 import { useState } from "react";
 import { Box, NumberInput, Popover, Button } from '@mantine/core'
+import hashSpotColor from "./hashSpotColor";
 
 interface SpotPolygonProps {
     parking_spot: ParkingSpot;
     colorKey: number;
     deleteSpot: (spot: ParkingSpot) => void
     handleUpdateSpot: (spot: ParkingSpot) => void
+    editMode: boolean
 }
 
-const colors = ['red', 'orange', 'yellow', 'green', 'teal', 'blue', 'cyan', 'purple', 'pink', 'indigo', 'lime']
 const vertexSize = 20
 
-function SpotPolygon({ parking_spot, colorKey, deleteSpot, handleUpdateSpot }: SpotPolygonProps) {
+function SpotPolygon({ parking_spot, colorKey, deleteSpot, handleUpdateSpot, editMode }: SpotPolygonProps) {
     const [vertices, setVertices] = useState<Vertex[]>(parking_spot.vertices)
     const [spotLabel, setSpotLabel] = useState<string | number>(parking_spot.spot_num)
     const [popoverOpened, setPopoverOpened] = useState(false);
     const [popoverPosition, setPopoverPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-    const color = (colors[colorKey % colors.length])
+
+    const color = hashSpotColor(colorKey)
 
     const updateSpotNumber = () => {
         const newNum = parseInt(spotLabel.toString())
@@ -55,7 +57,7 @@ function SpotPolygon({ parking_spot, colorKey, deleteSpot, handleUpdateSpot }: S
 
     const handleRightClick = (event: React.MouseEvent) => {
         event.preventDefault(); // Prevent the default context menu
-        setPopoverPosition({ x: event.clientX, y: event.clientY });
+        setPopoverPosition({ x: event.pageX, y: event.pageY }); // Use pageX and pageY for proper positioning
         setPopoverOpened(true);
     };
 
@@ -70,23 +72,22 @@ function SpotPolygon({ parking_spot, colorKey, deleteSpot, handleUpdateSpot }: S
                     height: "100%",
                     pointerEvents: "none", // Prevent blocking interactions with DraggableVertex
                 }}
-                onContextMenu={handleRightClick} // Add right-click handler
+                onContextMenu={editMode ? handleRightClick : undefined} //Right click handler
             >
                 <polygon
                     points={vertices
                         .map((v) => `${v.x + vertexSize / 2},${v.y + vertexSize / 2}`)
                         .join(' ')}
                     style={{
-                        fill: 'rgba(0, 0, 0, 0.25)', // Semi-transparent red
+                        fill: 'rgba(0, 0, 0, 0.25)', // Semi-transparent fill
                         stroke: color, // Optional border
                         strokeWidth: 2,
-                        cursor: "context-menu", // Show context menu cursor
+                        cursor: editMode ? "context-menu" : "default", // Change cursor based on editMode
                         pointerEvents: "all", // Enable pointer events for polygon
                     }}
-
                 />
             </svg>
-            {vertices.map((vertex, index) => (
+            {editMode && vertices.map((vertex, index) => (
                 <DraggableVertex
                     key={index}
                     vertex={vertex}
@@ -106,9 +107,12 @@ function SpotPolygon({ parking_spot, colorKey, deleteSpot, handleUpdateSpot }: S
                 value={spotLabel}
                 onChange={setSpotLabel}
                 onBlur={updateSpotNumber}
+                disabled={!editMode}
+                fw={editMode ? 500 : 300}
                 styles={{
                     input: {
                         color: "white", // Change font color
+                        backgroundColor: "transparent"
                     },
                 }}
             />
@@ -116,7 +120,7 @@ function SpotPolygon({ parking_spot, colorKey, deleteSpot, handleUpdateSpot }: S
                 opened={popoverOpened}
                 onClose={() => setPopoverOpened(false)}
                 onChange={setPopoverOpened}
-                position="right-start"
+                position="bottom-start"
                 shadow="md"
                 styles={{
                     dropdown: { position: 'absolute', top: popoverPosition.y, left: popoverPosition.x },
