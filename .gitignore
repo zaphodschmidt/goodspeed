@@ -351,4 +351,10 @@ fly.toml
 snapshots/
 dhcp_config_generated.txt
 
+# ML
+
+yolo11n.pt
+backend/yolo11n.pt
+
 # End of https://www.toptal.com/developers/gitignore/api/macos,python,django,linux
+
