@@ -1,4 +1,4 @@
-import { List, Stack, Text, Title, useMantineTheme, Highlight, AspectRatio, Group, useMantineColorScheme, Box } from '@mantine/core';
+import { List, Stack, Text, Title, useMantineTheme, Highlight, AspectRatio, Group, useMantineColorScheme } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 
 // import { generateSlug } from '../misc/generateSlug';

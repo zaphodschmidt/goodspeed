@@ -78,6 +78,7 @@ function CameraDetail() {
       camera: camera.id!,
       spot_num: spotNum,
       vertices,
+      occupied: false,
     };
     console.log("newSpot:", newSpot)
     createParkingSpot(newSpot)
@@ -153,8 +154,7 @@ function CameraDetail() {
         <Button onClick={() => AddNewSpot(camera)}>Add Spot</Button>
         <Button onClick={deleteAllSpots}>Delete All Spots</Button>
       </Group>}
-      <SpotTable spots={spots.sort((a, b) => a.spot_num - b.spot_num)
-      } />
+      <SpotTable spots={[...spots].sort((a, b) => a.spot_num - b.spot_num)}/>
     </Stack>
   );
 }

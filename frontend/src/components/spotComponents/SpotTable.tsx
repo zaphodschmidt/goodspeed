@@ -25,7 +25,7 @@ export default function SpotTable({ spots, detailed }: SpotTableProps) {
             {
                 accessorKey: 'spot_num',
                 header: 'Spot #',
-                Cell: ({ cell, row }) => {
+                Cell: ({ cell }) => {
                     // const color = hashSpotColor(row.index)
                     return (
                         <Group>
