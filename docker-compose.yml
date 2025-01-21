@@ -18,7 +18,7 @@ services:
       context: ./frontend
       target: development # Use the development stage
       args:
-        API_URL: http://localhost:8000
+        API_URL: https://api.goodspeedparking.info
     container_name: frontend
     ports:
       - "5173:5173"
