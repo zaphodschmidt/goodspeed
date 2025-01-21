@@ -2,8 +2,7 @@ services:
   backend:
     build:
       context: ./backend
-      args:
-        ENV: development
+      target: ${ENV}
     volumes:
       - ./backend/:/usr/src/app/
       - ./backend/db.sqlite3:/app/db.sqlite3
@@ -16,9 +15,9 @@ services:
   frontend:
     build:
       context: ./frontend
-      target: development # Use the development stage
+      target: ${ENV}
       args:
-        API_URL: http://localhost:8000
+        API_URL: https://api.goodspeedparking.info
     container_name: frontend
     ports:
       - "5173:5173"
