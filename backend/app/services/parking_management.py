@@ -6,6 +6,8 @@ from ultralytics.solutions.solutions import BaseSolution
 from ultralytics.utils.plotting import Annotator
 from app.models import Building, Camera, ParkingSpot
 from django.db import transaction
+import base64
+from io import BytesIO
 
 MODEL = 'yolov8n.pt'
 
@@ -126,20 +128,51 @@ class ParkingManagement(BaseSolution):
         self.display_output(im0)  # display output with base class function
         return im0  # return output image for more usage
 
-    def runParkingDetection(self, imagePath: str):
-        managment = ParkingManagement(model_path = MODEL)
-        managment.json = managment.loadCameraVertices(imagePath)
-        imgBGR = cv2.imread(imagePath)
+    # def runParkingDetection(self, imagePath: str):
+    #     managment = ParkingManagement(model_path = MODEL)
+    #     managment.json = managment.loadCameraVertices(imagePath)
+    #     imgBGR = cv2.imread(imagePath)
+
+    #     if imgBGR is None:
+    #         print(f"Could not open {imagePath}")
+    #         return
+        
+    #     results = managment.model.track(imgBGR, persist = True, show = False)
+
+    #     if results and results[0].boxes:
+    #         output = managment.process_data(imgBGR)
+    #         # cv2.imwrite(imagePath, output)
+    #         # print("Saved img!!")
+
+    def runParkingDetection(image_content: bytes, building_name: str, camera_num: int):
+        # Initialize ParkingManagement
+        management = ParkingManagement(model_path=MODEL)
+
+        # Decode the image content into an OpenCV format
+        imgBGR = np.array(PILImage.open(BytesIO(image_content)))
 
         if imgBGR is None:
-            print(f"Could not open {imagePath}")
+            print("Could not process the provided image content")
             return
-        
-        results = managment.model.track(imgBGR, persist = True, show = False)
+
+        # Load the camera vertices using building_name and camera_num
+        metadata = f"dummy_building_{building_name}_cam{camera_num}.jpeg"  # Dummy metadata to match loadCameraVertices logic
+        management.json = management.loadCameraVertices(metadata)
+
+        if not management.json:
+            print("No parking spot data loaded.")
+            return
+
+        # Perform parking detection
+        results = management.model.track(imgBGR, persist=True, show=False)
 
         if results and results[0].boxes:
-            output = managment.process_data(imgBGR)
-            cv2.imwrite(imagePath, output)
-            # print("Saved img!!")
+            output = management.process_data(imgBGR)
+            # You can encode the output image and return it as a response if needed
+            _, encoded_image = cv2.imencode('.jpg', output)
+            processed_image = base64.b64encode(encoded_image).decode('utf-8')
+            print("Processed image successfully!")
+            return processed_image  # Optionally return the processed image
 
-        
+
+            

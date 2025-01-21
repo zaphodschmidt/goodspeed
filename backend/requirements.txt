@@ -10,3 +10,5 @@ pytz
 celery
 redis
 shapely
+dj-database-url
+psycopg[binary]

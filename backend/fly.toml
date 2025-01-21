@@ -9,9 +9,6 @@ console_command = '/code/manage.py shell'
 
 [build]
 
-[deploy]
-  release_command = 'touch db.sqlite3 && python manage.py migrate'
-
 [env]
   PORT = '8000'
   DEBUG = 'True'
@@ -22,14 +19,15 @@ console_command = '/code/manage.py shell'
   ALLOWED_HOSTS = 'goodspeedbackend.fly.dev,goodspeedparking.info'
   DATABASE_PATH = '/mnt/db/db.sqlite3'
   MEDIA_PATH = '/mnt/db/media/'
-
-[[mounts]]
-  source = 'db'
-  destination = '/mnt/db'
+  DATABASE_URL = "postgres://postgres:tEjuNTWYyOkeXtD@lively-moon-9353.flycast:5432"
 
 [processes]
   app = "gunicorn --bind :8000 --workers 2 config.wsgi"
   worker = "celery -A config worker --loglevel=info"
+
+[[mounts]]
+  source = 'db'
+  destination = '/mnt/db'
 
 [http_service]
   internal_port = 8000
