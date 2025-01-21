@@ -92,13 +92,9 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',  # Default database name in Fly.io Postgres
-        'USER': 'postgres',
-        'PASSWORD': 'tEjuNTWYyOkeXtD',
-        'HOST': 'lively-moon-9353.flycast',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
 
@@ -135,12 +131,10 @@ CORS_ALLOW_HEADERS = [
 CORS_ALLOWED_ORIGINS = [
     os.getenv('FRONTEND_URL'),
     os.getenv('BACKEND_URL'),
-    os.getenv('PROXY_URL'),
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     os.getenv('FRONTEND_URL'),
-    os.getenv('PROXY_URL'),
 ]
 
 
@@ -165,7 +159,7 @@ STATIC_URL = "static/"
 # Media
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.getenv('MEDIA_PATH')#os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

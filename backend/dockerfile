@@ -1,6 +1,4 @@
-# Base stage for installing dependencies
-ARG PYTHON_VERSION=3.12-slim
-FROM python:${PYTHON_VERSION} AS base
+FROM python:3.13-slim as base
 
 # General environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -27,18 +25,17 @@ WORKDIR /usr/src/app
 # Copy only necessary files to avoid large image size
 COPY . /usr/src/app
 
-# Set build argument for environment
-ARG ENV=production
-
-# Install development dependencies conditionally
-RUN if [ "$ENV" = "development" ]; then pip install --no-cache-dir debugpy; fi
-
-# Expose port for the app
+# Expose port
 EXPOSE 8000
 
-# Command to run based on the environment
-CMD if [ "$ENV" = "development" ]; then \
-        python manage.py runserver 0.0.0.0:8000; \
-    else \
-        gunicorn --bind :8000 --workers 2 config.wsgi:application; \
-    fi
+#Prod-specific
+FROM base AS production
+
+CMD gunicorn --bind :8000 --workers 2 config.wsgi;
+
+#dev-specific
+FROM base AS development
+
+RUN pip install debugpy
+
+CMD python manage.py runserver 0.0.0.0:8000;
