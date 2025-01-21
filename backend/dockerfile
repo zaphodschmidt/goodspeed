@@ -18,14 +18,13 @@ COPY . /usr/src/app
 # Expose port
 EXPOSE 8000
 
-
 #Prod-specific
-from base as production
+FROM base AS production
 
 CMD gunicorn --bind :8000 --workers 2 config.wsgi;
 
 #dev-specific
-from base as development
+FROM base AS development
 
 RUN pip install debugpy
 
