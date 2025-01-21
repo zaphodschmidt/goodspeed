@@ -1,4 +1,6 @@
-FROM python:3.13-slim as base
+# Unified Dockerfile
+ARG PYTHON_VERSION=3.13-slim
+FROM python:${PYTHON_VERSION}
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -15,17 +17,18 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy app files
 COPY . /usr/src/app
 
+# Build argument to determine environment
+ARG ENV=production
+
+# Development-specific configuration
+RUN if [ "$ENV" = "development" ]; then pip install debugpy; fi
+
 # Expose port
 EXPOSE 8000
 
-#Prod-specific
-FROM base AS production
-
-CMD gunicorn --bind :8000 --workers 2 config.wsgi;
-
-#dev-specific
-FROM base AS development
-
-RUN pip install debugpy
-
-CMD python manage.py runserver 0.0.0.0:8000;
+# Command based on the environment
+CMD if [ "$ENV" = "development" ]; then \
+        python manage.py runserver 0.0.0.0:8000; \
+    else \
+        gunicorn --bind :8000 --workers 2 config.wsgi; \
+    fi

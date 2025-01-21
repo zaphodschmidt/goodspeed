@@ -26,7 +26,7 @@ LOCATION="${LOCATION1}"
 CSV_FILE="${CSV_FILE}"
 SNAPSHOT_DIR="./snapshots"
 CAMERA_PASSWORD="${CAMERA_PASSWORD}"
-API_ENDPOINT="https://api.goodspeedparking.info/api/upload/"
+API_ENDPOINT="https://goodspeedbackend.fly.dev/api/upload/"
 
 BUILDING_NAME=$(grep -m 1 '^Building:' "$CSV_FILE" | awk -F',' '{print $2}' | xargs)
 SUBNET=$(grep -m 1 '^Subnet:' "$CSV_FILE" | awk -F',' '{print $2}' | xargs)
