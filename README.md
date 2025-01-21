@@ -25,18 +25,29 @@ The project uses React with Typescript and Mantine components to provide an inte
 ### Docker
 Docker is used to containerize the application. Right now, there are containers for the frontend and backend. The `docker-compose` configuration defines these services.
 
-## Example `.env` Configuration
+## Environment Files
 
+- `.env.dev`: Contains environment variables for development, such as local URLs and debug settings.
+- `.env.prod`: Contains environment variables for production, including secure keys and production URLs.
+
+These files allow you to easily switch between development and production configurations.
+
+### Example `.env` Configuration
+
+### `.env.dev`
 ```env
-DEBUG='True'
-ENV='development'
-BACKEND_URL='http://localhost:8000'
-FRONTEND_URL='http://localhost:5173'
-ALLOWED_HOSTS='localhost'
-SECRET_KEY= < a SHA256 key you would like to use for encryption. >
-DJANGO_SETTINGS='config.settings'
-LOCATION1 = 'halleyRise'
-LOCATION2 = 'vertex1'
+DJANGO_DEBUG=True
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+DJANGO_SECRET_KEY=dev-secret-key
+BACKEND_URL=http://localhost:8000
+```
+
+### `.env.prod`
+```env
+DJANGO_DEBUG=False
+DJANGO_ALLOWED_HOSTS=your-production-domain.com
+DJANGO_SECRET_KEY=prod-secret-key
+BACKEND_URL=https://your-production-domain.com
 ```
 
 ## Starting the Project
@@ -61,12 +72,3 @@ LOCATION2 = 'vertex1'
 
 4. Once the containers are running, the frontend is accessible at [http://localhost:5173](http://localhost:5173) and the backend is accessible at [http://localhost:8000](http://localhost:8000)
 
-## Accessing Deployment Server: 
-
-The server is deployed as an Amazon EC2 instance.
-
-To access it, run the following command with a valid ```goodspeedparking.pem``` file:
-
-```
-ssh -i "goodspeedparking.pem" ec2-user@ec2-3-145-155-182.us-east-2.compute.amazonaws.com
-```
