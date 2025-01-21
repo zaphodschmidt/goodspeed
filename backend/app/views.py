@@ -1,13 +1,12 @@
-# from django.shortcuts import render
 from rest_framework import viewsets
 from .models import *
 from .serializers import *
 from django.http import JsonResponse
-from rest_framework import status, permissions
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 from django.core.files.storage import default_storage
-
+from app.models import Building, Camera, ParkingSpot, Vertex
+from .services.parking_management import ParkingManagement
+import os
 
 class BuildingViewSet(viewsets.ModelViewSet):
     # permission_classes = [permissions.AllowAny]
@@ -48,6 +47,7 @@ def upload_image(request):
         except Camera.DoesNotExist:
             return JsonResponse({'error': 'Camera not found'}, status=404)
         
+
         # Handle image replacement
         new_image = Image.objects.create(image=image)
 
@@ -60,6 +60,14 @@ def upload_image(request):
 
         camera.image = new_image
         camera.save()
+
+        # Run parking detection on the uploaded image
+        image_path = new_image.image.path  # Get the path to the saved image
+        image_path = os.path.abspath(new_image.image.path)
+        print(f"Absolute image path: {image_path}")
+        parking_management = ParkingManagement(model_path='yolov8n.pt')
+        parking_management.runParkingDetection(image_path)
+        # run_parking_detection.delay(image_path)
 
         return JsonResponse({
             'message': 'Image uploaded successfully',

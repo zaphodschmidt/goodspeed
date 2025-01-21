@@ -4,4 +4,6 @@ djangorestframework
 django-cors-headers
 pillow
 gunicorn
+opencv-python
+ultralytics
 pytz
