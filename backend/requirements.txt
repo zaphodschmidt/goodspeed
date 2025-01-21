@@ -7,5 +7,3 @@ gunicorn
 opencv-python
 ultralytics
 pytz
-celery
-redis
