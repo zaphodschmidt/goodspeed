@@ -8,7 +8,6 @@ from app.models import Building, Camera, ParkingSpot, Vertex
 from .tasks import run_parking_detection
 from .services.parking_management import ParkingManagement
 import os
-import base64
 
 class BuildingViewSet(viewsets.ModelViewSet):
     # permission_classes = [permissions.AllowAny]
@@ -63,19 +62,18 @@ def upload_image(request):
         camera.image = new_image
         camera.save()
 
-         # Serialize the image file content
-        with new_image.image.open('rb') as img_file:
-            new_image_content = base64.b64encode(img_file.read()).decode('utf-8')
-        new_image_name = new_image.image.name
-
-        # Trigger the Celery task
-        run_parking_detection.delay(new_image_content, new_image_name, cam_num, building_name)
+        # Run parking detection on the uploaded image
+        image_path = new_image.image.path  # Get the path to the saved image
+        image_path = os.path.abspath(new_image.image.path)
+        print(f"Absolute image path: {image_path}")
+        parking_management = ParkingManagement(model_path='yolov8n.pt')
+        parking_management.runParkingDetection(image_path)
+        # run_parking_detection.delay(image_path)
 
         return JsonResponse({
             'message': 'Image uploaded successfully',
             'camera_id': camera.id,
             'new_image_url': new_image.image.url,
         })
-
 
     return JsonResponse({'error': 'Invalid request'}, status=400)

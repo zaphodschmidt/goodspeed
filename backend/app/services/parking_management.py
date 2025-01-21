@@ -6,8 +6,6 @@ from ultralytics.solutions.solutions import BaseSolution
 from ultralytics.utils.plotting import Annotator
 from app.models import Building, Camera, ParkingSpot
 from django.db import transaction
-import base64
-from io import BytesIO
 
 MODEL = 'yolov8n.pt'
 
@@ -16,45 +14,37 @@ class ParkingManagement(BaseSolution):
         super().__init__(**kwargs)
         self.json = None
         self.pr_info = {"Occupancy": 0, "Available": 0}
-
         self.arc = (0, 0, 255)
         self.occ = (0, 255, 0)
         self.dc = (255, 0, 189)
-
         self.normalImgW = 2560
         self.normalImgH = 1920
         self.webpageImgW = 1000
         self.webpageImgH = 750
-
+        
     def loadCameraVertices(self, photo: str):
         # Extract building name and camera number from the filename
         buildingName = photo.split('_')[3]
         cameraNumStr = photo.split('_')[4]  # This will be "cam11.jpeg"
         cameraNum = int(cameraNumStr[3:].split('.')[0])  # Remove "cam" and ".jpeg"
         
-
         if buildingName.lower() == "vertex1":
             buildingName = "Vertex"
-
         try:
             building = Building.objects.get(name=buildingName)
         except Building.DoesNotExist:
             print(f"Building '{buildingName}' does not exist.")
             return
-
         try:
             camera = building.cameras.get(cam_num=cameraNum)
         except Camera.DoesNotExist:
             print(f"Camera {cameraNum} does not exist in building {building.name}.")
             return
-
         #calc how much the boudning boxes need to be scaled
         scaleW = self.normalImgW / self.webpageImgW
         scaleH = self.normalImgH / self.webpageImgH
-
         parkingSpotBounds = []
         self.spot_ids = []
-
         for spot in camera.parking_spots.all():
             print(f"Found parking spot: {spot}")
             if not spot.vertices.exists():
@@ -65,11 +55,9 @@ class ParkingManagement(BaseSolution):
                     pointsDict["points"].append([point.x * scaleW, point.y * scaleH])
                 parkingSpotBounds.append(pointsDict)
                 self.spot_ids.append(spot.id)
-
         # jsonData = json.dumps(parkingSpotBounds)
         # with open('vertexes.json', 'w') as f:
         #     f.write(jsonData)
-
         print(f"Loaded parking spots: {self.spot_ids}")
         return parkingSpotBounds
 
@@ -95,9 +83,7 @@ class ParkingManagement(BaseSolution):
         self.extract_tracks(im0)  # extract tracks from im0
         es, fs = len(self.json), 0  # empty slots, filled slots
         annotator = Annotator(im0, self.line_width)  # init annotator
-
         parking_spots_to_update = []
-
         for region , spot_id in zip(self.json, self.spot_ids):
             # Convert points to a NumPy array with the correct dtype and reshape properly
             pts_array = np.array(region["points"], dtype=np.int32).reshape((-1, 1, 2))
@@ -115,64 +101,26 @@ class ParkingManagement(BaseSolution):
             fs, es = (fs + 1, es - 1) if rg_occupied else (fs, es)
             # Plotting regions
             cv2.polylines(im0, [pts_array], isClosed=True, color=self.occ if rg_occupied else self.arc, thickness=2)
-
             parking_spots_to_update.append({"spot_id": spot_id, "occupied": rg_occupied})
             
         with transaction.atomic():
             for spot in parking_spots_to_update:
                 ParkingSpot.objects.filter(id=spot["spot_id"]).update(occupied=spot["occupied"])
-
         self.pr_info["Occupancy"], self.pr_info["Available"] = fs, es
-
         annotator.display_analytics(im0, self.pr_info, (104, 31, 17), (255, 255, 255), 10)
         self.display_output(im0)  # display output with base class function
         return im0  # return output image for more usage
 
-    # def runParkingDetection(self, imagePath: str):
-    #     managment = ParkingManagement(model_path = MODEL)
-    #     managment.json = managment.loadCameraVertices(imagePath)
-    #     imgBGR = cv2.imread(imagePath)
-
-    #     if imgBGR is None:
-    #         print(f"Could not open {imagePath}")
-    #         return
-        
-    #     results = managment.model.track(imgBGR, persist = True, show = False)
-
-    #     if results and results[0].boxes:
-    #         output = managment.process_data(imgBGR)
-    #         # cv2.imwrite(imagePath, output)
-    #         # print("Saved img!!")
-
-    def runParkingDetection(image_content: bytes, building_name: str, camera_num: int):
-        # Initialize ParkingManagement
-        management = ParkingManagement(model_path=MODEL)
-
-        # Decode the image content into an OpenCV format
-        imgBGR = np.array(PILImage.open(BytesIO(image_content)))
-
+    def runParkingDetection(self, imagePath: str):
+        managment = ParkingManagement(model_path = MODEL)
+        managment.json = managment.loadCameraVertices(imagePath)
+        imgBGR = cv2.imread(imagePath)
         if imgBGR is None:
-            print("Could not process the provided image content")
+            print(f"Could not open {imagePath}")
             return
-
-        # Load the camera vertices using building_name and camera_num
-        metadata = f"dummy_building_{building_name}_cam{camera_num}.jpeg"  # Dummy metadata to match loadCameraVertices logic
-        management.json = management.loadCameraVertices(metadata)
-
-        if not management.json:
-            print("No parking spot data loaded.")
-            return
-
-        # Perform parking detection
-        results = management.model.track(imgBGR, persist=True, show=False)
-
+        
+        results = managment.model.track(imgBGR, persist = True, show = False)
         if results and results[0].boxes:
-            output = management.process_data(imgBGR)
-            # You can encode the output image and return it as a response if needed
-            _, encoded_image = cv2.imencode('.jpg', output)
-            processed_image = base64.b64encode(encoded_image).decode('utf-8')
-            print("Processed image successfully!")
-            return processed_image  # Optionally return the processed image
-
-
-            
+            output = managment.process_data(imgBGR)
+            cv2.imwrite(imagePath, output)
+            # print("Saved img!!")
