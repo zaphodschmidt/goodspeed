@@ -14,8 +14,8 @@ RUN npm install
 COPY . .
 
 # Set build-time argument to specify API_URL
-# ARG API_URL=https://example.com
-# ENV VITE_API_URL=$API_URL
+ARG API_URL=https://example.com
+ENV VITE_API_URL=$API_URL
 
 EXPOSE 5173
 
