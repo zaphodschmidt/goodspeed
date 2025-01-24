@@ -22,25 +22,22 @@ _gateway (10.110.70.1) at d4:01:c3:54:58:6b [ether] on eth0
 ```bash
 sudo nano /etc/netplan/00-installer-config.yaml
 ```
-2. Using the nano text editor, paste in the following:
+2. Using the nano text editor, paste in the following, paste in the following but use the subnet of the network of the garage (in this example, 10.0.0.x was the subnet used)
 ```yaml
 network:
   version: 2
-  renderer: NetworkManager
+  renderer: networkd
   ethernets:
     eth0:
-      dhcp4: false
       addresses:
-#The following line must use the subnet of the router with the fourth number as 2.
-        - 10.110.70.2/24
+        - 10.0.0.254/24 # verify correct subnet
       routes:
         - to: 0.0.0.0/0
-#The following line must be the IP of the router.
-          via: 10.110.70.1
-      nameservers: 
+          via: 10.0.0.1 # verify correct subnet
+      nameservers:
          addresses:
           - 8.8.8.8
-          - 8.8.4.4
+          - 1.1.1.1
 ```
 3. Then, edit the lines with comments above them to use the proper subnets.
 4. Save this configuration and exit nano by doing CTRL+X, then pressing the y key, and pressing ENTER.
@@ -70,14 +67,45 @@ sudo apt install isc-dhcp-server
 ```bash
 sudo nano /etc/dhcp/dhcpd.conf
 ```
-3. Using the nano text editor, add these lines to the bottom of the file, but with the subnet of your router. For this example, the subnet 10.110.70.x was used.
+3. Using the nano text editor, paste this into the file, but with the subnet of your router. For this example, the subnet 10.0.0.x was used.
 ```conf
-subnet 10.110.70.0 netmask 255.255.255.0 {
-  interface eth0;
-  range 10.110.70.3 10.110.70.50;
-  option routers 10.110.70.1;
-  option subnet-mask 255.255.255.0;
-  option broadcast-address 10.110.70.255; 
+# option definitions common to all supported networks...
+option domain-name-servers 8.8.8.8, 1.1.1.1;
+
+default-lease-time 600;
+max-lease-time 7200;
+
+# The ddns-updates-style parameter controls whether or not the server will
+# attempt to do a DNS update when a lease is confirmed. We default to the
+# behavior of the version 2 packages ('none', since DHCP v2 didn't
+# have support for DDNS.)
+ddns-update-style none;
+
+authoritative;
+
+
+# Define a common subnet and options
+subnet 10.0.0.0 netmask 255.255.255.0 {
+    range 10.0.0.150 10.0.0.200;
+    option routers 10.0.0.254;
+    option subnet-mask 255.255.255.0;
+    option broadcast-address 10.0.0.255;
+
+    # Group for fixed-address hosts
+    group {
+        option subnet-mask 255.255.255.0;
+        option domain-name-servers 1.1.1.1, 8.8.8.8;  # Overriding global domain-name-servers
+
+        host cam_02 {
+            hardware ethernet ec:71:db:02:ec:d6;
+            fixed-address 10.0.0.2;
+        }
+
+        host cam_03 {
+            hardware ethernet ec:71:db:65:a2:b6;
+            fixed-address 10.0.0.3;
+        }
+    }
 }
 ```
 4. Save this configuration and exit nano by doing CTRL+X, then pressing the y key, and pressing ENTER.
