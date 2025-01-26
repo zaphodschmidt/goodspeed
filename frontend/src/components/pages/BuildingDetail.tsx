@@ -61,6 +61,7 @@ function BuildingDetail() {
                                                 onError={(event) => {
                                                     event.currentTarget.src = no_image; // Set fallback image if the original URL is invalid
                                                 }}
+                                                radius='md'
                                             />
                                         <Group justify='space-between'>
                                             <Text fz='xl'>{camera.cam_num}</Text>

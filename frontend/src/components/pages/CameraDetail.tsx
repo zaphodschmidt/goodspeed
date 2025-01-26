@@ -118,6 +118,7 @@ function CameraDetail() {
         ratio={4 / 3}
       >
         <BackgroundImage
+          radius='md'
           ref={imageRef}
           src={camera.image?.image_url || no_image}
           style={{
