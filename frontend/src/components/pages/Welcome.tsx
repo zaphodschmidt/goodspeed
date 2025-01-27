@@ -9,6 +9,7 @@ import {
   Group,
   useMantineColorScheme,
   Image,
+  Box,
 } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
@@ -21,21 +22,22 @@ function Welcome() {
   const { colorScheme } = useMantineColorScheme();
 
   return (
-    <Stack align="center" gap="xl">
-      <Text
-        fs="italic"
-        fz="100"
-        fw={900}
-        variant="gradient"
-        gradient={{ from: theme.primaryColor, to: "cyan", deg: 90 }}
-      >
-        Goodspeed.info
-      </Text>
-      <Stack w="75%" align="center">
+    <Stack align="center" gap="md" p='md'>
+        <Text
+          w='100%'
+          fs="italic"
+          ta='center'
+          fz="clamp(2rem, 5vw, 5rem)" // Adjust font size dynamically
+          fw={900}
+          variant="gradient"
+          gradient={{ from: theme.primaryColor, to: "cyan", deg: 90 }}
+        >
+          Goodspeed
+        </Text>
         <Highlight
           fz="xl"
           ta="center"
-          highlight="goodspeed.info"
+          highlight="goodspeedparking.info"
           highlightStyles={{
             backgroundImage:
               colorScheme === "dark"
@@ -46,8 +48,7 @@ function Welcome() {
             WebkitTextFillColor: "transparent",
           }}
         >
-          Welcome to goodspeed.info, the management platform for Goodspeed
-          Parking.
+          Welcome to goodspeedparking.info, the management platform for Goodspeed Parking.
         </Highlight>
 
         <Title order={3} ta="center" mt="lg">
@@ -64,10 +65,9 @@ function Welcome() {
             Monitor spot occupancy and reservation information.
           </List.Item>
         </List>
-      </Stack>
 
       {/* Hardcoded building buttons */}
-      <Group justify="center" gap="5%" mt="xl">
+      <Group justify="center" gap="5%" align="flex-start" mt="xl">
         <Stack align="center" w="25%">
           <AspectRatio
             ratio={1}
@@ -80,6 +80,7 @@ function Welcome() {
             />
           </AspectRatio>
           <Title
+            ta='center'
             order={3}
             style={{ cursor: "pointer" }}
             onClick={() => navigate("building/halley-rise")}

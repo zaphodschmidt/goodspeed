@@ -25,10 +25,12 @@ export default function CustomAppShell({ children }: { children: React.ReactNode
             <AppShell.Header>
                 <Group justify='space-between'>
                     <Flex
-                        align='center' p='md'
+                        align='center' 
+                        p='md'
                         gap='md'
                         onClick={() => navigate('/')} // Add navigation on click
                         style={{ cursor: 'pointer' }}
+                        w='20%'
                     >
                         <Burger
                             opened={opened}
@@ -39,8 +41,8 @@ export default function CustomAppShell({ children }: { children: React.ReactNode
                         <ThemeIcon variant='filled' size='xl' radius='50%'>
                             <IconCar />
                         </ThemeIcon>
-                        <Title order={3} fs="italic" fw={700} >
-                            Goodspeed.info
+                        <Title order={3} fs="italic" fw={700}>
+                            Goodspeed
                         </Title>
                     </Flex>
                     <Flex align='center' p='md' justify='flex-end' gap='md' >
