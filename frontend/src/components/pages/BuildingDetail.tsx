@@ -11,6 +11,11 @@ import {
   Group,
   Tabs,
   Title,
+  // useMatches,
+  Box,
+  useMantineTheme,
+  useMantineColorScheme,
+  Center,
 } from "@mantine/core";
 import { generateSlug } from "../misc/generateSlug";
 import no_image from "../../assets/no_image.jpeg";
@@ -30,11 +35,19 @@ function BuildingDetail() {
 
   const [activePage, setPage] = useState(1);
 
-  const camsPerPage = 15;
+  const theme = useMantineTheme();
+  const { colorScheme } = useMantineColorScheme();
+
+  const camsPerPage = 12;
+  // const camsPerPage = useMatches({
+  //   base: 6,
+  //   sm: 9,
+  //   lg: 12,
+  // });
   const numPages = Math.ceil(cameras.length / camsPerPage);
   const displayedCameras: Camera[] = cameras.slice(
-    (activePage - 1) * 15,
-    activePage * 15
+    (activePage - 1) * camsPerPage,
+    activePage * camsPerPage
   );
   const [activeTab, setActiveTab] = useState<string | null>("cameras");
 
@@ -65,9 +78,32 @@ function BuildingDetail() {
         </Tabs.List>
         <Tabs.Panel value="cameras">
           <Stack align="center">
-            <Grid columns={5} align="center" justify="flex-start" p="md">
+            <Center
+              w='100%'
+              p='md'
+              bg={
+                colorScheme === "dark"
+                  ? theme.colors.dark[7]
+                  : theme.white
+              }
+              style={{
+                position: "sticky",
+                top: 75, // Adjust this value if you have a header or other elements above
+                // zIndex: 100, // Ensure it stays above other content
+                // background: "white", // Add a background to avoid transparency issues
+                // padding: "0.5rem 0", // Optional padding for better appearance
+              }}
+            >
+              <Pagination
+                size="md"
+                value={activePage}
+                onChange={setPage}
+                total={numPages}
+              />
+            </Center>
+            <Grid align="center" justify="flex-start" p='md'>
               {displayedCameras.map((camera) => (
-                <Grid.Col span={1} key={camera.id}>
+                <Grid.Col span={{ base: 6, sm: 4, md: 3 }} key={camera.id}>
                   <AspectRatio ratio={4 / 3}>
                     <div
                       style={{ cursor: "pointer" }}
@@ -84,9 +120,15 @@ function BuildingDetail() {
                         }}
                         radius="md"
                       />
-                      <Group justify="space-between" gap='xs' wrap="nowrap">
-                        <Text fz="clamp(0.5rem, 5vw, 1rem)">{camera.cam_num}</Text>
-                        <Text fz="clamp(0.25rem, 5vw, .75rem)" c="gray" truncate='end'>
+                      <Group justify="space-between" gap="xs" wrap="nowrap">
+                        <Text fz="clamp(0.25rem, 5vw, 1rem)">
+                          {camera.cam_num}
+                        </Text>
+                        <Text
+                          fz="clamp(0.25rem, 5vw, .75rem)"
+                          c="gray"
+                          truncate="end"
+                        >
                           {camera.MAC}
                         </Text>
                       </Group>
@@ -95,11 +137,6 @@ function BuildingDetail() {
                 </Grid.Col>
               ))}
             </Grid>
-            <Pagination
-              value={activePage}
-              onChange={setPage}
-              total={numPages}
-            />
           </Stack>
         </Tabs.Panel>
         <Tabs.Panel value="spots">
