@@ -10,6 +10,7 @@ import {
   NavLink,
   ScrollArea,
   Tooltip,
+  Box,
 } from "@mantine/core";
 import { useNavigate, useLocation } from "react-router-dom";
 import { IconHome, IconSun, IconMoon, IconCar } from "@tabler/icons-react";
@@ -40,24 +41,29 @@ export default function CustomAppShell({
     >
       <AppShell.Header>
         <Group justify="space-between">
-          <Flex
-            align="center"
-            p="md"
-            gap="md"
-            onClick={() => navigate("/")} // Add navigation on click
-            style={{ cursor: "pointer" }}
-            w="20%"
-          >
+          <Flex align="center" p="md" gap="md" w="20%">
             <Burger
               opened={opened}
               onClick={toggle}
               hiddenFrom="sm"
               size="sm"
             />
-            <ThemeIcon variant="filled" size="xl" radius="50%">
+            <ThemeIcon
+              variant="filled"
+              size="xl"
+              radius="50%"
+              onClick={() => navigate("/")} // Add navigation on click
+              style={{ cursor: "pointer" }}
+            >
               <IconCar />
             </ThemeIcon>
-            <Title order={3} fs="italic" fw={700}>
+            <Title
+              order={3}
+              fs="italic"
+              fw={700}
+              onClick={() => navigate("/")} // Add navigation on click
+              style={{ cursor: "pointer" }}
+            >
               Goodspeed
             </Title>
           </Flex>
