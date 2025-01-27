@@ -84,9 +84,9 @@ function BuildingDetail() {
                         }}
                         radius="md"
                       />
-                      <Group justify="space-between">
-                        <Text fz="xl">{camera.cam_num}</Text>
-                        <Text ta="right" c="gray">
+                      <Group justify="space-between" gap='xs' wrap="nowrap">
+                        <Text fz="clamp(0.5rem, 5vw, 1rem)">{camera.cam_num}</Text>
+                        <Text fz="clamp(0.25rem, 5vw, .75rem)" c="gray" truncate='end'>
                           {camera.MAC}
                         </Text>
                       </Group>
