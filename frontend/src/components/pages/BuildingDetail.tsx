@@ -68,7 +68,7 @@ function BuildingDetail() {
             <Grid columns={5} align="center" justify="flex-start" p="md">
               {displayedCameras.map((camera) => (
                 <Grid.Col span={1} key={camera.id}>
-                  <AspectRatio w="1000px" ratio={4 / 3}>
+                  <AspectRatio ratio={4 / 3}>
                     <div
                       style={{ cursor: "pointer" }}
                       onClick={() =>
