@@ -10,7 +10,6 @@ import {
   NavLink,
   ScrollArea,
   Tooltip,
-  Box,
 } from "@mantine/core";
 import { useNavigate, useLocation } from "react-router-dom";
 import { IconHome, IconSun, IconMoon, IconCar } from "@tabler/icons-react";
@@ -84,7 +83,9 @@ export default function CustomAppShell({
               <ActionIcon
                 size="xl"
                 variant="light"
-                onClick={() => navigate("/")}
+                onClick={() => {
+                  navigate("/");
+                }}
               >
                 <IconHome />
               </ActionIcon>
@@ -102,7 +103,10 @@ export default function CustomAppShell({
               // href="#required-for-focus"
               label="Welcome"
               active={location.pathname === "/"}
-              onClick={() => navigate(`/`)}
+              onClick={() => {
+                toggle();
+                navigate(`/`);
+              }}
             />
 
             {buildings.map((building) => {
@@ -119,7 +123,10 @@ export default function CustomAppShell({
                       variant="subtle"
                       label="Overview"
                       active={location.pathname === `/building/${slug}`}
-                      onClick={() => navigate(`/building/${slug}`)}
+                      onClick={() => {
+                        toggle();
+                        navigate(`/building/${slug}`);
+                      }}
                     />
                     <NavLink
                       // href="#required-for-focus"
@@ -135,11 +142,12 @@ export default function CustomAppShell({
                             `/building/${slug}/camera/${camera.cam_num}`
                           }
                           label={`Camera #${camera.cam_num}`}
-                          onClick={() =>
+                          onClick={() => {
+                            toggle();
                             navigate(
                               `/building/${slug}/camera/${camera.cam_num}`
-                            )
-                          }
+                            );
+                          }}
                         />
                       ))}
                     </NavLink>
