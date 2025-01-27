@@ -1,4 +1,11 @@
-import { Card, Container, createTheme, Paper, rem, Select } from "@mantine/core";
+import {
+  Card,
+  Container,
+  createTheme,
+  Paper,
+  rem,
+  Select,
+} from "@mantine/core";
 import type { MantineThemeOverride } from "@mantine/core";
 
 const CONTAINER_SIZES: Record<string, string> = {
@@ -44,8 +51,8 @@ export const mantineTheme: MantineThemeOverride = createTheme({
           "--container-size": fluid
             ? "100%"
             : size !== undefined && size in CONTAINER_SIZES
-              ? CONTAINER_SIZES[size]
-              : rem(size),
+            ? CONTAINER_SIZES[size]
+            : rem(size),
         },
       }),
     }),
