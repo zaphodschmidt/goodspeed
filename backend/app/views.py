@@ -67,7 +67,6 @@ def upload_image(request):
         print(f"Absolute image path: {image_path}")
         parking_management = ParkingManagement(model_path='yolov8n.pt')
         parking_management.runParkingDetection(image_path)
-        # run_parking_detection.delay(image_path)
 
         return JsonResponse({
             'message': 'Image uploaded successfully',
@@ -76,3 +75,6 @@ def upload_image(request):
         })
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+

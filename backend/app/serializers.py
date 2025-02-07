@@ -12,7 +12,7 @@ class ImageSerializer(serializers.ModelSerializer):
     def get_image_url(self,obj):
         return self.context['request'].build_absolute_uri(obj.image.url)
     
-    
+
 class VertexSerializer(serializers.ModelSerializer):
 
     class Meta:
