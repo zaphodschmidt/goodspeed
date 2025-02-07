@@ -4,6 +4,8 @@ import { useState } from "react";
 import { updateVertex } from "../../apiService.ts";
 
 interface DraggableVertexProps {
+  xScale: number;
+  yScale: number;
   vertex: Vertex;
   color: string;
   vertexSize: number;
@@ -11,6 +13,8 @@ interface DraggableVertexProps {
 }
 
 function DraggableVertex({
+  // yScale,
+  // xScale,
   vertex,
   color,
   vertexSize,
