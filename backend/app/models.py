@@ -34,6 +34,7 @@ class Camera(models.Model):
 
 class Zone(models.Model):
     zone_number = models.CharField(max_length=50)
+    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='zones')
 
     def __str__(self):
         return f"Zone {self.zone_number} in spot {self.spt.name}"
@@ -53,6 +54,16 @@ class ParkingSpot(models.Model):
 
     def __str__(self):
         return f"Spot {self.spot_num} (Camera {self.camera.cam_num})"
+    
+    def save(self, *args, **kwargs):
+        if self.zone and self.zone.building != self.camera.building:
+            raise ValidationError(
+                f"Zone {self.zone.zone_number} belongs to {self.zone.building.name}, "
+                f"but this spot's camera is in {self.camera.building.name}. "
+                "A zone cannot have parking spots from different buildings."
+            )
+
+        super().save(*args, **kwargs)
     
 
 class Reservation(models.Model):
