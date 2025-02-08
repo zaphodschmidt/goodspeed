@@ -2,7 +2,11 @@ import http.client
 import base64
 import json
 import os
+
 from dotenv import load_dotenv, find_dotenv
+from app.models import ParkingSpot, Building
+from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 
 load_dotenv(find_dotenv())
 
@@ -14,15 +18,15 @@ PARKMOBILE_NY_USERNAME = os.environ.get("PARKMOBILE_NY_USERNAME")
 PARKMOBILE_NY_PASSWORD = os.environ.get("PARKMOBILE_NY_PASSWORD")
 PARKMOBILE_APIKEY = os.environ.get("PARKMOBILE_APIKEY")
 
-def getAllPakinglots():
+def getAllParkinglots():
     login = {
         "avalon":(PARKMOBILE_AVALON_USERNAME, PARKMOBILE_AVALON_PASSWORD), 
-        "avalon":(PARKMOBILE_CAPI_USERNAME, PARKMOBILE_CAPI_PASSWORD), 
-        "avalon":(PARKMOBILE_NY_USERNAME, PARKMOBILE_NY_PASSWORD)
+        "capi":(PARKMOBILE_CAPI_USERNAME, PARKMOBILE_CAPI_PASSWORD), 
+        "ny":(PARKMOBILE_NY_USERNAME, PARKMOBILE_NY_PASSWORD)
     }
     all_responses = []
 
-    for user, pwd in login:
+    for user, pwd in login.items():
         credentials = f"{user}:{pwd}"
         encoded_credentials = base64.b64encode(credentials.encode("utf-8")).decode("utf-8")
 
@@ -37,9 +41,6 @@ def getAllPakinglots():
         res = conn.getresponse()
         data = res.read().decode("utf-8")
 
-        print(f"Status: {res.status}")
-        print(f"Response: {data}")
-
         try:
             parsed_data = json.loads(data)
             all_responses.append({
@@ -49,11 +50,8 @@ def getAllPakinglots():
             })
         except json.JSONDecodeError:
             print(f"Failed to parse JSON for user {user}")
-
-    with open("response.json", "w") as f:
-        json.dump(all_responses, f, indent=4)
-
-    print("All responses saved to all_responses.json")
+        
+    return all_responses
 
 class PaymentChecking():
     def __init__(self, username, password, api_key):
@@ -76,9 +74,6 @@ class PaymentChecking():
         res = conn.getresponse()
         data = res.read().decode("utf-8")
 
-        print(f"Status: {res.status}")
-        print(f"Response: {data}")
-
         try:
             parsed_data = json.loads(data)
             response = {
@@ -87,27 +82,49 @@ class PaymentChecking():
         except json.JSONDecodeError:
             print(f"Failed to parse JSON for user {self.username}")
 
-        with open("allSpots.json", "w") as f:
-            json.dump(response, f, indent=4)
-            print("All responses saved to allSpots.json")
-
         return response
     
     def getParking_Zone(self, zoneNumber:str):
         endpoint = f"/nforceapi/parkingrights/zone/{zoneNumber}?format=json"
-        self.get(endpoint)
+        return self.get(endpoint)
     
     def getParking_Spot(self, zoneNumber:str, spotNumber:str):
         endpoint = f"/nforceapi/parkingrights/zone/{zoneNumber}/{spotNumber}?format=json"
-        self.get(endpoint)
+        return self.get(endpoint)
 
     def getParking_SpotRange(self, zoneNumber:str, startSpotNumber:str, endSpotNumber:str):
         endpoint = f"/nforceapi/parkingrights/zone/{zoneNumber}/{startSpotNumber}/{endSpotNumber}?format=json"
-        self.get(endpoint)
+        return self.get(endpoint)
         
     def getParking_LPN(self, LPN:str):
         endpoint = f"/nforceapi/parkingrights/vehicle/{LPN}?format=json"
-        self.get(endpoint)
+        return self.get(endpoint)
+
+    def checkOccupiedspot_zone(self, building:str):
+        pass
+
+    #checks if all the occupied spots in a garage have been paid for
+    def checkOccupiedspot_zone(self, building:str, zoneNumber:str):
+        occupiedSpots = self.getParking_Zone(zoneNumber)
+        for spot in occupiedSpots["parkingRights"]:
+            #If the building doesn't exist print and return
+            try:
+                building = Building.objects.get(name=building)
+            except Building.DoesNotExist:
+                print(f"Parking spot {spot["spaceNumber"]} does not exist!")
+                return
+            
+            #If the parking spot doesn't exist print and return
+            try:
+                db_data = ParkingSpot.objects.get(spot_num=spot["spaceNumber"])
+                # if db_data:
+
+            except Building.DoesNotExist:
+                print(f"Parking spot {spot["spaceNumber"]} does not exist!")
+                return
+        
+        
+
 
 if __name__ == "__main__":
     pay = PaymentChecking(PARKMOBILE_AVALON_USERNAME, PARKMOBILE_AVALON_PASSWORD, PARKMOBILE_APIKEY)
