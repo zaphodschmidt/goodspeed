@@ -1,76 +1,90 @@
 import DraggableVertex from "./DraggableVertex";
 import { ParkingSpot, Vertex } from "../../types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, NumberInput, Popover, Button } from "@mantine/core";
 import hashSpotColor from "./hashSpotColor";
+import { updateVertex } from "../../apiService";
+
 
 interface SpotPolygonProps {
-  parking_spot: ParkingSpot;
+  xScale: number;
+  yScale: number;
+  spot: ParkingSpot;
   colorKey: number;
   deleteSpot: (spot: ParkingSpot) => void;
   handleUpdateSpot: (spot: ParkingSpot) => void;
+  setSpot: (spot: ParkingSpot) => void;
   editMode: boolean;
 }
 
-const vertexSize = 20;
-
-function SpotPolygon({
-  parking_spot,
+export default function SpotPolygon({
+  xScale,
+  yScale,
+  spot,
   colorKey,
   deleteSpot,
   handleUpdateSpot,
+  setSpot,
   editMode,
 }: SpotPolygonProps) {
-  const [vertices, setVertices] = useState<Vertex[]>(parking_spot.vertices);
-  const [spotLabel, setSpotLabel] = useState<string | number>(
-    parking_spot.spot_num
-  );
+
+  //consts
+  const scaledVertices = spot.vertices.map((vertex) => ({
+    ...vertex,
+    y: vertex.y * yScale,
+    x: vertex.x * xScale,
+  }));
+  const color = hashSpotColor(colorKey);
+
+  console.log(xScale)
+  console.log(yScale)
+  console.log(scaledVertices)
+
+
+  //states
+  const [centerX, centerY] = calculateCentroid(scaledVertices);
+  const [spotLabel, setSpotLabel] = useState<string | number>(spot.spot_num);
   const [popoverOpened, setPopoverOpened] = useState(false);
   const [popoverPosition, setPopoverPosition] = useState<{
     x: number;
     y: number;
   }>({ x: 0, y: 0 });
 
-  const color = hashSpotColor(colorKey);
-
-  const updateSpotNumber = () => {
-    const newNum = parseInt(spotLabel.toString());
-    const updatedSpot: ParkingSpot = { ...parking_spot, spot_num: newNum };
-    handleUpdateSpot(updatedSpot);
-  };
-
-  const calculateCentroid = (vertices: Vertex[]): [number, number] => {
-    let signedArea = 0; // Accumulate the polygon's signed area
-    let Cx = 0; // Accumulate x-coordinate of centroid
-    let Cy = 0; // Accumulate y-coordinate of centroid
-
-    const n = vertices.length;
-
-    for (let i = 0; i < n; i++) {
-      const x0 = vertices[i].x;
-      const y0 = vertices[i].y;
-      const x1 = vertices[(i + 1) % n].x; // Wrap around to the first vertex
-      const y1 = vertices[(i + 1) % n].y;
-
-      const a = x0 * y1 - x1 * y0; // Calculate cross product
-      signedArea += a;
-      Cx += (x0 + x1) * a;
-      Cy += (y0 + y1) * a;
-    }
-
-    signedArea *= 0.5;
-    Cx = Cx / (6 * signedArea);
-    Cy = Cy / (6 * signedArea);
-
-    return [Cx, Cy];
-  };
-  const [centerX, centerY] = calculateCentroid(vertices);
-
+  /*
+  Functions
+  */
   const handleRightClick = (event: React.MouseEvent) => {
     event.preventDefault(); // Prevent the default context menu
     setPopoverPosition({ x: event.pageX, y: event.pageY }); // Use pageX and pageY for proper positioning
     setPopoverOpened(true);
   };
+
+
+  const updateSpotNumber = () => {
+    const newNum = parseInt(spotLabel.toString());
+    const updatedSpot: ParkingSpot = { ...spot, spot_num: newNum };
+    handleUpdateSpot(updatedSpot);
+  };
+
+  function updateVertexPosition(vertex: Vertex) {
+     const normalizedVertex ={
+      ...vertex,
+      y: Math.round(vertex.y / yScale),
+      x: Math.round(vertex.x / xScale),
+    };
+    const updatedVertices = spot.vertices.map((v) => (v.id === vertex.id ? normalizedVertex : v))
+    const updatedSpot: ParkingSpot = { ...spot, vertices: updatedVertices}
+    setSpot(updatedSpot)
+  }
+
+  async function handleUpdateVertex(vertex: Vertex){ 
+    const normalizedVertex ={
+      ...vertex,
+      y: Math.round(vertex.y / yScale),
+      x: Math.round(vertex.x / xScale),
+    };
+    await updateVertex(normalizedVertex)
+  }
 
   return (
     <>
@@ -86,8 +100,8 @@ function SpotPolygon({
         onContextMenu={editMode ? handleRightClick : undefined} //Right click handler
       >
         <polygon
-          points={vertices
-            .map((v) => `${v.x + vertexSize / 2},${v.y + vertexSize / 2}`)
+          points={scaledVertices
+            .map((v) => `${v.x},${v.y}`)
             .join(" ")}
           style={{
             fill: "rgba(0, 0, 0, 0.25)", // Semi-transparent fill
@@ -99,17 +113,13 @@ function SpotPolygon({
         />
       </svg>
       {editMode &&
-        vertices.map((vertex, index) => (
+        scaledVertices.map((vertex, index) => (
           <DraggableVertex
             key={index}
             vertex={vertex}
             color={color}
-            vertexSize={vertexSize}
-            updateVertices={(updatedVertex) =>
-              setVertices(
-                vertices.map((v) => (v.id === vertex.id ? updatedVertex : v))
-              )
-            }
+            updateVertexPosition={updateVertexPosition}
+            handleUpdateVertex={handleUpdateVertex}
           />
         ))}
       <NumberInput
@@ -153,9 +163,9 @@ function SpotPolygon({
           <Button
             variant="subtle"
             color="gray"
-            onClick={() => deleteSpot(parking_spot)}
+            onClick={() => deleteSpot(spot)}
           >
-            Delete Spot {parking_spot.spot_num}
+            Delete Spot {spot.spot_num}
           </Button>
         </Popover.Dropdown>
       </Popover>
@@ -163,4 +173,28 @@ function SpotPolygon({
   );
 }
 
-export default SpotPolygon;
+const calculateCentroid = (vertices: Vertex[]): [number, number] => {
+  let signedArea = 0; // Accumulate the polygon's signed area
+  let Cx = 0; // Accumulate x-coordinate of centroid
+  let Cy = 0; // Accumulate y-coordinate of centroid
+
+  const n = vertices.length;
+
+  for (let i = 0; i < n; i++) {
+    const x0 = vertices[i].x;
+    const y0 = vertices[i].y;
+    const x1 = vertices[(i + 1) % n].x; // Wrap around to the first vertex
+    const y1 = vertices[(i + 1) % n].y;
+
+    const a = x0 * y1 - x1 * y0; // Calculate cross product
+    signedArea += a;
+    Cx += (x0 + x1) * a;
+    Cy += (y0 + y1) * a;
+  }
+
+  signedArea *= 0.5;
+  Cx = Cx / (6 * signedArea);
+  Cy = Cy / (6 * signedArea);
+
+  return [Cx, Cy];
+};

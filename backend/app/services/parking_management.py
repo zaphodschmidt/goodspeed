@@ -17,8 +17,6 @@ class ParkingManagement(BaseSolution):
         self.arc = (0, 0, 255)
         self.occ = (0, 255, 0)
         self.dc = (255, 0, 189)
-        self.normalImgW = 2560
-        self.normalImgH = 1920
         self.webpageImgW = 1000
         self.webpageImgH = 750
         
@@ -41,8 +39,6 @@ class ParkingManagement(BaseSolution):
             print(f"Camera {cameraNum} does not exist in building {building.name}.")
             return
         #calc how much the boudning boxes need to be scaled
-        scaleW = self.normalImgW / self.webpageImgW
-        scaleH = self.normalImgH / self.webpageImgH
         parkingSpotBounds = []
         self.spot_ids = []
         for spot in camera.parking_spots.all():
@@ -52,7 +48,7 @@ class ParkingManagement(BaseSolution):
             else:
                 pointsDict = {"points": []}
                 for point in spot.vertices.all():
-                    pointsDict["points"].append([point.x * scaleW, point.y * scaleH])
+                    pointsDict["points"].append([point.x, point.y])
                 parkingSpotBounds.append(pointsDict)
                 self.spot_ids.append(spot.id)
         # jsonData = json.dumps(parkingSpotBounds)
