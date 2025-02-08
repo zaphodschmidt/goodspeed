@@ -100,31 +100,33 @@ class PaymentChecking():
         endpoint = f"/nforceapi/parkingrights/vehicle/{LPN}?format=json"
         return self.get(endpoint)
 
-    def checkOccupiedspot_zone(self, building:str):
+    def checkOccupiedspot_building(self, building:str):
         pass
 
     #checks if all the occupied spots in a garage have been paid for
-    def checkOccupiedspot_zone(self, building:str, zoneNumber:str):
-        occupiedSpots = self.getParking_Zone(zoneNumber)
+    def checkOccupiedspot_zone(self, buildingName:str, zoneNumber:str):
+        occupiedSpots = (self.getParking_Zone(zoneNumber))['response']
+        db_spots = []
         for spot in occupiedSpots["parkingRights"]:
             #If the building doesn't exist print and return
             try:
-                building = Building.objects.get(name=building)
+                building = Building.objects.get(name=buildingName)
             except Building.DoesNotExist:
-                print(f"Parking spot {spot["spaceNumber"]} does not exist!")
-                return
+                print(f"Building {building} does not exist!")
+                # return
             
             #If the parking spot doesn't exist print and return
             try:
-                db_data = ParkingSpot.objects.get(spot_num=spot["spaceNumber"])
-                # if db_data:
+                parkingSpot = ParkingSpot.objects.filter(camera__building=building).filter(spot_num=spot["spaceNumber"])
+                # if(parkingSpot.)
+                print(parkingSpot)
+                db_spots.append(parkingSpot)
 
-            except Building.DoesNotExist:
+            except ParkingSpot.DoesNotExist:
                 print(f"Parking spot {spot["spaceNumber"]} does not exist!")
-                return
+                # return
+        return db_spots
         
-        
-
 
 if __name__ == "__main__":
     pay = PaymentChecking(PARKMOBILE_AVALON_USERNAME, PARKMOBILE_AVALON_PASSWORD, PARKMOBILE_APIKEY)
