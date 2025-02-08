@@ -10,6 +10,7 @@ import { mantineTheme } from "./theme.ts";
 import { mantineCssVariableResolver } from "./cssVariableResolver.ts";
 import CustomAppShell from "./components/misc/CustomAppShell.tsx";
 import { BuildingsProvider } from "./components/misc/BuildingsProvider.tsx";
+import CreateReservation from "./components/pages/CreateReservation.tsx";
 
 function App() {
   return (
@@ -36,6 +37,10 @@ function App() {
                   <BuildingDetail />
                 </CustomAppShell>
               }
+            />
+            <Route
+              path="/building/:buildingSlug/reserve"
+              element={<CreateReservation />}
             />
             <Route
               path="/building/:buildingSlug/camera/:camNum"
