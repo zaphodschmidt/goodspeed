@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 from corsheaders.defaults import default_headers
+from celery.schedules import crontab
+import app.tasks
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -168,3 +170,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Celery Stuff
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
+CELERY_BEAT_SCHEDULE = {
+    "sample_task": {
+        "task": "app.tasks.sample_task",
+        "schedule": crontab(minute="*/1"),
+    },
+}
