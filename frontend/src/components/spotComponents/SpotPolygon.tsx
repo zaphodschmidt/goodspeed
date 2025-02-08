@@ -139,7 +139,11 @@ export default function SpotPolygon({
           input: {
             color: "white", // Change font color
             backgroundColor: "transparent",
+            textAlign: 'center'
           },
+        }}
+        style={{
+          transform: 'translate(-50%, -50%)'
         }}
       />
       <Popover
