@@ -3,10 +3,15 @@ import base64
 import json
 import os
 
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 from dotenv import load_dotenv, find_dotenv
-from app.models import ParkingSpot, Building
+from app.models import ParkingSpot, Building, Zone
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
+from app.serializers import ParkingSpotSerializer
 
 load_dotenv(find_dotenv())
 
@@ -59,7 +64,7 @@ class PaymentChecking():
         self.password = password
         self.api_key = api_key
 
-    def get(self, endpoint):
+    def get(self, endpoint:str):
         response = []
         credentials = f"{self.username}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode("utf-8")).decode("utf-8")
@@ -84,6 +89,33 @@ class PaymentChecking():
 
         return response
     
+    #TODO Finish email finding part of code
+    def sendEmailForTicket(self, receiverEmail:str, building:str, spot:str):
+        sender_email = "szaphod@gmail.com"
+        receiverEmail ="parkerjeanneallen@gmail.com"
+        # receiver_email ="zapschmidt@hotmail.com"
+        password = "wovw qiay gkbo ylfv"
+        subject = "Fuck you"
+        body = "This is from a python script that I made :) I love you"
+
+        message = MIMEMultipart()
+        message['From'] = sender_email
+        message['To'] = receiverEmail
+        message['Subject'] = subject
+        message.attach(MIMEText(body, 'plain'))
+
+        try:
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(sender_email, password)
+            text = message.as_string()
+            server.sendmail(sender_email, receiver_email, text)
+            print("Email sent successfully!")
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            server.quit()
+    
     def getParking_Zone(self, zoneNumber:str):
         endpoint = f"/nforceapi/parkingrights/zone/{zoneNumber}?format=json"
         return self.get(endpoint)
@@ -99,34 +131,42 @@ class PaymentChecking():
     def getParking_LPN(self, LPN:str):
         endpoint = f"/nforceapi/parkingrights/vehicle/{LPN}?format=json"
         return self.get(endpoint)
+    
 
     def checkOccupiedspot_building(self, building:str):
         pass
 
     #checks if all the occupied spots in a garage have been paid for
     def checkOccupiedspot_zone(self, buildingName:str, zoneNumber:str):
-        occupiedSpots = (self.getParking_Zone(zoneNumber))['response']
-        db_spots = []
-        for spot in occupiedSpots["parkingRights"]:
-            #If the building doesn't exist print and return
-            try:
-                building = Building.objects.get(name=buildingName)
-            except Building.DoesNotExist:
-                print(f"Building {building} does not exist!")
-                # return
-            
-            #If the parking spot doesn't exist print and return
-            try:
-                parkingSpot = ParkingSpot.objects.filter(camera__building=building).filter(spot_num=spot["spaceNumber"])
-                # if(parkingSpot.)
-                print(parkingSpot)
-                db_spots.append(parkingSpot)
-
-            except ParkingSpot.DoesNotExist:
-                print(f"Parking spot {spot["spaceNumber"]} does not exist!")
-                # return
-        return db_spots
+        ##Get parking data from the DB
+        #If the building doesn't exist print and return
+        try:
+            building = Building.objects.get(name=buildingName)
+        except Building.DoesNotExist:
+            print(f"Building {building} does not exist!")
+            return
         
+        #If the parking spot doesn't exist print and return
+        try:
+            parkingSpots = ParkingSpot.objects.filter(camera__building=building, zone__in=zoneNumber)
+            jsonParkingSpots = ParkingSpotSerializer(parkingSpots, many=True).data
+
+        except Zone.DoesNotExist:
+            print(f"Parking spot {zoneNumber} does not exist!")
+            return
+                
+        ##Get park mobile data
+        occupiedSpots = (self.getParking_Zone(zoneNumber))['response']['parkingRights']
+        prkmob_spots = {}
+        for spot in occupiedSpots:
+            prkmob_spots[spot["spaceNumber"]] = spot
+        
+        ##find who didn't pay
+        for db_spot in jsonParkingSpots:
+            #if the spot is occupied and they didn't pay their ticket
+            if db_spot['occupied'] and db_spot["spot_num"] not in prkmob_spots["spaceNumber"]:
+                #TODO send text to person
+                pass
 
 if __name__ == "__main__":
     pay = PaymentChecking(PARKMOBILE_AVALON_USERNAME, PARKMOBILE_AVALON_PASSWORD, PARKMOBILE_APIKEY)
