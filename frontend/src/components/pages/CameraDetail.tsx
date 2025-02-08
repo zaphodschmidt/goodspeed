@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Building, Camera, ParkingSpot, Vertex } from "../../types.ts";
 import {
@@ -10,7 +10,7 @@ import {
   Title,
   ActionIcon,
   Tooltip,
-  Image,
+  Image
 } from "@mantine/core";
 import no_image from "../../assets/no_image.jpeg";
 import { generateSlug } from "../misc/generateSlug.ts";
@@ -25,10 +25,10 @@ import SpotTable from "../spotComponents/SpotTable.tsx";
 import { useBuildings } from "../misc/useBuildingsContext.ts";
 import CustomLoader from "../misc/CustomLoader.tsx";
 import { IconCheck, IconEdit } from "@tabler/icons-react";
-import { useResizeObserver } from "@mantine/hooks";
+import { useElementSize } from '@custom-react-hooks/use-element-size';
 
-const BACKEND_IMAGE_WIDTH = 1000;
-const BACKEND_IMAGE_HEIGHT = 750;
+const BACKEND_IMAGE_WIDTH = 2560;
+const BACKEND_IMAGE_HEIGHT = 1920;
 const LEFT_X = Math.round(BACKEND_IMAGE_WIDTH * 0.25);
 const RIGHT_X = Math.round(BACKEND_IMAGE_WIDTH * 0.75);
 const TOP_Y = Math.round(BACKEND_IMAGE_HEIGHT * 0.25);
@@ -44,7 +44,7 @@ function CameraDetail() {
     camNum: string;
   }>();
   // Reference to the BackgroundImage to get its dimensions
-  const [imageRef, rect] = useResizeObserver();
+  const [imageRef, rect] = useElementSize();
   //get updated buildings using useBuildings context
   const { buildings } = useBuildings();
 
@@ -59,8 +59,8 @@ function CameraDetail() {
   const camera_id =
     building?.cameras.find((c) => c.cam_num === Number(camNum))?.id ||
     undefined;
-  const xScale = rect.width/BACKEND_IMAGE_WIDTH
-  const yScale = rect.height/BACKEND_IMAGE_HEIGHT
+  const xScale = rect.width / BACKEND_IMAGE_WIDTH
+  const yScale = rect.height / BACKEND_IMAGE_HEIGHT
 
   /*
   States
@@ -68,7 +68,8 @@ function CameraDetail() {
   const [camera, setCamera] = useState<Camera | undefined>();
   const [spots, setSpots] = useState<ParkingSpot[]>([]);
   const [editMode, setEditMode] = useState(false);
-  
+
+  console.log(spots)
 
   /*
   UseEffects
@@ -83,6 +84,7 @@ function CameraDetail() {
       });
     }
   }, [camera_id]);
+
 
   /*
   Functions
@@ -138,11 +140,16 @@ function CameraDetail() {
   };
 
   const handleUpdateSpot = async (updatedSpot: ParkingSpot) => {
+    console.log("alrighty, updating this spot", updatedSpot)
     await updateParkingSpot(updatedSpot);
     setSpots(
       spots.map((spot) => (spot.id === updatedSpot.id ? updatedSpot : spot))
     );
   };
+
+  function setSpot(newSpot: ParkingSpot){
+    setSpots((prev) => prev.map((s) => s.id === newSpot.id ? newSpot : s))
+  }
 
   /*
   Returns
@@ -167,41 +174,35 @@ function CameraDetail() {
       </Group>
       <AspectRatio w={1000} mx="auto" pos="relative" ratio={4 / 3}>
         <BackgroundImage
-          radius="md"
           ref={imageRef}
-          src={camera.image?.image_url || no_image}
+          radius="md"
           // onLoad={() => {
           //   const rect = imageRef.current!.getBoundingClientRect();
-          //   const imageHeight = rect.height;
-          //   const imageWidth = rect.width;
-          //   setXScale(imageWidth / BACKEND_IMAGE_WIDTH);
-          //   setYScale(imageHeight / BACKEND_IMAGE_HEIGHT);
+          //   setXScale(rect.width / BACKEND_IMAGE_WIDTH)
+          //   setYScale(rect.height / BACKEND_IMAGE_HEIGHT)
           // }}
+          src={camera.image?.image_url || no_image}
           style={{
             position: "relative",
             width: "100%",
             height: "100%",
             objectFit: "contain",
           }}
-        >
-          <Image
-            src={camera.image?.image_url}
-            fallbackSrc={no_image}
-            style={{ display: "none" }}
-          />
+        > 
           {spots.length > 0 &&
-            spots.map((spot, index) => (
-              <SpotPolygon
+            spots.map((spot, index) => {
+              return(<SpotPolygon
                 xScale={xScale}
                 yScale={yScale}
                 key={spot.id}
-                parking_spot={spot}
+                spot={spot}
                 colorKey={index}
                 deleteSpot={deleteSpot}
                 handleUpdateSpot={handleUpdateSpot}
                 editMode={editMode}
-              />
-            ))}
+                setSpot={setSpot}
+              />)
+          })}
         </BackgroundImage>
       </AspectRatio>
       {editMode && (

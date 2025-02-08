@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@custom-react-hooks/use-element-size": "^1.5.1",
     "@emotion/react": "^11.14.0",
     "@mantine/core": "^7.16.0",
     "@mantine/dates": "^7.16.0",

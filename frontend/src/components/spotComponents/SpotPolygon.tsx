@@ -1,58 +1,90 @@
 import DraggableVertex from "./DraggableVertex";
 import { ParkingSpot, Vertex } from "../../types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, NumberInput, Popover, Button } from "@mantine/core";
 import hashSpotColor from "./hashSpotColor";
+import { updateVertex } from "../../apiService";
 
-const vertexSize = 20;
 
 interface SpotPolygonProps {
   xScale: number;
   yScale: number;
-  parking_spot: ParkingSpot;
+  spot: ParkingSpot;
   colorKey: number;
   deleteSpot: (spot: ParkingSpot) => void;
   handleUpdateSpot: (spot: ParkingSpot) => void;
+  setSpot: (spot: ParkingSpot) => void;
   editMode: boolean;
 }
 
 export default function SpotPolygon({
   xScale,
   yScale,
-  parking_spot,
+  spot,
   colorKey,
   deleteSpot,
   handleUpdateSpot,
+  setSpot,
   editMode,
 }: SpotPolygonProps) {
-  const [vertices, setVertices] = useState<Vertex[]>(parking_spot.vertices);
-  const scaledVertices = vertices.map((vertex) => ({
-    ...vertex, x: vertex.x*xScale, y:vertex.y*yScale
-  }))
-  const [spotLabel, setSpotLabel] = useState<string | number>(
-    parking_spot.spot_num
-  );
+
+  //consts
+  const scaledVertices = spot.vertices.map((vertex) => ({
+    ...vertex,
+    y: vertex.y * yScale,
+    x: vertex.x * xScale,
+  }));
+  const color = hashSpotColor(colorKey);
+
+  console.log(xScale)
+  console.log(yScale)
+  console.log(scaledVertices)
+
+
+  //states
+  const [centerX, centerY] = calculateCentroid(scaledVertices);
+  const [spotLabel, setSpotLabel] = useState<string | number>(spot.spot_num);
   const [popoverOpened, setPopoverOpened] = useState(false);
   const [popoverPosition, setPopoverPosition] = useState<{
     x: number;
     y: number;
   }>({ x: 0, y: 0 });
 
-  const color = hashSpotColor(colorKey);
-
-  const updateSpotNumber = () => {
-    const newNum = parseInt(spotLabel.toString());
-    const updatedSpot: ParkingSpot = { ...parking_spot, spot_num: newNum };
-    handleUpdateSpot(updatedSpot);
-  };
-
-  const [centerX, centerY] = calculateCentroid(scaledVertices);
-
+  /*
+  Functions
+  */
   const handleRightClick = (event: React.MouseEvent) => {
     event.preventDefault(); // Prevent the default context menu
     setPopoverPosition({ x: event.pageX, y: event.pageY }); // Use pageX and pageY for proper positioning
     setPopoverOpened(true);
   };
+
+
+  const updateSpotNumber = () => {
+    const newNum = parseInt(spotLabel.toString());
+    const updatedSpot: ParkingSpot = { ...spot, spot_num: newNum };
+    handleUpdateSpot(updatedSpot);
+  };
+
+  function updateVertexPosition(vertex: Vertex) {
+     const normalizedVertex ={
+      ...vertex,
+      y: Math.round(vertex.y / yScale),
+      x: Math.round(vertex.x / xScale),
+    };
+    const updatedVertices = spot.vertices.map((v) => (v.id === vertex.id ? normalizedVertex : v))
+    const updatedSpot: ParkingSpot = { ...spot, vertices: updatedVertices}
+    setSpot(updatedSpot)
+  }
+
+  async function handleUpdateVertex(vertex: Vertex){ 
+    const normalizedVertex ={
+      ...vertex,
+      y: Math.round(vertex.y / yScale),
+      x: Math.round(vertex.x / xScale),
+    };
+    await updateVertex(normalizedVertex)
+  }
 
   return (
     <>
@@ -69,7 +101,7 @@ export default function SpotPolygon({
       >
         <polygon
           points={scaledVertices
-            .map((v) => `${v.x + vertexSize / 2},${v.y + vertexSize / 2}`)
+            .map((v) => `${v.x},${v.y}`)
             .join(" ")}
           style={{
             fill: "rgba(0, 0, 0, 0.25)", // Semi-transparent fill
@@ -83,18 +115,11 @@ export default function SpotPolygon({
       {editMode &&
         scaledVertices.map((vertex, index) => (
           <DraggableVertex
-            yScale={yScale}
-            xScale={xScale}
             key={index}
             vertex={vertex}
             color={color}
-            vertexSize={vertexSize}
-            updateVertices={(updatedVertex) =>{
-              const scaledVertex = {...updatedVertex, x: updatedVertex.x / xScale, y: updatedVertex.y / yScale}
-              setVertices(
-                vertices.map((v) => (v.id === vertex.id ? scaledVertex : v))
-              )
-            }}
+            updateVertexPosition={updateVertexPosition}
+            handleUpdateVertex={handleUpdateVertex}
           />
         ))}
       <NumberInput
@@ -138,16 +163,15 @@ export default function SpotPolygon({
           <Button
             variant="subtle"
             color="gray"
-            onClick={() => deleteSpot(parking_spot)}
+            onClick={() => deleteSpot(spot)}
           >
-            Delete Spot {parking_spot.spot_num}
+            Delete Spot {spot.spot_num}
           </Button>
         </Popover.Dropdown>
       </Popover>
     </>
   );
 }
-
 
 const calculateCentroid = (vertices: Vertex[]): [number, number] => {
   let signedArea = 0; // Accumulate the polygon's signed area
