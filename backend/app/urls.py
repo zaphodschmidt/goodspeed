@@ -11,6 +11,7 @@ router.register(r'buildings', views.BuildingViewSet, basename='buildings')
 router.register(r'cameras', views.CameraViewSet, basename='cameras') 
 router.register(r'parking_spots', views.ParkingSpotViewSet, basename='parking_spots') 
 router.register(r'vertices', views.VertexViewSet, basename='vertices') 
+router.register(r'reservations', views.ReservationViewSet, basename='reservations') 
 
 urlpatterns = [
     path('', include(router.urls)), 

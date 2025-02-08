@@ -29,6 +29,12 @@ class CameraViewSet(viewsets.ModelViewSet):
     queryset = Camera.objects.all()
     serializer_class = CameraSerializer
 
+class ReservationViewSet(viewsets.ModelViewSet):
+    # permission_classes = [permissions.AllowAny]
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerializer
+
+
 class ParkingSpotViewSet(viewsets.ModelViewSet):
     # permission_classes = [permissions.AllowAny]
     queryset = ParkingSpot.objects.all()

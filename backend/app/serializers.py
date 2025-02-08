@@ -23,6 +23,14 @@ class VertexSerializer(serializers.ModelSerializer):
         }
 
 
+class ReservationSerializer(serializers.ModelSerializer):
+    is_expired = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Reservation
+        fields = '__all__'
+
+
 class ParkingSpotSerializer(serializers.ModelSerializer):
     vertices = VertexSerializer(many=True, required=False)
 

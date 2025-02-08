@@ -1,5 +1,7 @@
 from django.db import models
 from pytz import common_timezones
+from django.utils.timezone import now
+from django.core.exceptions import ValidationError
 
 class Image(models.Model):
     image = models.ImageField(upload_to='uploads/')
@@ -40,7 +42,6 @@ class ParkingSpot(models.Model):
     occupied = models.BooleanField(default=False) 
     start_datetime = models.DateTimeField(null=True) # start of parkmobile lease
     end_datetime = models.DateTimeField(null=True) # end of parkmobile lease
-    reserved_by_lpn = models.CharField(null=True, max_length=15)
     occupied_by_lpn = models.CharField(null=True, max_length=15)
     camera = models.ForeignKey(Camera, on_delete=models.CASCADE, related_name='parking_spots')
     zone = models.ForeignKey(Zone, null=True, on_delete=models.CASCADE, related_name='parking_spots')
@@ -50,6 +51,28 @@ class ParkingSpot(models.Model):
 
     def __str__(self):
         return f"Spot {self.spot_num} (Camera {self.camera.cam_num})"
+    
+
+class Reservation(models.Model):
+    spot = models.OneToOneField(ParkingSpot, related_name='reservation', on_delete=models.CASCADE)
+    lpn = models.CharField(max_length=12)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    def save(self, *args, **kwargs):
+        if Reservation.objects.filter(spot=self.spot).exists():
+            raise ValidationError(f"Parking spot {self.spot} is already reserved")
+        
+        super().save(*args, **kwargs)
+
+    @property
+    def is_expired(self):
+        timezone = self.spot.camera.building.timezone
+        return 1
+
+
+           
+
 
 class Vertex(models.Model):
     spot = models.ForeignKey(ParkingSpot, on_delete=models.CASCADE, related_name='vertices')
