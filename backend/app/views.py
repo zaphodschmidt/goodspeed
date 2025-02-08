@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
 from app.models import Building, Camera, ParkingSpot, Vertex
-from .services.parking_management import ParkingManagement
+from .tasks import run_parking_detection
 import os
 
 class BuildingViewSet(viewsets.ModelViewSet):
@@ -65,9 +65,7 @@ def upload_image(request):
         image_path = new_image.image.path  # Get the path to the saved image
         image_path = os.path.abspath(new_image.image.path)
         print(f"Absolute image path: {image_path}")
-        parking_management = ParkingManagement(model_path='yolov8n.pt')
-        parking_management.runParkingDetection(image_path)
-        # run_parking_detection.delay(image_path)
+        run_parking_detection.delay(image_path)
 
         return JsonResponse({
             'message': 'Image uploaded successfully',

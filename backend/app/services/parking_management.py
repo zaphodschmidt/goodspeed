@@ -107,7 +107,7 @@ class ParkingManagement(BaseSolution):
         self.display_output(im0)  # display output with base class function
         return im0  # return output image for more usage
 
-    def runParkingDetection(self, imagePath: str):
+    def run_parking_detection(self, imagePath: str):
         managment = ParkingManagement(model_path = MODEL)
         managment.json = managment.loadCameraVertices(imagePath)
         imgBGR = cv2.imread(imagePath)
