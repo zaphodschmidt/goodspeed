@@ -9,3 +9,4 @@ ultralytics
 pytz
 celery
 redis
+python-dotenv
