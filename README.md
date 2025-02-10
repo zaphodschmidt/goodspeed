@@ -67,15 +67,15 @@ LOCATION2 = 'vertex1'
 The app is deployed on a Amazon EC2 instance. To access it, run the following command in a directory with the ```goodspeedparking.pem``` credential file:
 
 ```
-ssh -i "goodspeedparking.pem" ec2-user@ec2-3-145-155-182.us-east-2.compute.amazonaws.com
+ssh -i "goodspeedparking.pem" ec2-user@ec2-3-135-249-114.us-east-2.compute.amazonaws.com
 ```
 
 If you want to get all the photos from the media folder:
 ```
-scp -r -i ~/.ssh/goodspeedparking.pem ec2-user@ec2-3-145-155-182.us-east-2.compute.amazonaws.com:~/goodspeed/backend/media/uploads ./Desktop/coding/goodspeed/backend/media/uploads
+scp -r -i ~/.ssh/goodspeedparking.pem ec2-user@ec2-3-135-249-114.us-east-2.compute.amazonaws.com:~/goodspeed/backend/media/uploads ./Desktop/coding/goodspeed/backend/media/uploads
 ```
 
 If you want to get the sqlite db:
 ```
-scp -r -i ~/.ssh/goodspeedparking.pem ec2-user@ec2-3-145-155-182.us-east-2.compute.amazonaws.com:~/goodspeed/backend/db.sqlite3 ./Desktop/coding/goodspeed/backend/db.sqlite3
+scp -r -i ~/.ssh/goodspeedparking.pem ec2-user@ec2-3-135-249-114.us-east-2.compute.amazonaws.com:~/goodspeed/backend/db.sqlite3 ./Desktop/coding/goodspeed/backend/db.sqlite3
 ```
