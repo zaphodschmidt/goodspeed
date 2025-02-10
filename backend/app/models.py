@@ -28,7 +28,13 @@ class Camera(models.Model):
 
     def __str__(self):
         return f"Camera {self.cam_num} in {self.building.name}"
-    
+
+class Zone(models.Model):
+    zone_number = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"Zone {self.zone_number} in spot {self.spt.name}"
+
 class ParkingSpot(models.Model):
     spot_num = models.IntegerField()
     occupied = models.BooleanField(default=False) 
@@ -37,6 +43,7 @@ class ParkingSpot(models.Model):
     reserved_by_lpn = models.CharField(null=True, max_length=15)
     occupied_by_lpn = models.CharField(null=True, max_length=15)
     camera = models.ForeignKey(Camera, on_delete=models.CASCADE, related_name='parking_spots')
+    zone = models.ForeignKey(Zone, null=True, on_delete=models.CASCADE, related_name='parking_spots')
 
     # class Meta:
     #     unique_together = ('spot_num', 'camera')
