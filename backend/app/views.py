@@ -58,7 +58,6 @@ def upload_image(request):
             camera = Camera.objects.get(cam_num=cam_num, building__name=building_name)
         except Camera.DoesNotExist:
             return JsonResponse({'error': 'Camera not found'}, status=404)
-        
 
         # Handle image replacement
         new_image = Image.objects.create(image=image)

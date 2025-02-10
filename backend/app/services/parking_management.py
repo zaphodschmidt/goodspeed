@@ -58,6 +58,7 @@ class ParkingManagement(BaseSolution):
         # jsonData = json.dumps(parkingSpotBounds)
         # with open('vertexes.json', 'w') as f:
         #     f.write(jsonData)
+        
         print(f"Loaded parking spots: {self.spot_ids}")
         return parkingSpotBounds
 
@@ -74,7 +75,7 @@ class ParkingManagement(BaseSolution):
             if fileName.is_file() and self.isJpeg(fileName):
                 files.append(path+"/"+fileName.name)
         return files
-
+    
     def process_data(self, im0):
         if not self.json:
             print("No parking spot data loaded.")
@@ -82,7 +83,6 @@ class ParkingManagement(BaseSolution):
     
         self.extract_tracks(im0)  # extract tracks from im0
         es, fs = len(self.json), 0  # empty slots, filled slots
-        annotator = Annotator(im0, self.line_width)  # init annotator
         parking_spots_to_update = []
         for region , spot_id in zip(self.json, self.spot_ids):
             # Convert points to a NumPy array with the correct dtype and reshape properly
@@ -93,9 +93,8 @@ class ParkingManagement(BaseSolution):
                 dist = cv2.pointPolygonTest(pts_array, (xc, yc), False)
                 if dist >= 0:
                     # cv2.circle(im0, (xc, yc), radius=self.line_width * 4, color=self.dc, thickness=-1)
-                    annotator.display_objects_labels(
-                        im0, self.model.names[int(cls)], (104, 31, 17), (255, 255, 255), xc, yc, 10
-                    )
+                    #     im0, self.model.names[int(cls)], (104, 31, 17), (255, 255, 255), xc, yc, 10
+                    # )
                     rg_occupied = True
                     break
             fs, es = (fs + 1, es - 1) if rg_occupied else (fs, es)
@@ -107,7 +106,6 @@ class ParkingManagement(BaseSolution):
             for spot in parking_spots_to_update:
                 ParkingSpot.objects.filter(id=spot["spot_id"]).update(occupied=spot["occupied"])
         self.pr_info["Occupancy"], self.pr_info["Available"] = fs, es
-        annotator.display_analytics(im0, self.pr_info, (104, 31, 17), (255, 255, 255), 10)
         self.display_output(im0)  # display output with base class function
         return im0  # return output image for more usage
 

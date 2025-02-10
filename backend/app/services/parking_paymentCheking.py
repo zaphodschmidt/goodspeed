@@ -109,7 +109,7 @@ class PaymentChecking():
             server.starttls()
             server.login(sender_email, password)
             text = message.as_string()
-            server.sendmail(sender_email, receiver_email, text)
+            server.sendmail(sender_email, receiverEmail, text)
             print("Email sent successfully!")
         except Exception as e:
             print(f"Error: {e}")
