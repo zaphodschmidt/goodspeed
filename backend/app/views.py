@@ -76,7 +76,7 @@ def upload_image(request):
         image_path = new_image.image.path  # Get the path to the saved image
         image_path = os.path.abspath(new_image.image.path)
         print(f"Absolute image path: {image_path}")
-        parking_management = ParkingManagement(model_path='yolov8n.pt')
+        parking_management = ParkingManagement(model_path='yolo11n.pt')
         parking_management.runParkingDetection(image_path)
 
         return JsonResponse({
