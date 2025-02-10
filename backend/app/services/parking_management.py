@@ -18,8 +18,7 @@ class ParkingManagement(BaseSolution):
         self.arc = (0, 0, 255)
         self.occ = (0, 255, 0)
         self.dc = (255, 0, 189)
-        self.webpageImgW = 1000
-        self.webpageImgH = 750
+
         self.buildingName = None
         self.cameraNum = None
         self.cameraObj = None
@@ -104,7 +103,7 @@ class ParkingManagement(BaseSolution):
         return im0  # return output image for more usage
     
     def drawLP_polylines(self, img0, lp):
-        x1, y1, x2, y2, id, score,label = lp
+        x1, y1, x2, y2, conf, cls_id = lp
         cv2.rectangle(img0, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 4)
         pts = np.array([
             [int(x1), int(y1)],
@@ -113,6 +112,7 @@ class ParkingManagement(BaseSolution):
             [int(x1), int(y2)]
         ], np.int32)
         
+        print(f"DRAWING ON {pts}")
         pts = pts.reshape((-1, 1, 2))
         cv2.polylines(img0, [pts], isClosed=True, color=(255, 0, 0), thickness=2)
 
@@ -138,22 +138,14 @@ class ParkingManagement(BaseSolution):
         return inside
 
     def LP_in_spot(self, lp, spot_polygon):
-        print(f"QOWL: {spot_polygon}")
-        print([p['x'] for p in spot_polygon])
-        print([p['y'] for p in spot_polygon])
-
-
-        x1, y1, x2, y2, obj_id, score, label = lp
-        print(f"x1 :{x1}, y1 {y1}, x2: {x2}, y2:{y2}")
+        x1, y1, x2, y2, conf, cls_id = lp
         poly_min_x = min(p['x'] for p in spot_polygon)
         poly_max_x = max(p['x'] for p in spot_polygon)
         poly_min_y = min(p['y'] for p in spot_polygon)
         poly_max_y = max(p['y'] for p in spot_polygon)
         
         if x1 < poly_min_x or x2 > poly_max_x or y1 < poly_min_y or y2 > poly_max_y:
-            print("RETURNED FALSE")
             return False
-        print("RETURNED TRUE")
 
         corners = [
             {'x': x1, 'y': y1},
@@ -163,45 +155,42 @@ class ParkingManagement(BaseSolution):
         ]
         for corner in corners:
             if self.is_point_in_polygon(corner, spot_polygon):
-                print(f"LICENSE PLATE THAT IS IN A SPOT: {lp}")
                 return True
-        print(f"NO LP IN SPOT: {spot_polygon['']}")
         return False
 
     def runLPDetection(self, img0):
         model = YOLO(LPR_MODEL)
-        results = model.track(img0,persist=True)
+        results = model.predict(img0)
         foundLPs = results[0].boxes.data.tolist()
 
         #go through all the found license plates for the camera
         for spot in self.cameraObj.parking_spots.all():
             spot = ParkingSpotSerializer(spot).data
             if spot['occupied']:
-                print("###################################################################")
-                print(spot)
                 lps = []
-                for i, lp in enumerate(foundLPs):
+                for lp in foundLPs:
                     if self.LP_in_spot(lp, spot['vertices']):
-                        lps.append([i,lp])
-
-                for i in lps:
-                    foundLPs.remove(lps[i])
+                        lps.append(lp)
 
                 lenLps = len(lps)
                 bestLP = None
                 if lenLps<1:
                     print("DID NOT FIND LP IN OCCUPIED SPOT!!!!!!!!")
                     continue
+
+                elif lenLps == 1:
+                    bestLP = lps[0]
+
                 elif lenLps > 1:
                     mostAccurateScore = -1
-                    bestLP = lps[0][1]
-                    print(bestLP)
-                    for i in range(1,lenLps-1):
-                        print(f"LPS: {lps[i]}")
-                        x1, y1, x2, y2, obj_id, score, label = lps[i][1]
-                        if max(mostAccurateScore, score) == score:
-                            mostAccurateScore = score
-                            bestLP = lps[i][1]
+                    bestLP = lps[0]
+                    print(f"bestLP: {bestLP}")
+                    for lp in lps:
+                        print(f"LP: {lp}")
+                        x1, y1, x2, y2, conf, cls_id = lp
+                        if max(mostAccurateScore, conf) == conf:
+                            mostAccurateScore = conf
+                            bestLP = lp
 
                 #draw line and do analysis
                 print(bestLP)
