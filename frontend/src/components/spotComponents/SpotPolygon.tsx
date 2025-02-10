@@ -1,6 +1,6 @@
 import DraggableVertex from "./DraggableVertex";
 import { ParkingSpot, Vertex } from "../../types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Box, NumberInput, Popover, Button } from "@mantine/core";
 import hashSpotColor from "./hashSpotColor";
 import { updateVertex } from "../../apiService";

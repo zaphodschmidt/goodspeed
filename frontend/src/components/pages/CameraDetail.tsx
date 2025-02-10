@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Building, Camera, ParkingSpot, Vertex } from "../../types.ts";
 import {
@@ -10,7 +10,6 @@ import {
   Title,
   ActionIcon,
   Tooltip,
-  Image
 } from "@mantine/core";
 import no_image from "../../assets/no_image.jpeg";
 import { generateSlug } from "../misc/generateSlug.ts";

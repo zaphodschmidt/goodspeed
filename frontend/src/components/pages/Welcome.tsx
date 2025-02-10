@@ -9,7 +9,6 @@ import {
   Group,
   useMantineColorScheme,
   Image,
-  Box,
 } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
