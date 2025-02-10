@@ -8,3 +8,5 @@ opencv-python
 ultralytics
 pytz
 python-dotenv
+celery
+redis

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Building, Camera, ParkingSpot, Vertex } from "../../types.ts";
 import {
@@ -10,6 +10,7 @@ import {
   Title,
   ActionIcon,
   Tooltip,
+  Image
 } from "@mantine/core";
 import no_image from "../../assets/no_image.jpeg";
 import { generateSlug } from "../misc/generateSlug.ts";
@@ -24,28 +25,55 @@ import SpotTable from "../spotComponents/SpotTable.tsx";
 import { useBuildings } from "../misc/useBuildingsContext.ts";
 import CustomLoader from "../misc/CustomLoader.tsx";
 import { IconCheck, IconEdit } from "@tabler/icons-react";
+import { useElementSize } from '@custom-react-hooks/use-element-size';
+
+const BACKEND_IMAGE_WIDTH = 2560;
+const BACKEND_IMAGE_HEIGHT = 1920;
+const LEFT_X = Math.round(BACKEND_IMAGE_WIDTH * 0.25);
+const RIGHT_X = Math.round(BACKEND_IMAGE_WIDTH * 0.75);
+const TOP_Y = Math.round(BACKEND_IMAGE_HEIGHT * 0.25);
+const BOTTOM_Y = Math.round(BACKEND_IMAGE_HEIGHT * 0.75);
 
 function CameraDetail() {
+  /*
+  Hooks
+  */
+  //obtain building information from current URL
   const { buildingSlug, camNum } = useParams<{
     buildingSlug: string;
     camNum: string;
   }>();
-
+  // Reference to the BackgroundImage to get its dimensions
+  const [imageRef, rect] = useElementSize();
+  //get updated buildings using useBuildings context
   const { buildings } = useBuildings();
-  const [editMode, setEditMode] = useState(false);
 
+  /*
+  Consts
+  */
+  //this building, based on the current URL
   const building: Building | undefined = buildings.find(
     (b) => generateSlug(b.name) === buildingSlug
   );
+  //find the id of the camera based on the current building and url
   const camera_id =
     building?.cameras.find((c) => c.cam_num === Number(camNum))?.id ||
     undefined;
+  const xScale = rect.width / BACKEND_IMAGE_WIDTH
+  const yScale = rect.height / BACKEND_IMAGE_HEIGHT
+
+  /*
+  States
+  */
   const [camera, setCamera] = useState<Camera | undefined>();
   const [spots, setSpots] = useState<ParkingSpot[]>([]);
+  const [editMode, setEditMode] = useState(false);
 
-  // Reference to the BackgroundImage to get its dimensions
-  const imageRef = useRef<HTMLDivElement>(null);
+  console.log(spots)
 
+  /*
+  UseEffects
+  */
   // Update the image dimensions when the component mounts, and fetch updated camera data.
   useEffect(() => {
     if (camera_id) {
@@ -57,6 +85,10 @@ function CameraDetail() {
     }
   }, [camera_id]);
 
+
+  /*
+  Functions
+  */
   const deleteAllSpots = () => {
     for (const parking_spot of spots) {
       deleteParkingSpot(parking_spot);
@@ -70,26 +102,23 @@ function CameraDetail() {
   };
 
   const AddNewSpot = (camera: Camera) => {
-    const rect = imageRef.current!.getBoundingClientRect();
-    const imageSize = { width: rect.width, height: rect.height };
     const spotNum = spots.length;
-
     const vertices: Vertex[] = [
       {
-        x: Math.round(imageSize.width * 0.25),
-        y: Math.round(imageSize.height * 0.25),
+        x: LEFT_X,
+        y: TOP_Y,
       },
       {
-        x: Math.round(imageSize.width * 0.75),
-        y: Math.round(imageSize.height * 0.25),
+        x: LEFT_X,
+        y: BOTTOM_Y,
       },
       {
-        x: Math.round(imageSize.width * 0.75),
-        y: Math.round(imageSize.height * 0.75),
+        x: RIGHT_X,
+        y: BOTTOM_Y,
       },
       {
-        x: Math.round(imageSize.width * 0.25),
-        y: Math.round(imageSize.height * 0.75),
+        x: RIGHT_X,
+        y: TOP_Y,
       },
     ];
 
@@ -111,12 +140,20 @@ function CameraDetail() {
   };
 
   const handleUpdateSpot = async (updatedSpot: ParkingSpot) => {
+    console.log("alrighty, updating this spot", updatedSpot)
     await updateParkingSpot(updatedSpot);
     setSpots(
       spots.map((spot) => (spot.id === updatedSpot.id ? updatedSpot : spot))
     );
   };
 
+  function setSpot(newSpot: ParkingSpot){
+    setSpots((prev) => prev.map((s) => s.id === newSpot.id ? newSpot : s))
+  }
+
+  /*
+  Returns
+  */
   if (!building || !camera) {
     return <CustomLoader />;
   }
@@ -137,8 +174,13 @@ function CameraDetail() {
       </Group>
       <AspectRatio w={1000} mx="auto" pos="relative" ratio={4 / 3}>
         <BackgroundImage
-          radius="md"
           ref={imageRef}
+          radius="md"
+          // onLoad={() => {
+          //   const rect = imageRef.current!.getBoundingClientRect();
+          //   setXScale(rect.width / BACKEND_IMAGE_WIDTH)
+          //   setYScale(rect.height / BACKEND_IMAGE_HEIGHT)
+          // }}
           src={camera.image?.image_url || no_image}
           style={{
             position: "relative",
@@ -146,28 +188,21 @@ function CameraDetail() {
             height: "100%",
             objectFit: "contain",
           }}
-        >
-          <img
-            src={camera.image?.image_url}
-            alt=""
-            style={{ display: "none" }}
-            onError={() => {
-              // Update the fallback image in case of error
-              imageRef.current!.style.backgroundImage = `url(${no_image})`;
-            }}
-          />
-
+        > 
           {spots.length > 0 &&
-            spots.map((spot, index) => (
-              <SpotPolygon
+            spots.map((spot, index) => {
+              return(<SpotPolygon
+                xScale={xScale}
+                yScale={yScale}
                 key={spot.id}
-                parking_spot={spot}
+                spot={spot}
                 colorKey={index}
                 deleteSpot={deleteSpot}
                 handleUpdateSpot={handleUpdateSpot}
                 editMode={editMode}
-              />
-            ))}
+                setSpot={setSpot}
+              />)
+          })}
         </BackgroundImage>
       </AspectRatio>
       {editMode && (
