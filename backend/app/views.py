@@ -77,7 +77,7 @@ def upload_image(request):
         image_path = new_image.image.path  # Get the path to the saved image
         image_path = os.path.abspath(new_image.image.path)
         print(f"Absolute image path: {image_path}")
-        run_parking_detection.delay(image_path)
+        run_parking_detection.delay(image_path, cam_num, building_name)
 
         return JsonResponse({
             'message': 'Image uploaded successfully',

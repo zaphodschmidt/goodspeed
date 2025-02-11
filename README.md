@@ -72,10 +72,10 @@ ssh -i "goodspeedparking.pem" ec2-user@ec2-3-135-249-114.us-east-2.compute.amazo
 
 If you want to get all the photos from the media folder:
 ```
-scp -r -i ~/.ssh/goodspeedparking.pem ec2-user@ec2-3-135-249-114.us-east-2.compute.amazonaws.com:~/goodspeed/backend/media/uploads ./Desktop/coding/goodspeed/backend/media/uploads
+scp -r -i ~/.ssh/goodspeedparking.pem ec2-user@ec2-3-135-249-114.us-east-2.compute.amazonaws.com:~/goodspeed/backend/media/uploads ~/Desktop/coding/goodspeed/backend/media/uploads
 ```
 
 If you want to get the sqlite db:
 ```
-scp -r -i ~/.ssh/goodspeedparking.pem ec2-user@ec2-3-135-249-114.us-east-2.compute.amazonaws.com:~/goodspeed/backend/db.sqlite3 ./Desktop/coding/goodspeed/backend/db.sqlite3
+scp -r -i ~/.ssh/goodspeedparking.pem ec2-user@ec2-3-135-249-114.us-east-2.compute.amazonaws.com:~/goodspeed/backend/db.sqlite3 ~/Desktop/coding/goodspeed/backend/db.sqlite3
 ```
