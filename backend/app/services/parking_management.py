@@ -18,45 +18,35 @@ class ParkingManagement(BaseSolution):
         self.arc = (0, 0, 255)
         self.occ = (0, 255, 0)
         self.dc = (255, 0, 189)
-
-        self.buildingName = None
-        self.cameraNum = None
-        self.cameraObj = None
-        
-    def loadCameraVertices(self, photo: str):
-        # Extract building name and camera number from the filename
-        self.buildingName = photo.split('_')[3]
-        cameraNumStr = photo.split('_')[4]  # This will be "cam11.jpeg"
-        self.cameraNum = int(cameraNumStr[3:].split('.')[0])  # Remove "cam" and ".jpeg"
-        
-        if self.buildingName.lower() == "vertex1":
-            buildingName = "Vertex"
-        try:
-            building = Building.objects.get(name=buildingName)
-        except Building.DoesNotExist:
-            print(f"Building '{buildingName}' does not exist.")
-            return
-        try:
-            self.cameraObj = building.cameras.get(cam_num=self.cameraNum)
-        except Camera.DoesNotExist:
-            print(f"Camera {self.cameraNum} does not exist in building {building.name}.")
-            return
-        #calc how much the boudning boxes need to be scaled
-        parkingSpotBounds = []
         self.spot_ids = []
-        for spot in self.cameraObj.parking_spots.all():
+        self.camera_obj = None
+
+
+    def load_camera_vertices(self, cam_num, building_name):
+        # Find the Camera
+        try:
+            self.camera_obj = Camera.objects.get(cam_num=cam_num, building__name=building_name)
+        except Camera.DoesNotExist:
+            print(f"Camera {cam_num} does not exist in building {building_name}")
+            return
+
+        #assemble list of dictionaries of parking spot vertices.
+        parking_spot_bounds = []
+        for spot in self.camera_obj.parking_spots.all():
             print(f"Found parking spot: {spot}")
             if not spot.vertices.exists():
                 print(f"Parking spot {spot.id} has no vertices.")
             else:
-                pointsDict = {"points": []}
+                points_dict = {"points": []}
                 for point in spot.vertices.all():
-                    pointsDict["points"].append([point.x, point.y])
-                parkingSpotBounds.append(pointsDict)
+                    points_dict["points"].append([point.x, point.y])
+                parking_spot_bounds.append(points_dict)
                 self.spot_ids.append(spot.id)
 
         print(f"Loaded parking spots: {self.spot_ids}")
-        return parkingSpotBounds
+        print(f"{parking_spot_bounds}")
+
+        return parking_spot_bounds
 
     def isJpeg(self, file_path:str):
         try:
@@ -71,12 +61,12 @@ class ParkingManagement(BaseSolution):
             if fileName.is_file() and self.isJpeg(fileName):
                 files.append(path+"/"+fileName.name)
         return files
-    
+
     def process_data(self, im0):
         if not self.json:
             print("No parking spot data loaded.")
             return im0
-    
+
         self.extract_tracks(im0)  # extract tracks from im0
         es, fs = len(self.json), 0  # empty slots, filled slots
         parking_spots_to_update = []
@@ -94,14 +84,15 @@ class ParkingManagement(BaseSolution):
             # Plotting regions
             cv2.polylines(im0, [pts_array], isClosed=True, color=self.occ if rg_occupied else self.arc, thickness=2)
             parking_spots_to_update.append({"spot_id": spot_id, "occupied": rg_occupied})
-            
+
+
         with transaction.atomic():
             for spot in parking_spots_to_update:
                 ParkingSpot.objects.filter(id=spot["spot_id"]).update(occupied=spot["occupied"])
         self.pr_info["Occupancy"], self.pr_info["Available"] = fs, es
         self.display_output(im0)  # display output with base class function
         return im0  # return output image for more usage
-    
+
     def drawLP_polylines(self, img0, lp):
         x1, y1, x2, y2, conf, cls_id = lp
         cv2.rectangle(img0, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 4)
@@ -111,7 +102,7 @@ class ParkingManagement(BaseSolution):
             [int(x2), int(y2)],
             [int(x1), int(y2)]
         ], np.int32)
-        
+
         print(f"DRAWING ON {pts}")
         pts = pts.reshape((-1, 1, 2))
         cv2.polylines(img0, [pts], isClosed=True, color=(255, 0, 0), thickness=2)
@@ -120,7 +111,7 @@ class ParkingManagement(BaseSolution):
         x, y = point['x'], point['y']
         inside = False
         n = len(polygon)
-        
+
         p1 = polygon[0]
         for i in range(1, n + 1):
             p2 = polygon[i % n]
@@ -143,7 +134,7 @@ class ParkingManagement(BaseSolution):
         poly_max_x = max(p['x'] for p in spot_polygon)
         poly_min_y = min(p['y'] for p in spot_polygon)
         poly_max_y = max(p['y'] for p in spot_polygon)
-        
+
         if x1 < poly_min_x or x2 > poly_max_x or y1 < poly_min_y or y2 > poly_max_y:
             return False
 
@@ -164,7 +155,7 @@ class ParkingManagement(BaseSolution):
         foundLPs = results[0].boxes.data.tolist()
 
         #go through all the found license plates for the camera
-        for spot in self.cameraObj.parking_spots.all():
+        for spot in self.camera_obj.parking_spots.all():
             spot = ParkingSpotSerializer(spot).data
             if spot['occupied']:
                 lps = []
@@ -198,17 +189,18 @@ class ParkingManagement(BaseSolution):
 
         return img0
 
-    def runParkingDetection(self, imagePath: str):
-        self.json = self.loadCameraVertices(imagePath)
-        imgBGR = cv2.imread(imagePath)
+    def run_parking_detection(self, image_path: str, cam_num: str, building_name:str):
+        self.json = self.load_camera_vertices(cam_num=cam_num, building_name=building_name)
+        imgBGR = cv2.imread(image_path)
         if imgBGR is None:
-            print(f"Could not open {imagePath}")
+            print(f"Could not open {image_path}")
             return
-        
+
         results = self.model.track(imgBGR, persist = True, show = False)
         if results and results[0].boxes:
-            carOccupancy = self.process_data(imgBGR)
-            carLPs = self.runLPDetection(carOccupancy)
+            car_occupancy = self.process_data(imgBGR)
+            carLPs = self.runLPDetection(car_occupancy)
 
-            cv2.imwrite(imagePath, carLPs)
+            print(image_path)
+            cv2.imwrite(image_path, carLPs)
             print("Saved img!!")
