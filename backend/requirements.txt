@@ -10,3 +10,4 @@ pytz
 python-dotenv
 celery
 redis
+easyocr

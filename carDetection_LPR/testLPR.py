@@ -6,7 +6,6 @@ import pytesseract
 import easyocr
 import re
 
-
 def noiseRemoval(image):
     import numpy as np
     kernel = np.ones((1,1), np.uint8)
