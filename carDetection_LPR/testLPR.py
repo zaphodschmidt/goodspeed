@@ -4,6 +4,8 @@ import os
 import numpy as np
 import pytesseract
 import easyocr
+import re
+
 
 def noiseRemoval(image):
     import numpy as np
@@ -130,8 +132,6 @@ def analyzeLP(img0, bestLP):
     # text = pytesseract.image_to_string(blurred, config='--psm 8')  # PSM 8 is for single line of text
     # print("blurred:", text.strip())
 
-  
-
     # thick_BW = thickFont(img0_bw)
     # cv2.imwrite(f'preprocessed_license_plate_thick_BW.jpg', thick_BW)
     # text = pytesseract.image_to_string(thick_BW, config='--psm 8')  # PSM 8 is for single line of text
@@ -152,24 +152,21 @@ def analyzeLP(img0, bestLP):
     # text = pytesseract.image_to_string(inverted, config='--psm 8')  # PSM 8 is for single line of text
     # print("inverted:", text.strip())
 
-
     # #threshold
     # _, thresholded = cv2.threshold(lp, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     # cv2.imwrite('preprocessed_license_plate_threshold.jpg', thresholded)
     # text = pytesseract.image_to_string(thresholded, config='--psm 8')  # PSM 8 is for single line of text
     # print("Extracted License Plate Text:", text.strip())
 
-
 def easyORC_Trial(imgPath):
-    # Initialize the EasyOCR reader
     reader = easyocr.Reader(['en'])
-
-    # Read text from the image
     result = reader.readtext(imgPath)
+    pattern = re.compile(r'[^a-zA-Z0-9]')
 
     # Print the extracted text
     for detection in result:
-        print("Extracted Text:", detection[1])
+        filtered_text = re.sub(pattern, '', detection[1])
+        print("Extracted Text:", filtered_text)
 
 if __name__ == "__main__":
     imgPath = "./TESTLP.png"
@@ -187,3 +184,4 @@ if __name__ == "__main__":
     img0 = cv2.imread("./TESTLP.png")
     analyzeLP(img0, bestLP)
     easyORC_Trial('preprocessed_license_plate_noBoarder.jpg')
+    easyORC_Trial('preprocessed_license_plate2.jpg')
