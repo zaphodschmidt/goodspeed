@@ -12,6 +12,8 @@ import requests
 from pprint import pprint
 from dotenv import load_dotenv, find_dotenv
 from icecream import install, ic
+import json
+from time import sleep
 install()
 load_dotenv(find_dotenv())
 
@@ -191,6 +193,28 @@ class ParkingManagement(BaseSolution):
 ######################
 ######################
 
+    def customSerializer(self, obj):
+        if isinstance(obj, (np.integer, int)):
+            return int(obj)
+        if isinstance(obj, (np.floating, float)):
+            return float(obj)
+        if isinstance(obj, (np.ndarray, list)):
+            return obj.tolist()
+        if isinstance(obj, bytes):
+            return obj.decode('utf-8', 'ignore')
+        if isinstance(obj, str):
+            return str(obj)
+        print(f"[WARNING] Unsupported serialization type: {type(obj)} -> {obj}")
+        return str(obj)
+
+    def deep_serialize(self, obj, serializer):
+        if isinstance(obj, dict):
+            return {k: self.deep_serialize(v, serializer) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [self.deep_serialize(item, serializer) for item in obj]
+        else:
+            return serializer(obj)
+    
     def LP_encodeCroppedLPs(self, img0, lp:dict):
         x1, y1, x2, y2, conf, cls_id = lp["LP_bounding_box"]
         cropped_image = img0[int(y1):int(y2), int(x1):int(x2)]
@@ -204,25 +228,56 @@ class ParkingManagement(BaseSolution):
     def LP_OCR(self, img0, spotsToLPs:dict):
         api_token = os.environ.get("OCR_API_TOKEN")
         regions = ["mx", "us-ca"] # Change to your country
+
+        if not api_token:
+            print("Missing OCR API token")
+            return spotsToLPs
+        
         for spotNum, lp in spotsToLPs.items():
             files = self.LP_encodeCroppedLPs(img0, lp)
-            response = requests.post(
-                'https://api.platerecognizer.com/v1/plate-reader/',
-                data=dict(regions=regions),
-                files=files,
-                headers={'Authorization': f'Token {api_token}'},
-                timeout = 10
-            )
-            
-            pprint(response.json())
-            spotsToLPs[spotNum]["LP_num"] = "HI"
+            if not files:
+                continue
+
+            try:
+                sleep(1.0)
+                response = requests.post(
+                    'https://api.platerecognizer.com/v1/plate-reader/',
+                    data=dict(regions=regions),
+                    files=files,
+                    headers={'Authorization': f'Token {api_token}'},
+                    timeout = 1
+                )
+                data = {'ocr_result': response.json() if response.headers.get('Content-Type')== "application/json" else None}
+                spotsToLPs[spotNum]["data"] = data
+
+            except Exception as e:
+                print(f"OCR failed for spot {spotNum}: {str(e)}")
+                spotsToLPs[spotNum]["data"] = {'error': str(e)}
+
+        spotsToLPs = self.deep_serialize(spotsToLPs, self.customSerializer)
+        return spotsToLPs
 
 ######################
 ######################
 ######################
 
     def LP_inputDataToDB(self, spotsToLPs):
-        pass
+        print(spotsToLPs)
+        with transaction.atomic():
+            for spotID, spotInfo in spotsToLPs.items():
+                spotID = int(spotID)
+                plateNum = None
+                data = spotInfo.get("data")
+                ocr_data = data.get("ocr_result")
+                result = ocr_data.get("results", [])
+                if result and "plate" in result[0]:
+                    plateNum = result[0]["plate"]
+                else:
+                    print("Plate Number Was Not Found")
+
+                ParkingSpot.objects.filter(id=spotID).update(
+                    occupied_by_lpn=plateNum
+                )
 
 ######################
 ######################
@@ -251,6 +306,8 @@ class ParkingManagement(BaseSolution):
 
             #ocr the license plate text
             spotsToLPs = self.LP_OCR(car_img_with_lps, spotsToLPs)
+            with open("data.json", "w") as f:
+                json.dump(spotsToLPs, f, default=self.customSerializer, indent=4)
 
             #Inputs complete licence plate location, text and spot it belongs to into the db
             self.LP_inputDataToDB(spotsToLPs)

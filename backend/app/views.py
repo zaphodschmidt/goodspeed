@@ -9,6 +9,7 @@ from .services.parking_management import ParkingManagement
 from .services.parking_paymentCheking import PaymentChecking
 from .tasks import run_parking_detection
 import os
+import json
 
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
