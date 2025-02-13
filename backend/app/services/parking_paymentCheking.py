@@ -96,7 +96,7 @@ class PaymentChecking():
         # receiver_email ="zapschmidt@hotmail.com"
         password = "wovw qiay gkbo ylfv"
         subject = "Fuck you"
-        body = "This is from a python script that I made :) I love you"
+        body = "This is from a python script that I made :)"
 
         message = MIMEMultipart()
         message['From'] = sender_email

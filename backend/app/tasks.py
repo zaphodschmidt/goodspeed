@@ -9,3 +9,4 @@ def run_parking_detection(image_path, cam_num, building_name):
     parking_management = ParkingManagement(model_path='yolov8n.pt')
     parking_management.run_parking_detection(image_path, cam_num, building_name)
     logger.info(f"Spot detection completed for {image_path}")
+
