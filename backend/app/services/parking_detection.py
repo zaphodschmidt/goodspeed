@@ -20,7 +20,7 @@ load_dotenv(find_dotenv())
 MODEL = 'yolov8n.pt'
 LPR_MODEL = 'best_model_NPT.pt'
 
-class ParkingManagement(BaseSolution):
+class ParkingDetection(BaseSolution):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.json = None
