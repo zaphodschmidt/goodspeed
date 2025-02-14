@@ -18,7 +18,7 @@ export default function CreateReservation(){
         <Title order={1}>
           {building?.name}
         </Title>
-
+        
       </Stack>
     </Center>
   )

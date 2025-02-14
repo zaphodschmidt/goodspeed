@@ -3,7 +3,7 @@ import { ParkingSpot, Vertex } from "../../types";
 import { useEffect, useState } from "react";
 import { Box, NumberInput, Popover, Button } from "@mantine/core";
 import hashSpotColor from "./hashSpotColor";
-import { updateVertex } from "../../apiService";
+import { updateVertex } from "../../api/apiService";
 
 
 interface SpotPolygonProps {

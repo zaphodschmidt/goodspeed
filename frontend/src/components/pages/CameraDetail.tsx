@@ -19,7 +19,7 @@ import {
   deleteParkingSpot,
   getCameraByID,
   updateParkingSpot,
-} from "../../apiService.ts";
+} from "../../api/apiService.ts";
 import SpotPolygon from "../spotComponents/SpotPolygon.tsx";
 import SpotTable from "../spotComponents/SpotTable.tsx";
 import { useBuildings } from "../misc/useBuildingsContext.ts";

@@ -97,6 +97,7 @@ class CameraSerializer(serializers.ModelSerializer):
 class BuildingSerializer(serializers.ModelSerializer):
     cameras = CameraSerializer(many=True, read_only=True)
     
+    
     class Meta:
         model = Building
         fields = '__all__'

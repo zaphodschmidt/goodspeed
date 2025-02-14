@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getBuildings } from "../../apiService";
+import { getBuildings } from "../../api/apiService";
 import { Building } from "../../types";
 import { BuildingsContext } from "./BuildingsContext";
 

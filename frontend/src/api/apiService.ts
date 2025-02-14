@@ -1,8 +1,7 @@
 import axios, { AxiosRequestHeaders } from "axios";
-import { Camera, ParkingSpot, Vertex } from "./types";
-
+import { Camera, ParkingSpot, Vertex } from "../types";
 export const API_BASE_URL = import.meta.env.VITE_API_URL;
-console.log(API_BASE_URL);
+
 
 export function getAuthHeaders(): AxiosRequestHeaders["headers"] {
   const token = localStorage.getItem("access_token");
