@@ -14,3 +14,5 @@ easyocr
 icecream
 boto3
 django-storages
+shapely
+lap
