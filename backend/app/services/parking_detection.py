@@ -318,7 +318,7 @@ class ParkingDetection(BaseSolution):
             #Find car objects and determine if a spot is full or not
             car_occupancy_img = self.process_data(imgBGR)
 
-            # #Find License plate bounding box
+            #Find License plate bounding box
             foundLPs = self.runLPDetection(car_occupancy_img)
 
             #determine which license plate goes to which spot
@@ -333,11 +333,11 @@ class ParkingDetection(BaseSolution):
                 json.dump(spotsToLPs, f, default=self.customSerializer, indent=4)
 
             #Inputs complete licence plate location, text and spot it belongs to into the db
-            self.LP_inputDataToDB(spotsToLPs)
+            # self.LP_inputDataToDB(spotsToLPs)
 
-            # cv2.imwrite(image_path, car_img_with_lps)
             # Convert processed image back to bytes
-            _, buffer = cv2.imencode(".jpeg", car_img_with_lps)
+            # _, buffer = cv2.imencode(".jpeg", car_img_with_lps)
+            _, buffer = cv2.imencode(".jpeg", car_img_with_lps, [cv2.IMWRITE_JPEG_QUALITY, 10])
             processed_image_bytes = BytesIO(buffer)
 
             # Upload processed image back to S3
