@@ -60,24 +60,23 @@ def upload_image(request):
             camera = Camera.objects.get(cam_num=cam_num, building__name=building_name)
         except Camera.DoesNotExist:
             return JsonResponse({'error': 'Camera not found'}, status=404)
-
-        # Handle image replacement
-        new_image = Image.objects.create(image=image)
-
+        
         if camera.image:
             # Delete the old image from S3
             if camera.image.image:
                 camera.image.image.delete(save=False)
             camera.image.delete()
 
+
+        # Handle image replacement
+        new_image = Image.objects.create(image=image)
+
+        
         camera.image = new_image
         camera.save()
 
         # Run parking detection on the uploaded image
-        # image_path = new_image.image.path  # Get the path to the saved image
-        # image_path = os.path.abspath(new_image.image.path)
-        # print(f"Absolute image path: {image_path}")
-        # run_parking_detection.delay(image_path, cam_num, building_name)
+        run_parking_detection.delay(cam_num, building_name)
 
         return JsonResponse({
             'message': 'Image uploaded successfully',

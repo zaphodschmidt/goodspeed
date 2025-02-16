@@ -8,12 +8,14 @@ from django.db import transaction
 from app.serializers import VertexSerializer, ParkingSpotSerializer
 import easyocr
 import re
+import boto3
 import requests
 from pprint import pprint
 from dotenv import load_dotenv, find_dotenv
 from icecream import install, ic
 import json
 from time import sleep
+from io import BytesIO
 install()
 load_dotenv(find_dotenv())
 
@@ -30,7 +32,7 @@ class ParkingManagement(BaseSolution):
         self.dc = (255, 0, 189)
         self.spot_ids = []
         self.camera_obj = None
-    
+
 ######################
 ######################
 ######################
@@ -56,7 +58,7 @@ class ParkingManagement(BaseSolution):
                 self.spot_ids.append(spot.id)
 
         return parking_spot_bounds
-    
+
 ######################
 ######################
 ######################
@@ -91,18 +93,18 @@ class ParkingManagement(BaseSolution):
         self.pr_info["Occupancy"], self.pr_info["Available"] = fs, es
         self.display_output(im0)  # display output with base class function
         return im0  # return output image for more usage
-    
+
 ######################
 ######################
 ######################
-   
+
     def runLPDetection(self, img0):
         model = YOLO(LPR_MODEL)
         results = model.predict(img0)
 
         foundLPs = results[0].boxes.data.tolist()
         return foundLPs
-    
+
 ######################
 ######################
 ######################
@@ -178,7 +180,7 @@ class ParkingManagement(BaseSolution):
                             bestLP = lp
                 spotsToLPs[spot["id"]] = {"LP_bounding_box":bestLP}
         return spotsToLPs
-    
+
 ######################
 ######################
 ######################
@@ -188,7 +190,7 @@ class ParkingManagement(BaseSolution):
             x1, y1, x2, y2, conf, cls_id = lp["LP_bounding_box"]
             cv2.rectangle(img0, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 4)
         return img0
-    
+
 ######################
 ######################
 ######################
@@ -214,7 +216,7 @@ class ParkingManagement(BaseSolution):
             return [self.deep_serialize(item, serializer) for item in obj]
         else:
             return serializer(obj)
-    
+
     def LP_encodeCroppedLPs(self, img0, lp:dict):
         x1, y1, x2, y2, conf, cls_id = lp["LP_bounding_box"]
         cropped_image = img0[int(y1):int(y2), int(x1):int(x2)]
@@ -224,7 +226,7 @@ class ParkingManagement(BaseSolution):
             'upload':('image.jpg', imgBytes, 'image/jpeg')
         }
         return files
-    
+
     def LP_OCR(self, img0, spotsToLPs:dict):
         api_token = os.environ.get("OCR_API_TOKEN")
         regions = ["mx", "us-ca"] # Change to your country
@@ -232,7 +234,7 @@ class ParkingManagement(BaseSolution):
         if not api_token:
             print("Missing OCR API token")
             return spotsToLPs
-        
+
         for spotNum, lp in spotsToLPs.items():
             files = self.LP_encodeCroppedLPs(img0, lp)
             if not files:
@@ -283,12 +285,27 @@ class ParkingManagement(BaseSolution):
 ######################
 ######################
 
-    def run_parking_detection(self, image_path: str, cam_num: str, building_name:str):
-        self.json = self.load_camera_vertices(cam_num=cam_num, building_name=building_name)
-        imgBGR = cv2.imread(image_path)
-        if imgBGR is None:
-            print(f"Could not open {image_path}")
+    def run_parking_detection(self, cam_num: str, building_name:str):
+        cam = Camera.objects.get(cam_num=cam_num, building__name=building_name)
+        image = cam.image.image
+        s3_image_key = f'{image.name}'
+
+        # Download the image from S3
+        s3_client = boto3.client("s3")
+        try:
+            s3_object = s3_client.get_object(Bucket='goodspeedbucket', Key=s3_image_key)
+            image_data = s3_object["Body"].read()
+            imgBGR = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR)
+        except Exception as e:
+            print(f"Error downloading {s3_image_key} from S3: {e}")
             return
+
+        if imgBGR is None:
+            print(f"Could not open image {s3_image_key}")
+            return
+
+        # Process Image
+        self.json = self.load_camera_vertices(cam_num=cam_num, building_name=building_name)
 
         results = self.model.track(imgBGR, persist = True, show = False)
         if results and results[0].boxes:
@@ -305,12 +322,27 @@ class ParkingManagement(BaseSolution):
             car_img_with_lps = self.drawLP_polylines(car_occupancy_img, spotsToLPs)
 
             #ocr the license plate text
-            spotsToLPs = self.LP_OCR(car_img_with_lps, spotsToLPs)
+            # spotsToLPs = self.LP_OCR(car_img_with_lps, spotsToLPs)
             with open("data.json", "w") as f:
                 json.dump(spotsToLPs, f, default=self.customSerializer, indent=4)
 
             #Inputs complete licence plate location, text and spot it belongs to into the db
             self.LP_inputDataToDB(spotsToLPs)
 
-            cv2.imwrite(image_path, car_img_with_lps)
+            # cv2.imwrite(image_path, car_img_with_lps)
+            # Convert processed image back to bytes
+            _, buffer = cv2.imencode(".jpeg", car_img_with_lps)
+            processed_image_bytes = BytesIO(buffer)
+
+            # Upload processed image back to S3
+            try:
+                s3_client.put_object(
+                    Bucket='goodspeedbucket',
+                    Key=s3_image_key,
+                    Body=processed_image_bytes.getvalue(),
+                    ContentType="image/jpeg",
+                )
+                print(f"Processed image saved to S3: {s3_image_key}")
+            except Exception as e:
+                print(f"Error uploading processed image to S3: {e}")
             print("Saved img!!")
