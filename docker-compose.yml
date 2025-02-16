@@ -26,15 +26,15 @@ services:
     depends_on:
       - redis
 
-  celery-beat:
-    build: ./backend
-    command: celery -A config beat -l info
-    volumes:
-      - ./backend/:/usr/src/app/
-    env_file:
-      - path: ${ENV_FILE:-.env}
-    depends_on:
-      - redis
+  # celery-beat:
+  #   build: ./backend
+  #   command: celery -A config beat -l info
+  #   volumes:
+  #     - ./backend/:/usr/src/app/
+  #   env_file:
+  #     - path: ${ENV_FILE:-.env}
+  #   depends_on:
+  #     - redis
 
   frontend:
     build:

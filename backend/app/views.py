@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
 from app.models import Building, Camera, ParkingSpot, Vertex
-from .services.parking_management import ParkingManagement
+from .services.parking_detection import ParkingDetection
 from .services.parking_paymentCheking import PaymentChecking
 from .tasks import run_parking_detection
 import os
