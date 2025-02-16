@@ -132,7 +132,6 @@ class PaymentChecking():
         endpoint = f"/nforceapi/parkingrights/vehicle/{LPN}?format=json"
         return self.get(endpoint)
     
-
     def checkOccupiedspot_building(self, building:str):
         pass
 
@@ -157,14 +156,14 @@ class PaymentChecking():
                 
         ##Get park mobile data
         occupiedSpots = (self.getParking_Zone(zoneNumber))['response']['parkingRights']
-        prkmob_spots = {}
+        parkmobile_spots = {}
         for spot in occupiedSpots:
-            prkmob_spots[spot["spaceNumber"]] = spot
+            parkmobile_spots[spot["spaceNumber"]] = spot
         
         ##find who didn't pay
         for db_spot in jsonParkingSpots:
             #if the spot is occupied and they didn't pay their ticket
-            if db_spot['occupied'] and db_spot["spot_num"] not in prkmob_spots["spaceNumber"]:
+            if db_spot['occupied'] and db_spot["spot_num"] not in parkmobile_spots["spaceNumber"]:
                 #TODO send text to person
                 pass
 
