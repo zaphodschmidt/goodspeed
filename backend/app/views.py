@@ -63,12 +63,11 @@ def upload_image(request):
 
         # Handle image replacement
         new_image = Image.objects.create(image=image)
-        print(new_image.image.url)
 
         if camera.image:
             # Delete the old image from S3
             if camera.image.image:
-                default_storage.delete(camera.image.image.name)
+                camera.image.image.delete(save=False)
             camera.image.delete()
 
         camera.image = new_image
