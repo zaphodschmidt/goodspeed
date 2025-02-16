@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from pytz import common_timezones
 
 class Image(models.Model):
@@ -19,6 +20,7 @@ class Building(models.Model):
 class Location(models.Model):
     name = models.CharField(max_length=100)
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='locations')
+    
 
 class Camera(models.Model):
     cam_num = models.IntegerField()
@@ -28,6 +30,11 @@ class Camera(models.Model):
     image = models.OneToOneField(Image, null=True, on_delete=models.SET_NULL, related_name='camera')
     location = models.ForeignKey(Location, null=True, on_delete=models.SET_NULL, related_name="cameras")
 
+    def save(self, *args, **kwargs):
+        if self.location and self.location.building != self.building:
+            raise ValidationError("The location must belong to the same building as the camera.")
+        super().save(*args, **kwargs)
+        
     class Meta:
         unique_together = ('cam_num', 'building')
 

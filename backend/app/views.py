@@ -1,13 +1,14 @@
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from .models import *
 from .serializers import *
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
+from django.shortcuts import get_object_or_404
 from app.models import Building, Camera, ParkingSpot, Vertex
 from .services.parking_detection import ParkingDetection
 from .services.parking_paymentCheking import PaymentChecking
-from .services.parking_locationHandler import *
 from .tasks import run_parking_detection
 import os
 import json
@@ -41,6 +42,48 @@ class VertexViewSet(viewsets.ModelViewSet):
     # permission_classes = [permissions.AllowAny]
     queryset = Vertex.objects.all()
     serializer_class = VertexSerializer
+
+class LocationViewSet(viewsets.ModelViewSet):
+    # permission_classes = [permissions.AllowAny]
+    queryset = Location.objects.all()
+    serializer_class = LocationSerializer
+
+    @action(detail=False, methods=['get'], name="CheckOccupancy")
+    def getOccupancyForLocation(self, request):
+        location_name = request.query_params.get('location_name')
+        building_name = request.query_params.get('building_name')
+
+        if location_name and building_name:
+            return JsonResponse({'error':'location_name and building_name are required'}, status=400)
+        
+        building_obj = get_object_or_404(Building, building_name = building_name)
+        location_obj = get_object_or_404(Location, location_name = location_name)
+
+        try:
+            cameras = Camera.objects.filter(building = building_obj, location = location_obj)
+        except Exception as e:
+            print(f"Error: Cameras could not be found \n {e}!")
+            raise
+
+        try:
+            parkingSpots = ParkingSpot.objects.filter(camera__in = cameras)
+            parkingSpots = ParkingSpotSerializer(parkingSpots, many=True).data
+        except Exception as e:
+            print(f"Error: Parking Spots could not be found \n {e}!")
+            raise
+
+        occupiedSpots = 0
+        totalSpots = 0
+        for spot in parkingSpots:
+            if spot['occupied']:
+                occupiedSpots+=1
+            totalSpots+=1
+
+        return JsonResponse({
+            'location':location_name,
+            'totalSpots': totalSpots,
+            'occupiedSpots': occupiedSpots
+        })
 
 @csrf_exempt
 def upload_image(request):
@@ -98,15 +141,3 @@ def getOccupiedSpots(request):
             'message': 'Spots Found Successfully',
             'spots': spots,
         })
-
-@csrf_exempt
-def addLocationToCamera(request, building_id:int, location:str, camera_id:int):
-    if request.method == "POST":
-        occ = LocationHandler(building_id, location)
-        return occ.addLocationToCamera(location, camera_id)
-
-@csrf_exempt
-def getParkingSpotsOpen(request, building_id:int, location:str):
-    if request.method == "GET":
-        occ = LocationHandler(building_id, location)
-        return occ.getOccupancyForLocation(location)
