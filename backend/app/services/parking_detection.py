@@ -20,10 +20,12 @@ from io import BytesIO
 install()
 load_dotenv(find_dotenv())
 from celery.utils.log import get_task_logger
+import logging
 
 logger = get_task_logger(__name__)
 
 MODEL = 'yolov8n.pt'
+logging.getLogger("ultralytics").setLevel(logging.ERROR)
 LPR_MODEL = 'best_model_NPT.pt'
 
 class ParkingDetection(BaseSolution):
@@ -204,7 +206,7 @@ class ParkingDetection(BaseSolution):
             return obj.decode('utf-8', 'ignore')
         if isinstance(obj, str):
             return str(obj)
-        logger.info(f"[WARNING] Unsupported serialization type: {type(obj)} -> {obj}")
+        logger.warning(f"[WARNING] Unsupported serialization type: {type(obj)} -> {obj}")
         return str(obj)
 
     def deep_serialize(self, obj, serializer):
@@ -230,7 +232,7 @@ class ParkingDetection(BaseSolution):
         regions = ["mx", "us-ca"] # Change to your country
 
         if not api_token:
-            logger.info("Missing OCR API token")
+            logger.warning("Missing OCR API token")
             return spotsToLPs
 
         for spotNum, lp in spotsToLPs.items():
@@ -251,7 +253,7 @@ class ParkingDetection(BaseSolution):
                 spotsToLPs[spotNum]["data"] = data
 
             except Exception as e:
-                logger.info(f"OCR failed for spot {spotNum}: {str(e)}")
+                logger.warning(f"OCR failed for spot {spotNum}: {str(e)}")
                 spotsToLPs[spotNum]["data"] = {'error': str(e)}
 
         spotsToLPs = self.deep_serialize(spotsToLPs, self.customSerializer)
@@ -296,11 +298,11 @@ class ParkingDetection(BaseSolution):
             image_data = s3_object["Body"].read()
             imgBGR = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR)
         except Exception as e:
-            logger.info(f"Error downloading {s3_image_key} from S3: {e}")
+            logger.warning(f"Error downloading {s3_image_key} from S3: {e}")
             return
 
         if imgBGR is None:
-            logger.info(f"Could not open image {s3_image_key}")
+            logger.warning(f"Could not open image {s3_image_key}")
             return
 
         # Process Image
@@ -343,5 +345,6 @@ class ParkingDetection(BaseSolution):
                 )
                 logger.info(f"Processed image saved to S3: {s3_image_key}")
             except Exception as e:
-                logger.info(f"Error uploading processed image to S3: {e}")
+                logger.warning(f"Error uploading processed image to S3: {e}")
+                
             logger.info("Saved img!!")
