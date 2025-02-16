@@ -20,10 +20,13 @@ from io import BytesIO
 install()
 load_dotenv(find_dotenv())
 from celery.utils.log import get_task_logger
+import logging
+import time
 
 logger = get_task_logger(__name__)
 
 MODEL = 'yolov8n.pt'
+logging.getLogger("ultralytics").setLevel(logging.ERROR)
 LPR_MODEL = 'best_model_NPT.pt'
 
 class ParkingDetection(BaseSolution):
@@ -42,7 +45,6 @@ class ParkingDetection(BaseSolution):
 ######################
 
     def load_camera_vertices(self):
-
         #assemble list of dictionaries of parking spot vertices.
         parking_spot_bounds = []
         for spot in self.camera_obj.parking_spots.all():
@@ -204,7 +206,7 @@ class ParkingDetection(BaseSolution):
             return obj.decode('utf-8', 'ignore')
         if isinstance(obj, str):
             return str(obj)
-        logger.info(f"[WARNING] Unsupported serialization type: {type(obj)} -> {obj}")
+        logger.warning(f"[WARNING] Unsupported serialization type: {type(obj)} -> {obj}")
         return str(obj)
 
     def deep_serialize(self, obj, serializer):
@@ -230,7 +232,7 @@ class ParkingDetection(BaseSolution):
         regions = ["mx", "us-ca"] # Change to your country
 
         if not api_token:
-            logger.info("Missing OCR API token")
+            logger.warning("Missing OCR API token")
             return spotsToLPs
 
         for spotNum, lp in spotsToLPs.items():
@@ -251,7 +253,7 @@ class ParkingDetection(BaseSolution):
                 spotsToLPs[spotNum]["data"] = data
 
             except Exception as e:
-                logger.info(f"OCR failed for spot {spotNum}: {str(e)}")
+                logger.warning(f"OCR failed for spot {spotNum}: {str(e)}")
                 spotsToLPs[spotNum]["data"] = {'error': str(e)}
 
         spotsToLPs = self.deep_serialize(spotsToLPs, self.customSerializer)
@@ -285,6 +287,13 @@ class ParkingDetection(BaseSolution):
 
     def run_parking_detection(self, cam_id: int):
         self.camera_obj = Camera.objects.get(id=cam_id)
+
+        self.load_camera_vertices()
+
+        if(not self.json):
+            return
+        
+        download_start = time.perf_counter()
         image = self.camera_obj.image.image
         s3_image_key = f'{image.name}'
         s3_bucket = settings.AWS_STORAGE_BUCKET_NAME
@@ -296,22 +305,24 @@ class ParkingDetection(BaseSolution):
             image_data = s3_object["Body"].read()
             imgBGR = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR)
         except Exception as e:
-            logger.info(f"Error downloading {s3_image_key} from S3: {e}")
+            logger.warning(f"Error downloading {s3_image_key} from S3: {e}")
             return
 
         if imgBGR is None:
-            logger.info(f"Could not open image {s3_image_key}")
+            logger.warning(f"Could not open image {s3_image_key}")
             return
+        download_elapsed = time.perf_counter() - download_start
+        logger.info(f"📥 S3 Image Download Time: {download_elapsed:.4f} seconds")
 
         # Process Image
-        self.load_camera_vertices()
 
+        process_start = time.perf_counter()
         results = self.model.track(imgBGR, persist = True, show = False)
         if results and results[0].boxes:
             #Find car objects and determine if a spot is full or not
             car_occupancy_img = self.process_data(imgBGR)
 
-            # #Find License plate bounding box
+            #Find License plate bounding box
             foundLPs = self.runLPDetection(car_occupancy_img)
 
             #determine which license plate goes to which spot
@@ -326,14 +337,18 @@ class ParkingDetection(BaseSolution):
                 json.dump(spotsToLPs, f, default=self.customSerializer, indent=4)
 
             #Inputs complete licence plate location, text and spot it belongs to into the db
-            self.LP_inputDataToDB(spotsToLPs)
+            # self.LP_inputDataToDB(spotsToLPs)
 
-            # cv2.imwrite(image_path, car_img_with_lps)
             # Convert processed image back to bytes
-            _, buffer = cv2.imencode(".jpeg", car_img_with_lps)
+            # _, buffer = cv2.imencode(".jpeg", car_img_with_lps)
+            _, buffer = cv2.imencode(".jpeg", car_img_with_lps, [cv2.IMWRITE_JPEG_QUALITY, 10])
             processed_image_bytes = BytesIO(buffer)
 
+            process_elapsed = time.perf_counter() - process_start
+            logger.info(f"🖼️ Image Processing Time: {process_elapsed:.4f} seconds")
+
             # Upload processed image back to S3
+            upload_start = time.perf_counter()
             try:
                 s3_client.put_object(
                     Bucket=s3_bucket,
@@ -343,5 +358,8 @@ class ParkingDetection(BaseSolution):
                 )
                 logger.info(f"Processed image saved to S3: {s3_image_key}")
             except Exception as e:
-                logger.info(f"Error uploading processed image to S3: {e}")
+                logger.warning(f"Error uploading processed image to S3: {e}")
+            upload_elapsed = time.perf_counter() - upload_start
+            logger.info(f"🚀 S3 Upload Time: {upload_elapsed:.4f} seconds")
+                
             logger.info("Saved img!!")
