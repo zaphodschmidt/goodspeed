@@ -12,3 +12,5 @@ celery
 redis
 easyocr
 icecream
+boto3
+django-storages

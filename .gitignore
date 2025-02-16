@@ -358,3 +358,6 @@ yolo11n.pt
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,python,django,linux
 
+images/
+static/
+staticfiles/

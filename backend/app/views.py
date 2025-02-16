@@ -63,22 +63,22 @@ def upload_image(request):
 
         # Handle image replacement
         new_image = Image.objects.create(image=image)
+        print(new_image.image.url)
 
         if camera.image:
-            # Delete the old image file
-            if camera.image.image and default_storage.exists(camera.image.image.path):
-                default_storage.delete(camera.image.image.path)
-            # Delete the old image model instance
+            # Delete the old image from S3
+            if camera.image.image:
+                default_storage.delete(camera.image.image.name)
             camera.image.delete()
 
         camera.image = new_image
         camera.save()
 
         # Run parking detection on the uploaded image
-        image_path = new_image.image.path  # Get the path to the saved image
-        image_path = os.path.abspath(new_image.image.path)
-        print(f"Absolute image path: {image_path}")
-        run_parking_detection.delay(image_path, cam_num, building_name)
+        # image_path = new_image.image.path  # Get the path to the saved image
+        # image_path = os.path.abspath(new_image.image.path)
+        # print(f"Absolute image path: {image_path}")
+        # run_parking_detection.delay(image_path, cam_num, building_name)
 
         return JsonResponse({
             'message': 'Image uploaded successfully',
