@@ -1,16 +1,13 @@
 from django.db import models
 from pytz import common_timezones
-from .storage_backends import ImageStorage
+from storages.backends.s3boto3 import S3Boto3Storage
 from storages.backends.s3 import S3File
 
 
 class Image(models.Model):
-    image = models.ImageField(upload_to='images/', storage=ImageStorage)
+    image = models.ImageField(upload_to='images/', storage=S3Boto3Storage)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
-    def open(self) -> S3File:
-        storage = ImageStorage()
-        return storage.open(self.file.name, mode="rb")
 
 class Building(models.Model):
     name = models.CharField(max_length=127)
