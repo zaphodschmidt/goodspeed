@@ -21,6 +21,7 @@ install()
 load_dotenv(find_dotenv())
 from celery.utils.log import get_task_logger
 import logging
+import time
 
 logger = get_task_logger(__name__)
 
@@ -44,7 +45,6 @@ class ParkingDetection(BaseSolution):
 ######################
 
     def load_camera_vertices(self):
-
         #assemble list of dictionaries of parking spot vertices.
         parking_spot_bounds = []
         for spot in self.camera_obj.parking_spots.all():
@@ -293,6 +293,7 @@ class ParkingDetection(BaseSolution):
         if(not self.json):
             return
         
+        download_start = time.perf_counter()
         image = self.camera_obj.image.image
         s3_image_key = f'{image.name}'
         s3_bucket = settings.AWS_STORAGE_BUCKET_NAME
@@ -310,9 +311,12 @@ class ParkingDetection(BaseSolution):
         if imgBGR is None:
             logger.warning(f"Could not open image {s3_image_key}")
             return
+        download_elapsed = time.perf_counter() - download_start
+        logger.info(f"📥 S3 Image Download Time: {download_elapsed:.4f} seconds")
 
         # Process Image
 
+        process_start = time.perf_counter()
         results = self.model.track(imgBGR, persist = True, show = False)
         if results and results[0].boxes:
             #Find car objects and determine if a spot is full or not
@@ -340,7 +344,11 @@ class ParkingDetection(BaseSolution):
             _, buffer = cv2.imencode(".jpeg", car_img_with_lps, [cv2.IMWRITE_JPEG_QUALITY, 10])
             processed_image_bytes = BytesIO(buffer)
 
+            process_elapsed = time.perf_counter() - process_start
+            logger.info(f"🖼️ Image Processing Time: {process_elapsed:.4f} seconds")
+
             # Upload processed image back to S3
+            upload_start = time.perf_counter()
             try:
                 s3_client.put_object(
                     Bucket=s3_bucket,
@@ -351,5 +359,7 @@ class ParkingDetection(BaseSolution):
                 logger.info(f"Processed image saved to S3: {s3_image_key}")
             except Exception as e:
                 logger.warning(f"Error uploading processed image to S3: {e}")
+            upload_elapsed = time.perf_counter() - upload_start
+            logger.info(f"🚀 S3 Upload Time: {upload_elapsed:.4f} seconds")
                 
             logger.info("Saved img!!")
