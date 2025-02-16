@@ -45,9 +45,6 @@ class VertexViewSet(viewsets.ModelViewSet):
 @csrf_exempt
 def upload_image(request):
     if request.method == 'POST':
-        print("POST data:", request.POST)
-        print("FILES data:", request.FILES)
-
         image = request.FILES.get('image')  # Safely get the image
         cam_num = request.POST.get('cam_num')
         building_name = request.POST.get('building_name')

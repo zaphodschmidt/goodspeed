@@ -7,6 +7,7 @@ from app.models import Building, Camera, ParkingSpot
 from django.db import transaction
 from app.serializers import VertexSerializer, ParkingSpotSerializer
 import easyocr
+from django.conf import settings
 import re
 import boto3
 import requests
@@ -18,6 +19,9 @@ from time import sleep
 from io import BytesIO
 install()
 load_dotenv(find_dotenv())
+from celery.utils.log import get_task_logger
+
+logger = get_task_logger(__name__)
 
 MODEL = 'yolov8n.pt'
 LPR_MODEL = 'best_model_NPT.pt'
@@ -43,7 +47,7 @@ class ParkingManagement(BaseSolution):
         parking_spot_bounds = []
         for spot in self.camera_obj.parking_spots.all():
             if not spot.vertices.exists():
-                print(f"Parking spot {spot.id} has no vertices.")
+                logger.info(f"Parking spot {spot.id} has no vertices.")
             else:
                 points_dict = {"points": []}
                 for point in spot.vertices.all():
@@ -59,7 +63,7 @@ class ParkingManagement(BaseSolution):
 
     def process_data(self, im0):
         if not self.json:
-            print("No parking spot data loaded.")
+            logger.info("No parking spot data loaded.")
             return im0
 
         self.extract_tracks(im0)  # extract tracks from im0
@@ -200,7 +204,7 @@ class ParkingManagement(BaseSolution):
             return obj.decode('utf-8', 'ignore')
         if isinstance(obj, str):
             return str(obj)
-        print(f"[WARNING] Unsupported serialization type: {type(obj)} -> {obj}")
+        logger.info(f"[WARNING] Unsupported serialization type: {type(obj)} -> {obj}")
         return str(obj)
 
     def deep_serialize(self, obj, serializer):
@@ -226,7 +230,7 @@ class ParkingManagement(BaseSolution):
         regions = ["mx", "us-ca"] # Change to your country
 
         if not api_token:
-            print("Missing OCR API token")
+            logger.info("Missing OCR API token")
             return spotsToLPs
 
         for spotNum, lp in spotsToLPs.items():
@@ -247,7 +251,7 @@ class ParkingManagement(BaseSolution):
                 spotsToLPs[spotNum]["data"] = data
 
             except Exception as e:
-                print(f"OCR failed for spot {spotNum}: {str(e)}")
+                logger.info(f"OCR failed for spot {spotNum}: {str(e)}")
                 spotsToLPs[spotNum]["data"] = {'error': str(e)}
 
         spotsToLPs = self.deep_serialize(spotsToLPs, self.customSerializer)
@@ -258,7 +262,7 @@ class ParkingManagement(BaseSolution):
 ######################
 
     def LP_inputDataToDB(self, spotsToLPs):
-        print(spotsToLPs)
+        logger.info(spotsToLPs)
         with transaction.atomic():
             for spotID, spotInfo in spotsToLPs.items():
                 spotID = int(spotID)
@@ -269,7 +273,7 @@ class ParkingManagement(BaseSolution):
                 if result and "plate" in result[0]:
                     plateNum = result[0]["plate"]
                 else:
-                    print("Plate Number Was Not Found")
+                    logger.info("Plate Number Was Not Found")
 
                 ParkingSpot.objects.filter(id=spotID).update(
                     occupied_by_lpn=plateNum
@@ -283,19 +287,20 @@ class ParkingManagement(BaseSolution):
         self.camera_obj = Camera.objects.get(id=cam_id)
         image = self.camera_obj.image.image
         s3_image_key = f'{image.name}'
+        s3_bucket = settings.AWS_STORAGE_BUCKET_NAME
 
         # Download the image from S3
         s3_client = boto3.client("s3")
         try:
-            s3_object = s3_client.get_object(Bucket='goodspeedbucket', Key=s3_image_key)
+            s3_object = s3_client.get_object(Bucket=s3_bucket, Key=s3_image_key)
             image_data = s3_object["Body"].read()
             imgBGR = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR)
         except Exception as e:
-            print(f"Error downloading {s3_image_key} from S3: {e}")
+            logger.info(f"Error downloading {s3_image_key} from S3: {e}")
             return
 
         if imgBGR is None:
-            print(f"Could not open image {s3_image_key}")
+            logger.info(f"Could not open image {s3_image_key}")
             return
 
         # Process Image
@@ -331,12 +336,12 @@ class ParkingManagement(BaseSolution):
             # Upload processed image back to S3
             try:
                 s3_client.put_object(
-                    Bucket='goodspeedbucket',
+                    Bucket=s3_bucket,
                     Key=s3_image_key,
                     Body=processed_image_bytes.getvalue(),
                     ContentType="image/jpeg",
                 )
-                print(f"Processed image saved to S3: {s3_image_key}")
+                logger.info(f"Processed image saved to S3: {s3_image_key}")
             except Exception as e:
-                print(f"Error uploading processed image to S3: {e}")
-            print("Saved img!!")
+                logger.info(f"Error uploading processed image to S3: {e}")
+            logger.info("Saved img!!")
