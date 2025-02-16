@@ -22,5 +22,6 @@ export default defineConfig({
   },
   build: {
     outDir: 'build', // Ensure this matches the Dockerfile
+    emptyOutDir: true,
   },
 })
