@@ -287,6 +287,12 @@ class ParkingDetection(BaseSolution):
 
     def run_parking_detection(self, cam_id: int):
         self.camera_obj = Camera.objects.get(id=cam_id)
+
+        self.load_camera_vertices()
+
+        if(not self.json):
+            return
+        
         image = self.camera_obj.image.image
         s3_image_key = f'{image.name}'
         s3_bucket = settings.AWS_STORAGE_BUCKET_NAME
@@ -306,7 +312,6 @@ class ParkingDetection(BaseSolution):
             return
 
         # Process Image
-        self.load_camera_vertices()
 
         results = self.model.track(imgBGR, persist = True, show = False)
         if results and results[0].boxes:
