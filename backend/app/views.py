@@ -76,7 +76,7 @@ def upload_image(request):
         camera.save()
 
         # Run parking detection on the uploaded image
-        run_parking_detection.delay(cam_num, building_name)
+        run_parking_detection.delay(camera.id)
 
         return JsonResponse({
             'message': 'Image uploaded successfully',

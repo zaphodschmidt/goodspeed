@@ -37,13 +37,7 @@ class ParkingManagement(BaseSolution):
 ######################
 ######################
 
-    def load_camera_vertices(self, cam_num, building_name):
-        # Find the Camera
-        try:
-            self.camera_obj = Camera.objects.get(cam_num=cam_num, building__name=building_name)
-        except Camera.DoesNotExist:
-            print(f"Camera {cam_num} does not exist in building {building_name}")
-            return
+    def load_camera_vertices(self):
 
         #assemble list of dictionaries of parking spot vertices.
         parking_spot_bounds = []
@@ -57,7 +51,7 @@ class ParkingManagement(BaseSolution):
                 parking_spot_bounds.append(points_dict)
                 self.spot_ids.append(spot.id)
 
-        return parking_spot_bounds
+        self.json = parking_spot_bounds
 
 ######################
 ######################
@@ -285,9 +279,9 @@ class ParkingManagement(BaseSolution):
 ######################
 ######################
 
-    def run_parking_detection(self, cam_num: str, building_name:str):
-        cam = Camera.objects.get(cam_num=cam_num, building__name=building_name)
-        image = cam.image.image
+    def run_parking_detection(self, cam_id: int):
+        self.camera_obj = Camera.objects.get(id=cam_id)
+        image = self.camera_obj.image.image
         s3_image_key = f'{image.name}'
 
         # Download the image from S3
@@ -305,7 +299,7 @@ class ParkingManagement(BaseSolution):
             return
 
         # Process Image
-        self.json = self.load_camera_vertices(cam_num=cam_num, building_name=building_name)
+        self.load_camera_vertices()
 
         results = self.model.track(imgBGR, persist = True, show = False)
         if results and results[0].boxes:
