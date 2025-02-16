@@ -16,12 +16,17 @@ class Building(models.Model):
     def __str__(self):
         return self.name
 
+class Location(models.Model):
+    name = models.CharField(max_length=100)
+    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='locations')
+
 class Camera(models.Model):
     cam_num = models.IntegerField()
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='cameras')
     MAC = models.CharField(max_length=50, unique=True)
     IP = models.GenericIPAddressField()
     image = models.OneToOneField(Image, null=True, on_delete=models.SET_NULL, related_name='camera')
+    location = models.ForeignKey(Location, null=True, on_delete=models.SET_NULL, related_name="cameras")
 
     class Meta:
         unique_together = ('cam_num', 'building')

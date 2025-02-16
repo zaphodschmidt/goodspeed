@@ -15,5 +15,7 @@ router.register(r'vertices', views.VertexViewSet, basename='vertices')
 urlpatterns = [
     path('', include(router.urls)), 
     path('upload/', views.upload_image, name='upload_image_api'),
-    path('occupied/', views.getOccupiedSpots, name='check_occupied_spots'),
+    path('occupiedParkMoblie/', views.getOccupiedSpots, name='check_occupied_spots'),
+    path('parkingSpotsOpen/<int:building_id>/<str:location>', views.getParkingSpotsOpen, name='get_parking_spots_open'),
+    path('api/camera/<int:building_id>/<str:location>/<int:cam_num>', views.addLocationToCamera , name='add_location_to_camera')
 ]

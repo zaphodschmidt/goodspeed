@@ -7,10 +7,10 @@ from django.core.files.storage import default_storage
 from app.models import Building, Camera, ParkingSpot, Vertex
 from .services.parking_detection import ParkingDetection
 from .services.parking_paymentCheking import PaymentChecking
+from .services.parking_locationHandler import *
 from .tasks import run_parking_detection
 import os
 import json
-
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
@@ -98,3 +98,15 @@ def getOccupiedSpots(request):
             'message': 'Spots Found Successfully',
             'spots': spots,
         })
+
+@csrf_exempt
+def addLocationToCamera(request, building_id:int, location:str, camera_id:int):
+    if request.method == "POST":
+        occ = LocationHandler(building_id, location)
+        return occ.addLocationToCamera(location, camera_id)
+
+@csrf_exempt
+def getParkingSpotsOpen(request, building_id:int, location:str):
+    if request.method == "GET":
+        occ = LocationHandler(building_id, location)
+        return occ.getOccupancyForLocation(location)
