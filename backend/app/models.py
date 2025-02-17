@@ -1,7 +1,6 @@
 from django.db import models
 from pytz import common_timezones
 from storages.backends.s3boto3 import S3Boto3Storage
-from storages.backends.s3 import S3File
 
 
 class Image(models.Model):
@@ -95,8 +94,8 @@ class ReservationType(models.Model):
         - description: A text description of what this reservation type entails.
         - spot_type: The category of spot this reservation applies to.
         - business_days: Whether the reservation is valid only on business days.
-        - start_time_of_day: The time this reservation becomes active each day.
-        - end_time_of_day: The time this reservation becomes inactive each day.
+        - active_at: The time of day this reservation becomes active each day. Defaults to midnight.
+        - inactive_at: The time of day this reservation becomes inactive each day. Defaults to 11:59 PM.
         - duration: Specifies whether the reservation lasts for a day or a month.
     """
     DURATION_CHOICES = [
@@ -107,8 +106,8 @@ class ReservationType(models.Model):
     description = models.TextField(blank=True)
     spot_type = models.ForeignKey(SpotType, on_delete=models.CASCADE, related_name="reservations")
     business_days = models.BooleanField()  
-    start_time_of_day = models.TimeField()  
-    end_time_of_day = models.TimeField()  
+    active_at = models.TimeField(default="00:00")  
+    inactive_at = models.TimeField(default="23:59")
     duration = models.CharField(max_length=50, choices=DURATION_CHOICES)  
 
 
