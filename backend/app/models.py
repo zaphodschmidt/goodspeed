@@ -92,7 +92,7 @@ class ReservationType(models.Model):
     Fields:
         - name: The name of the reservation type.
         - description: A text description of what this reservation type entails.
-        - spot_types: Which categories of spot this reservation applies to. (many to many)
+        - spot_type: Which categories of spot this reservation applies to. (many to many)
         - business_days: Whether the reservation is valid only on business days.
         - active_at: The time of day this reservation becomes active each day. Defaults to midnight.
         - inactive_at: The time of day this reservation becomes inactive each day. Defaults to 11:59 PM.
@@ -104,7 +104,7 @@ class ReservationType(models.Model):
     ]
     name = models.CharField(max_length=50)  
     description = models.TextField(blank=True)
-    spot_types = models.ManyToManyField(SpotType)
+    spot_type = models.ManyToManyField(SpotType)
     only_business_days = models.BooleanField()  
     active_at = models.TimeField(default="00:00")  
     inactive_at = models.TimeField(default="23:59")
