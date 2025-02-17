@@ -105,7 +105,7 @@ class ReservationType(models.Model):
     name = models.CharField(max_length=50)  
     description = models.TextField(blank=True)
     spot_type = models.ForeignKey(SpotType, on_delete=models.CASCADE, related_name="reservations")
-    business_days = models.BooleanField()  
+    only_business_days = models.BooleanField()  
     active_at = models.TimeField(default="00:00")  
     inactive_at = models.TimeField(default="23:59")
     duration = models.CharField(max_length=50, choices=DURATION_CHOICES)  
