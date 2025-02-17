@@ -1,4 +1,4 @@
-from backend.app.models import Building, SpotType
+from app.models import Building, SpotType
 
 
 class HalleyRiseSpotType:
@@ -29,6 +29,7 @@ class Residential(HalleyRiseSpotType):
     name = 'Residentail'
     description = 'Individually assigned spaces for residents in the small garage.'
     reservation_basis = 'per_spot'
+
 
 """
 Large Garage
