@@ -40,6 +40,7 @@ class SpotType(models.Model):
         - "per_type": A reservation allows parking in any spot of this type.
         - "parkmobile": The spot is managed by ParkMobile.
         - "none": No reservations are allowed for this type.
+    building: what building this spot type is for
     """
     RESERVATION_BASIS_CHOICES = [
         ("per_spot", "Per-spot"),
@@ -49,6 +50,7 @@ class SpotType(models.Model):
     ]
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True)
+    building = models.ForeignKey(Building, on_delete=models.CASCADE)
     reservation_basis = models.CharField(max_length=50, choices=RESERVATION_BASIS_CHOICES)
 
 
