@@ -21,6 +21,7 @@ import {
 } from "../../apiService.ts";
 import SpotPolygon from "../spotComponents/SpotPolygon.tsx";
 import SpotTable from "../spotComponents/SpotTable.tsx";
+import CameraSettings from "../cameraCompenents/CameraSettings.tsx";
 import { useBuildings } from "../misc/useBuildingsContext.ts";
 import CustomLoader from "../misc/CustomLoader.tsx";
 import { IconCheck, IconEdit } from "@tabler/icons-react";
@@ -150,6 +151,25 @@ function CameraDetail() {
     setSpots((prev) => prev.map((s) => s.id === newSpot.id ? newSpot : s))
   }
 
+  function renderEditMode(camera: Camera){
+    if(editMode){
+      return (
+        <>
+          <Group align="center" justify="center">
+            <Button onClick={() => AddNewSpot(camera)}>Add Spot</Button>
+            <Button onClick={deleteAllSpots}>Delete All Spots</Button>
+          </Group>
+          <CameraSettings/>
+        </>
+      )
+    }
+    else{
+      return (
+        <SpotTable spots={[...spots].sort((a, b) => a.spot_num - b.spot_num)} />
+      )
+    }
+  }
+
   /*
   Returns
   */
@@ -204,13 +224,7 @@ function CameraDetail() {
           })}
         </BackgroundImage>
       </AspectRatio>
-      {editMode && (
-        <Group align="center" justify="center">
-          <Button onClick={() => AddNewSpot(camera)}>Add Spot</Button>
-          <Button onClick={deleteAllSpots}>Delete All Spots</Button>
-        </Group>
-      )}
-      <SpotTable spots={[...spots].sort((a, b) => a.spot_num - b.spot_num)} />
+      {renderEditMode(camera)}
     </Stack>
   );
 }

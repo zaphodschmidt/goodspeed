@@ -48,8 +48,8 @@ class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
 
-    @action(detail=False, methods=['get'], name="CheckOccupancy")
-    def getOccupancyForLocation(self, request):
+    @action(detail=False, methods=['get'], name="occupancyForLocation")
+    def occupancyForLocation(self, request):
         location_name = request.query_params.get('location_name')
         building_name = request.query_params.get('building_name')
 
@@ -83,6 +83,31 @@ class LocationViewSet(viewsets.ModelViewSet):
             'location':location_name,
             'totalSpots': totalSpots,
             'occupiedSpots': occupiedSpots
+        })
+    
+    @action(detail=False, methods=['get'], name='buildinglocations')
+    def buildinglocations(self,request):
+        print(f"NAME: {request.query_params.get('building_name')}")
+        building_name = request.query_params.get('building_name')
+        if not building_name:
+            return JsonResponse(
+                {'error':'building_name is required'},
+                status=400
+            )
+
+        try:
+            building_obj = Building.objects.get(name=building_name)
+        except Building.DoesNotExist:
+            return JsonResponse(
+                {'error':f'Building name {building_name} not found!'},
+                status=400
+            )
+        
+        locations = Location.objects.filter(building=building_obj)
+        locations_data = LocationSerializer(locations, many=True).data
+        
+        return JsonResponse({
+            'locations': locations_data
         })
 
 @csrf_exempt

@@ -25,6 +25,18 @@ export async function getBuildings() {
   return response.data;
 }
 
+// Get buildings locations
+export async function getBuildingLocations(buildingName:string) {
+  const response = await axios.get(`${API_BASE_URL}/api/locations/buildinglocations/`, {
+    params: {building_name: buildingName},
+    withCredentials: true,
+  });
+  if (response.status !== 200) {
+    throw new Error("Could not get building locations data.");
+  }
+  return response.data;
+}
+
 // Create/Update/Delete for cameras
 const CAMERAS_URL = `${API_BASE_URL}/api/cameras`;
 
